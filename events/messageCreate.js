@@ -6,10 +6,9 @@ module.exports = {
 	once: false,
 	execute(message) {
         let discussion = "";
+        //if the message does not contain the word "georges" then dont respond
+        if (!message.content.toLowerCase().includes('georges') || message.author.bot) return;
 
-        //add condition: if the last message is myself then dont respond
-        if (message.author.bot) return;
-        
         message.channel.messages.fetch({ limit: 10 }).then(messages => {
             messages = messages.reverse();
             messages.forEach(msg => {

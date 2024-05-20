@@ -1,7 +1,6 @@
 
 const OpenAI = require('openai');
 const { openaiKey, prompt } = require('./config.json');
-const axios = require('axios');
 
 const client = new OpenAI({
     apiKey: openaiKey,
