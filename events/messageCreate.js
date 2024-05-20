@@ -1,13 +1,13 @@
 const { Events } = require('discord.js');
 const { getAiCompletion, getAiSummary } = require('../ai-client');
+const { botName } = require('../config.json');
 
 module.exports = {
 	name: Events.MessageCreate,
 	once: false,
 	execute(message) {
         let discussion = "";
-        //if the message does not contain the word "georges" then dont respond
-        if (!message.content.toLowerCase().includes('georges') || message.author.bot) return;
+        if (!message.content.toLowerCase().includes(botName) || message.author.bot) return;
 
         message.channel.messages.fetch({ limit: 10 }).then(messages => {
             messages = messages.reverse();

@@ -1,5 +1,6 @@
 {
 	"token": "",
 	"openaiKey": "",
-	"prompt": ""
+	"prompt": "",
+	"botName": "Georges"
   }
