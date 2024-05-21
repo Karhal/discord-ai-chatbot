@@ -7,8 +7,10 @@ module.exports = {
 	once: false,
 	execute(message) {
         let discussion = "";
-        if (!message.content.toLowerCase().includes(botName) || message.author.bot) return;
+        console.log((!message.content.toLowerCase().includes(botName.toLowerCase()) || message.author.bot))
+        if (!message.content.toLowerCase().includes(botName.toLowerCase()) || message.author.bot) return;
 
+        message.channel.sendTyping();
         message.channel.messages.fetch({ limit: 10 }).then(messages => {
             messages = messages.reverse();
             messages.forEach(msg => {

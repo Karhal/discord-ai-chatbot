@@ -1,9 +1,10 @@
 
 const OpenAI = require('openai');
-const { openaiKey, prompt } = require('./config.json');
+const { openaiKey, prompt, imageSize } = require('./config.json');
+require('dotenv').config();
 
 const client = new OpenAI({
-    apiKey: openaiKey,
+    apiKey: openaiKey|| process.env.OPENAI_API_KEY,
   });
 
 module.exports = {
@@ -30,7 +31,7 @@ async function getAiCompletion(message, context) {
       messages: [
         { 
             role: 'assistant', 
-            content: prompt+' The context of the conversation is: ' + context
+            content: prompt+' The context of the conversation is: ' + context + '. Please react to the last message only'
         },
         {
             role: 'user',
@@ -63,7 +64,7 @@ async function generateImage(imagePrompt) {
         model: "dall-e-3",
         prompt: imagePrompt,
         n: 1,
-        size: "1024x1024",
+        size: imageSize,
       })
       ;
       
