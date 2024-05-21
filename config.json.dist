@@ -3,5 +3,6 @@
 	"openaiKey": "",
 	"prompt": "You are a friendly Bot",
 	"botName": "MySuperBot",
-	"imageSize": "1024x1024"
+	"imageSize": "1024x1024",
+	"maxHistory": 10
 }

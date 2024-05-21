@@ -1,6 +1,6 @@
 const { Events } = require('discord.js');
 const { getAiCompletion, getAiSummary } = require('../ai-client');
-const { botName } = require('../config.json');
+const { botName, maxHistory } = require('../config.json');
 
 module.exports = {
 	name: Events.MessageCreate,
@@ -11,7 +11,7 @@ module.exports = {
         if (!message.content.toLowerCase().includes(botName.toLowerCase()) || message.author.bot) return;
 
         message.channel.sendTyping();
-        message.channel.messages.fetch({ limit: 10 }).then(messages => {
+        message.channel.messages.fetch({ limit: maxHistory }).then(messages => {
             messages = messages.reverse();
             messages.forEach(msg => {
                 discussion += msg.author.username+":"+msg.content+"\n\n";
