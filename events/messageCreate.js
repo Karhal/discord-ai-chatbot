@@ -54,7 +54,7 @@ module.exports = {
 
         }).then(response => {
             
-            if(!hasImage) { 
+            if(!hasImage) {
                 return;
             }
 
