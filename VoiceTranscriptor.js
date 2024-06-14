@@ -78,7 +78,7 @@ class VoiceTranscriptor {
       }); // Subscription on when user stops talking
     }
   
-    /*async getTranscription(tempFileName) {
+    async getTranscription(tempFileName) {
 
       try {
         const bytes = fs.readFileSync(tempFileName).toString('base64');
@@ -109,7 +109,7 @@ class VoiceTranscriptor {
       } catch (error) {
         console.log(error);
       }
-    }*/
+    }
   
     /*async AISpeech(transcription) {
       try {
