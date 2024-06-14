@@ -73,8 +73,6 @@ module.exports = {
         }).then(() => {
 
             message.channel.send(finalResponse);
-            console.log('Message sent');
-
         }).finally(async () => {
 
             if(hasImage) {
