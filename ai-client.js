@@ -2,12 +2,8 @@
 const OpenAI = require('openai');
 const { openaiKey, prompt, imageSize } = require('./config.json');
 const { joinVoiceChannel } = require('@discordjs/voice');
-<<<<<<< Updated upstream
-=======
-const VoiceTranscriptor = require('./VoiceTranscriptor.js');
 const fs = require('fs');
 const path = require('path');
->>>>>>> Stashed changes
 
 require('dotenv').config();
 
