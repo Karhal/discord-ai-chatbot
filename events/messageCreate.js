@@ -20,15 +20,18 @@ module.exports = {
         message.channel.sendTyping();
         message.channel.messages.fetch({ limit: maxHistory }).then(messages => {
             messages = messages.reverse();
+            console.log("history : " + messages);
             messages.forEach(msg => {
                 discussion += msg.author.username+":"+msg.content+"\n\n";
             });
 
         }).then(() => {
+
             console.log('Getting summary...');
 
             return getAiSummary(discussion);
         }).then((summary) => {
+            console.log(summary.choices[0].message.content);
             console.log('Getting completion...');
             message.channel.sendTyping();
 
