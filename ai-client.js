@@ -2,6 +2,12 @@
 const OpenAI = require('openai');
 const { openaiKey, prompt, imageSize } = require('./config.json');
 const { joinVoiceChannel } = require('@discordjs/voice');
+<<<<<<< Updated upstream
+=======
+const VoiceTranscriptor = require('./VoiceTranscriptor.js');
+const fs = require('fs');
+const path = require('path');
+>>>>>>> Stashed changes
 
 require('dotenv').config();
 
@@ -30,7 +36,9 @@ async function getAiSummary(conversation) {
 async function getAiCompletion(message, context) {
 
   const userMessage = message.author.username+': ' + message.content;
+  console.log('Last message:  ' + userMessage);
   voiceChannels = message.channel.guild.channels.cache.filter(channel => channel.type === 2);
+  const memory = await readMemory();
 
   const runner = client.beta.chat.completions
     .runTools({
@@ -38,7 +46,7 @@ async function getAiCompletion(message, context) {
       messages: [
         { 
             role: 'assistant', 
-            content: prompt+' The context of the conversation is: ' + context + ' END OF CONTEXT. Please react to the last message only'
+            content: prompt+' \n\nBackground facts to use only if necessary in the conversation : ' + memory + '. \n\nSUMMARY OF THE CONVERSATION: ' + context + ' \nEND OF SUMMARY.\n Please react to the last message only'
         },
         {
             role: 'user',
@@ -72,10 +80,24 @@ async function getAiCompletion(message, context) {
               },
             },
           },
+          {
+            type: 'function',
+            function: {
+              function: writeMemory,
+              description: "Use this tool when asked to remember an information, when the user says 'remember this'. Store only what the user says and nothing else.",
+              parameters: {
+                type: 'object',
+                properties: {
+                    memoryString: { type: 'string' },
+                },
+              },
+            },
+          },
       ],
     })
     .on('message', () => {});
 
+  console.log(prompt+'Facts to know: ' + memory + '. CONTEXT OF THE CONVERSATION: ' + context + ' END OF CONTEXT. Please react to the last message only');
   return await runner.finalContent();
 
 }
@@ -110,3 +132,38 @@ async function joinDiscordChannel(channelName) {
 
   console.log("Channel " + channelName + " not found");
 }
+
+async function writeMemory(memory) {
+
+    memory = JSON.parse(memory).memoryString;
+    const filePath = path.join(__dirname, 'memory.txt');
+    let facts = [];
+    if (!fs.existsSync(filePath)) {
+        fs.writeFileSync(filePath, '', 'utf8');
+    }
+    const data = fs.readFileSync(filePath, 'utf8');
+    facts = data.split('\n').filter(line => line.trim() !== '');
+
+    console.log("Memory: " + memory);
+    facts.push(memory);
+
+    if (facts.length > 10) {
+        facts = facts.slice(facts.length - 10);
+    }
+
+    fs.writeFileSync(filePath, facts.join('\n'), 'utf8');
+}
+
+async function readMemory() {
+    const filePath = path.join(__dirname, 'memory.txt');
+    if (!fs.existsSync(filePath)) {
+        console.log('Memory file does not exist.');
+        return [];
+    }
+    const data = fs.readFileSync(filePath, 'utf8');
+    const facts = data.split('\n').filter(line => line.trim() !== '');
+    console.log('Memory read: ', facts.join(', '));
+    
+    return facts;
+}
+
