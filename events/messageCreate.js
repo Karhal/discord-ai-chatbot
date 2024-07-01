@@ -72,7 +72,6 @@ module.exports = {
 
         }).then(() => {
 
-            console.log('Image saved locally:', imagePath);
             message.channel.send(finalResponse);
             console.log('Message sent');
 

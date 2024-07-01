@@ -152,9 +152,9 @@ async function writeMemory(memory) {
 
 async function readMemory() {
     const filePath = path.join(__dirname, 'memory.txt');
-    if (!fs.existsSync(filePath)) {
+    if (!fs.existsSync(filePath)) {      
         console.log('Memory file does not exist.');
-        return [];
+        return '';
     }
     const data = fs.readFileSync(filePath, 'utf8');
     const facts = data.split('\n').filter(line => line.trim() !== '');
