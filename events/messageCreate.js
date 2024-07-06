@@ -1,5 +1,5 @@
 const { Events } = require('discord.js');
-const { getAiCompletion, getAiSummary } = require('../ai-client');
+const { getAiCompletion, getAiSummary } = require('../completion');
 const { botName, maxHistory } = require('../config.json');
 const path = require('path');
 const fs = require('fs');
@@ -87,9 +87,8 @@ module.exports = {
                         }
                     });
                 }
-
             }
-            console.log('Done');
+            console.log('Done.');
         });
 	},
 };
