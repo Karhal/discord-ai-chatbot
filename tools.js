@@ -22,8 +22,8 @@ function setCurrentMessage(message) {
     currentMessage = message;
 }
 
-function setCompletionHandler(completionHandler) {
-    completionHandler = completionHandler;
+function setCompletionHandler(completion) {
+    completionHandler = completion;
 }
 
 async function joinDiscordChannel(channelName) {
@@ -41,10 +41,11 @@ async function joinDiscordChannel(channelName) {
             guildId: voiceChannel.guild.id,
             adapterCreator: voiceChannel.guild.voiceAdapterCreator,
         });
-
+        console.log('Handler : ');
+        console.log(completionHandler);
         audioConnection.receiver.speaking.on('start', (userId) => {
             const voiceTrascriptor = new VoiceTranscriptor(audioConnection, completionHandler);
-            voiceTrascriptor.listen(userId);
+            //voiceTrascriptor.listen(userId);
           }); // When someone talks
 
         return "Joined channel " + channelName;
