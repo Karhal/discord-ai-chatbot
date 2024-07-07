@@ -81,7 +81,9 @@ class VoiceTranscriptor {
           
           const aiCompletion = await this.aiCompletionHandler.getAiCompletion(userId, transcription, '');
           console.log(aiCompletion);
-          return aiCompletion;
+          this.AISpeech(aiCompletion);
+          
+          return;
         } // The transcription has a minimum of 5 letters
       }); // Subscription on when user stops talking
     }
@@ -119,15 +121,14 @@ class VoiceTranscriptor {
       }
     }
   
-    /*async AISpeech(transcription) {
+    async AISpeech(text) {
       try {
         // Call ChatGPT API
-        const text = await talkToAI(transcription);
         const textToSpeech = new TextToSpeechClient();
         const request = {
           input: { text },
           voice: {
-            languageCode: 'en-US', // Change it to the language you want
+            languageCode: 'fr-FR', // Change it to the language you want
             ssmlGender: 'NEUTRAL', // Gender
           },
           audioConfig: { audioEncoding: 'MP3' },
@@ -135,13 +136,13 @@ class VoiceTranscriptor {
   
         const [response] = await textToSpeech.synthesizeSpeech(request);
   
-        fs.writeFileSync('./assets/output.mp3', response.audioContent, 'binary');
+        fs.writeFileSync('./tmp/output.mp3', response.audioContent, 'binary');
   
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = dirname(__filename);
   
         const resource = createAudioResource(
-          join(__dirname, '../../../assets/output.mp3')
+          join(__dirname, '../../../tmp/output.mp3')
         );
   
         const player = createAudioPlayer();
@@ -159,7 +160,7 @@ class VoiceTranscriptor {
       } catch (err) {
         console.log(err);
       }
-    }*/
+    }
   
     playerSubcription(player) {
       player.on('error', (error) => {
