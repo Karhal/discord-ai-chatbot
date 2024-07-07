@@ -12,10 +12,10 @@ async function getAiSummary(conversation) {
     });
 }
 
-async function getAiCompletion(message, conversationSummary) {
+//async function getAiCompletion(message, conversationSummary) {
+async function getAiCompletion(username, message, conversationSummary) {
 
-  setCurrentMessage(message);
-  const userMessage = message.author.username+': ' + message.content;
+  const userMessage = username+': ' + message;
 
   const runner = aiClient.beta.chat.completions
     .runTools({

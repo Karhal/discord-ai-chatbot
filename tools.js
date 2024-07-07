@@ -2,6 +2,7 @@ const { aiClient } = require('./ai-client');
 const { imageSize } = require('./config.json');
 const { joinVoiceChannel } = require('@discordjs/voice');
 const { discordClient } = require('./discord-client'); 
+const VoiceTranscriptor = require('./VoiceTranscriptor.js')
 
 let audioConnection = null;
 let currentMessage = null;
@@ -36,6 +37,11 @@ async function joinDiscordChannel(channelName) {
             guildId: voiceChannel.guild.id,
             adapterCreator: voiceChannel.guild.voiceAdapterCreator,
         });
+
+        audioConnection.receiver.speaking.on('start', (userId) => {
+            const voiceTrascriptor = new VoiceTranscriptor(audioConnection);
+            voiceTrascriptor.listen(userId);
+          }); // When someone talks
 
         return "Joined channel " + channelName;
     }

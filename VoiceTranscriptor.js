@@ -14,11 +14,12 @@ const { SpeechClient } = require('@google-cloud/speech');
 const fs = require('fs');
 const { dirname, join } = require('path');
 const { fileURLToPath } = require('url');
+const { getAiCompletion } = require('./completion');
 
 const REQUEST_CONFIG = {
     encoding: "LINEAR16",
     sampleRateHertz: 48000,
-    languageCode: "en-US", // Change to the language you want
+    languageCode: "fr-FR", // Change to the language you want
     audioChannelCount: 2,
   };
 
@@ -74,7 +75,11 @@ class VoiceTranscriptor {
         const transcription = await this.getTranscription(outputPath);
         console.log(transcription);
   
-        if (transcription.length > 5) return this.AISpeech(transcription); // The transcription has a minimum of 5 letters
+        if (transcription.length > 5) {
+          const aiCompletion = await getAiCompletion(userId, transcription, '');
+          console.log(aiCompletion);
+          return aiCompletion;
+        } // The transcription has a minimum of 5 letters
       }); // Subscription on when user stops talking
     }
   
