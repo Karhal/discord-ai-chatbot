@@ -12,7 +12,7 @@ const {
 const { TextToSpeechClient } = require('@google-cloud/text-to-speech');
 const { SpeechClient } = require('@google-cloud/speech');
 const fs = require('fs');
-const { dirname, join } = require('path');
+const { dirname, join, path } = require('path');
 const { fileURLToPath } = require('url');
 //const aiCompletionHandler  = require('./handlers/AiCompletionHandler');
 
@@ -138,7 +138,8 @@ class VoiceTranscriptor {
   
         fs.writeFileSync('./tmp/output.mp3', response.audioContent, 'binary');
   
-        const __filename = fileURLToPath(import.meta.url);
+        //const __filename = fileURLToPath(import.meta.url);
+        const __filename = 'file://' + path.join(__dirname, path.basename(__filename));
         const __dirname = dirname(__filename);
   
         const resource = createAudioResource(
