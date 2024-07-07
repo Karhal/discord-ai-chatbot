@@ -1,7 +1,6 @@
 const { Events } = require('discord.js');
-const { getAiCompletion, getAiSummary } = require('../completion');
-const { setCurrentMessage } = require('../tools');
-const { botName, maxHistory } = require('../config.json');
+const aiCompletionHandler  = require('../handlers/AiCompletionHandler');
+const { botName, maxHistory, prompt } = require('../config.json');
 const path = require('path');
 const fs = require('fs');
 const axios = require('axios');
@@ -29,16 +28,15 @@ module.exports = {
         }).then(() => {
 
             console.log('Getting summary...');
+            return aiCompletionHandler.getAiSummary(discussion);
 
-            return getAiSummary(discussion);
         }).then((summary) => {
-            console.log(summary.choices[0].message.content);
+
             console.log('Getting completion...');
             message.channel.sendTyping();
 
-            //return getAiCompletion(message, summary.choices[0].message.content);
-            setCurrentMessage(message);
-            return getAiCompletion(message.author.username, message.content, summary.choices[0].message.content);
+            //setCurrentMessage(message);
+            return aiCompletionHandler.getAiCompletion(message.author.username, message.content, summary.choices[0].message.content);
 
         }).then((completion) => {
 

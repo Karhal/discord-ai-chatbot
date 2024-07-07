@@ -1,8 +1,5 @@
 const OpenAI = require('openai');
-
-const { openaiKey } = require('./config.json');
-const { openaiKey } = require('./config.json');
-
+const { openaiKey } = require('../config.json');
 
 
 require('dotenv').config();

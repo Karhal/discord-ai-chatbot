@@ -14,7 +14,7 @@ const { SpeechClient } = require('@google-cloud/speech');
 const fs = require('fs');
 const { dirname, join } = require('path');
 const { fileURLToPath } = require('url');
-const { getAiCompletion } = require('./completion');
+const aiCompletionHandler  = require('./handlers/AiCompletionHandler');
 
 const REQUEST_CONFIG = {
     encoding: "LINEAR16",
@@ -33,10 +33,12 @@ class VoiceTranscriptor {
     commandsChannel;
     time;
     messageId;
+    aiCompletionHandler;
 
     constructor(connection) {
       this.connection = connection;
       this.receiver = this.connection.receiver;
+      this.aiCompletionHandler = aiCompletionHandler;
     }
   
     async listen(userId) {
@@ -76,7 +78,8 @@ class VoiceTranscriptor {
         console.log(transcription);
   
         if (transcription.length > 5) {
-          const aiCompletion = await getAiCompletion(userId, transcription, '');
+          
+          const aiCompletion = await this.aiCompletionHandler.getAiCompletion(userId, transcription, '');
           console.log(aiCompletion);
           return aiCompletion;
         } // The transcription has a minimum of 5 letters

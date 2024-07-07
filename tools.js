@@ -1,8 +1,7 @@
-const { aiClient } = require('./ai-client');
+const { aiClient } = require('./clients/ai-client');
 const { imageSize } = require('./config.json');
 const { joinVoiceChannel } = require('@discordjs/voice');
-const { discordClient } = require('./discord-client'); 
-const VoiceTranscriptor = require('./VoiceTranscriptor.js')
+const VoiceTranscriptor = require('./VoiceTranscriptor.js');
 
 let audioConnection = null;
 let currentMessage = null;
@@ -49,8 +48,34 @@ async function joinDiscordChannel(channelName) {
     console.log("Channel " + channelName + " not found");
 }
 
-module.exports = {
-    generateImage,
-    joinDiscordChannel,
-    setCurrentMessage
-};
+const tools = 
+[
+    {
+        type: 'function',
+        function: {
+          function: generateImage,
+          description: "use this tool only when asked to generate an image or to get the picture of what the user asks",
+          parameters: {
+            type: 'object',
+            properties: {
+                imagePrompt: { type: 'string' },
+            },
+          },
+        },
+      },
+      {
+        type: 'function',
+        function: {
+          function: joinDiscordChannel,
+          description: "Use this tool only to join a voice channel in discord when asked to",
+          parameters: {
+            type: 'object',
+            properties: {
+                channelName: { type: 'string' },
+            },
+          },
+        },
+      },
+  ]
+
+module.exports = tools;
