@@ -23,7 +23,7 @@ class AiCompletionHandler {
 
   async getAiCompletion(username, message, conversationSummary) {
     const userMessage = `${username}: ${message}`;
-
+    console.log('User message: ' + userMessage);
     const runner = this.aiClient.beta.chat.completions
       .runTools({
         model: 'gpt-4o',
