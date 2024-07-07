@@ -45,7 +45,7 @@ async function joinDiscordChannel(channelName) {
         console.log(completionHandler);
         audioConnection.receiver.speaking.on('start', (userId) => {
             const voiceTrascriptor = new VoiceTranscriptor(audioConnection, completionHandler);
-            //voiceTrascriptor.listen(userId);
+            voiceTrascriptor.listen(userId);
           }); // When someone talks
 
         return "Joined channel " + channelName;
