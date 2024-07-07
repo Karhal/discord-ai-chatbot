@@ -14,7 +14,7 @@ const { SpeechClient } = require('@google-cloud/speech');
 const fs = require('fs');
 const { dirname, join } = require('path');
 const { fileURLToPath } = require('url');
-const aiCompletionHandler  = require('./handlers/AiCompletionHandler');
+//const aiCompletionHandler  = require('./handlers/AiCompletionHandler');
 
 const REQUEST_CONFIG = {
     encoding: "LINEAR16",
@@ -35,10 +35,10 @@ class VoiceTranscriptor {
     messageId;
     aiCompletionHandler;
 
-    constructor(connection) {
+    constructor(connection, completionHandler) {
       this.connection = connection;
       this.receiver = this.connection.receiver;
-      this.aiCompletionHandler = aiCompletionHandler;
+      this.aiCompletionHandler = completionHandler;
     }
   
     async listen(userId) {

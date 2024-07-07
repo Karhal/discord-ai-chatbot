@@ -5,6 +5,7 @@ const VoiceTranscriptor = require('./VoiceTranscriptor.js');
 
 let audioConnection = null;
 let currentMessage = null;
+let completionHandler = null;
 
 async function generateImage(imagePrompt) {
     return await aiClient.images.generate({
@@ -19,6 +20,10 @@ async function generateImage(imagePrompt) {
 
 function setCurrentMessage(message) {
     currentMessage = message;
+}
+
+function setCompletionHandler(completionHandler) {
+    completionHandler = completionHandler;
 }
 
 async function joinDiscordChannel(channelName) {
@@ -38,7 +43,7 @@ async function joinDiscordChannel(channelName) {
         });
 
         audioConnection.receiver.speaking.on('start', (userId) => {
-            const voiceTrascriptor = new VoiceTranscriptor(audioConnection);
+            const voiceTrascriptor = new VoiceTranscriptor(audioConnection, completionHandler);
             voiceTrascriptor.listen(userId);
           }); // When someone talks
 
@@ -80,5 +85,6 @@ const tools =
 
 module.exports = {
     tools,
-    setCurrentMessage
+    setCurrentMessage,
+    setCompletionHandler
 }
