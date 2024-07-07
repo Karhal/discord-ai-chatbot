@@ -1,5 +1,6 @@
 const { Events } = require('discord.js');
 const aiCompletionHandler  = require('../handlers/AiCompletionHandler');
+const { setCurrentMessage } = require('../tools');
 const { botName, maxHistory, prompt } = require('../config.json');
 const path = require('path');
 const fs = require('fs');
@@ -35,7 +36,7 @@ module.exports = {
             console.log('Getting completion...');
             message.channel.sendTyping();
 
-            //setCurrentMessage(message);
+            setCurrentMessage(message);
             return aiCompletionHandler.getAiCompletion(message.author.username, message.content, summary.choices[0].message.content);
 
         }).then((completion) => {

@@ -1,5 +1,5 @@
 
-const tools = require('../tools');
+const { tools } = require('../tools');
 const { aiClient } = require('../clients/ai-client');
 const { prompt } = require('../config.json');
 
