@@ -139,8 +139,8 @@ class VoiceTranscriptor {
         fs.writeFileSync('./tmp/output.mp3', response.audioContent, 'binary');
   
         //const __filename = fileURLToPath(import.meta.url);
-        const __filename = 'file://' + path.join(__dirname, path.basename(__filename));
-        const __dirname = dirname(__filename);
+        //const __filename = 'file://' + path.join(__dirname, path.basename(__filename));
+        //const __dirname = dirname(__filename);
   
         const resource = createAudioResource(
           join(__dirname, '../../../tmp/output.mp3')
