@@ -23,7 +23,8 @@ module.exports = {
             messages = messages.reverse();
             console.log("history : " + messages);
             messages.forEach(msg => {
-                discussion += msg.author.username+":"+msg.content+"\n\n";
+                const messageDateTime = msg.createdAt.toISOString();
+                discussion += msg.author.username + " [" + messageDateTime + "]:" + msg.content + "\n\n";
             });
 
         }).then(() => {

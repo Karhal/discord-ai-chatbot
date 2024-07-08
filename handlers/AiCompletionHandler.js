@@ -14,7 +14,7 @@ class AiCompletionHandler {
   async getAiSummary(conversation) {
     return await this.aiClient.chat.completions.create({
       messages: [
-        { role: 'assistant', content: 'Fais un résumé de cette discussion: ', },
+        { role: 'assistant', content: 'Craft a summary that is detailed, thorough, in-depth, and complex, while maintaining clarity and conciseness. Incorporate main ideas and essential information, eliminating extraneous language and focusing on critical aspects. Rely strictly on the provided text, without including external information. Format the summary in paragraph form for easy understanding. Conclude your notes with [End of Summary] to indicate completion. Then add the 2 last messages before the last one to complete the summary', }, 
         { role: 'user', content: conversation, }
       ],
       model: 'gpt-4o',
@@ -22,15 +22,16 @@ class AiCompletionHandler {
   }
 
   async getAiCompletion(username, message, conversationSummary) {
-    const userMessage = `${username}: ${message}`;
-    console.log('User message: ' + userMessage);
+    const messageDateTime = new Date().toISOString();
+    const userMessage = `${username} [${messageDateTime}]: ${message}`;
+    console.log(`${this.prompt}. SUMMARY OF CONVERSATION: ${conversationSummary}. Please react to the last message only`);
     const runner = this.aiClient.beta.chat.completions
       .runTools({
         model: 'gpt-4o',
         messages: [
           {
             role: 'assistant',
-            content: `${this.prompt} The context of the conversation is: ${conversationSummary} END OF CONTEXT. Please react to the last message only`
+            content: `${this.prompt}. SUMMARY OF CONVERSATION: ${conversationSummary} END OF SUMMARY. Please react to the last message only`
           },
           {
             role: 'user',
