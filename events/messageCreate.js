@@ -11,7 +11,7 @@ module.exports = {
 	once: false,
 	execute(message) {
 
-        let discussion = "";
+        let discussion = [];
         let finalResponse = "";
         let hasImage = false;
         let imagePath = "";
@@ -21,25 +21,24 @@ module.exports = {
         message.channel.sendTyping();
         message.channel.messages.fetch({ limit: maxHistory }).then(messages => {
             messages = messages.reverse();
-            console.log("history : " + messages);
             messages.forEach(msg => {
                 const messageDateTime = msg.createdAt.toISOString();
-                discussion += msg.author.username + " [" + messageDateTime + "]:" + msg.content + "\n\n";
+                discussion.push(msg.author.username + " [" + messageDateTime + "]:" + msg.content);
             });
-
         }).then(() => {
 
-            console.log('Getting summary...');
-            return aiCompletionHandler.getAiSummary(discussion);
+            console.log('Building summary...');
+            return aiCompletionHandler.generateSummary(discussion);
 
-        }).then((summary) => {
+        }).then(() => {
 
             console.log('Getting completion...');
             message.channel.sendTyping();
 
             setCurrentMessage(message);
             setCompletionHandler(aiCompletionHandler);
-            return aiCompletionHandler.getAiCompletion(message.author.username, message.content, summary.choices[0].message.content);
+            
+            return aiCompletionHandler.getAiCompletion();
 
         }).then((completion) => {
 

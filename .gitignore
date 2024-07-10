@@ -3,3 +3,4 @@ node_modules
 memory.txt
 .idea
 .nvmrc
+tmp/*
