@@ -1,5 +1,6 @@
 const { Events } = require('discord.js');
-const { getAiCompletion, getAiSummary } = require('../ai-client');
+const aiCompletionHandler  = require('../handlers/AiCompletionHandler');
+const { setCurrentMessage, setCompletionHandler } = require('../tools');
 const { botName, maxHistory } = require('../config.json');
 const path = require('path');
 const fs = require('fs');
@@ -22,20 +23,23 @@ module.exports = {
             messages = messages.reverse();
             console.log("history : " + messages);
             messages.forEach(msg => {
-                discussion += msg.author.username+":"+msg.content+"\n\n";
+                const messageDateTime = msg.createdAt.toISOString();
+                discussion += msg.author.username + " [" + messageDateTime + "]:" + msg.content + "\n\n";
             });
 
         }).then(() => {
 
             console.log('Getting summary...');
+            return aiCompletionHandler.getAiSummary(discussion);
 
-            return getAiSummary(discussion);
         }).then((summary) => {
-            console.log(summary.choices[0].message.content);
+
             console.log('Getting completion...');
             message.channel.sendTyping();
 
-            return getAiCompletion(message, summary.choices[0].message.content);
+            setCurrentMessage(message);
+            setCompletionHandler(aiCompletionHandler);
+            return aiCompletionHandler.getAiCompletion(message.author.username, message.content, summary.choices[0].message.content);
 
         }).then((completion) => {
 
@@ -73,8 +77,6 @@ module.exports = {
         }).then(() => {
 
             message.channel.send(finalResponse);
-            console.log('Message sent');
-
         }).finally(async () => {
 
             if(hasImage) {
@@ -89,9 +91,8 @@ module.exports = {
                         }
                     });
                 }
-
             }
-            console.log('Done');
+            console.log('Done.');
         });
 	},
 };
