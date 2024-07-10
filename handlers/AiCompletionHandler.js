@@ -3,44 +3,54 @@ const { tools, readMemory } = require('../tools');
 const { aiClient } = require('../clients/ai-client');
 const { prompt } = require('../config.json');
 
+class messageObject {
+  constructor(role, content) {
+    this.role = role;
+    this.content = content;
+  }
+}
+
 class AiCompletionHandler {
   
   constructor(aiClient, prompt, tools) {
     this.aiClient = aiClient;
     this.prompt = prompt;
     this.tools = tools;
-    console.log("TOOLS");
-    console.log(this.tools);
+    this.messagesArray = [];
+    this.conversation = [];
+    this.summary = null;
   }
 
-  async getAiSummary(conversation) {
-    return await this.aiClient.chat.completions.create({
+  async generateSummary(conversation) {
+
+    this.conversation = conversation;
+
+    const response =  await this.aiClient.chat.completions.create({
       messages: [
-        { role: 'assistant', content: 'Craft a summary that is detailed, thorough, in-depth, and complex, while maintaining clarity and conciseness. Incorporate main ideas and essential information, eliminating extraneous language and focusing on critical aspects. Rely strictly on the provided text, without including external information. Format the summary in paragraph form for easy understanding. Conclude your notes with [End of Summary] to indicate completion. Then add the 2 last messages before the last one to complete the summary', }, 
-        { role: 'user', content: conversation, }
+        { role: 'assistant', content: 'Craft a summary that is detailed, thorough, in-depth, and complex, while maintaining clarity and conciseness. Incorporate main ideas and essential information, eliminating extraneous language and focusing on critical aspects. Rely strictly on the provided text, without including external information. Format the summary in paragraph form for easy understanding.', }, 
+        { role: 'user', content: conversation.join("\n\n"), }
       ],
       model: 'gpt-4o',
     });
+    this.summary = response.choices[0].message.content;
   }
 
-  async getAiCompletion(username, message, conversationSummary) {
+  async getAiCompletion() {
+
     const memory = await readMemory();
-    const messageDateTime = new Date().toISOString();
-    const userMessage = `${username} [${messageDateTime}]: ${message}`;
-    console.log(`${this.prompt}. [PERSISTENT INFORMATION] ${memory} [END OF PERSISTENT INFORMATION]. [START OF SUMMARY] ${conversationSummary}. Please react to the last message only`);
+    this.fullPrompt = `${this.prompt}. [PERSISTENT INFORMATION] ${memory} [END OF PERSISTENT INFORMATION]. [START OF SUMMARY] ${this.summary }. Please react to the last message only`;
+    this.messagesArray.push(new messageObject('assistant', this.fullPrompt));
+    
+    for (let i = 0; i < this.conversation.length; i++) {
+      this.messagesArray.push(new messageObject('user', this.conversation[i]));
+    }
+
+    console.log(this.summary);
+    console.log(this.messagesArray);
     const runner = this.aiClient.beta.chat.completions
       .runTools({
         model: 'gpt-4o',
-        messages: [
-          {
-            role: 'assistant',
-            content: `${this.prompt}. [PERSISTENT INFORMATION] ${memory} [END OF PERSISTENT INFORMATION]. [START OF SUMMARY] ${conversationSummary}. Please react to the last message only`
-          },
-          {
-            role: 'user',
-            content: userMessage,
-        }
-    ],
+        messages: this.messagesArray,
       tools: this.tools,
     })
     .on('message', () => {});

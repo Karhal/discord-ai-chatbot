@@ -8,7 +8,6 @@ fs.readdirSync(toolsDir).filter(file => file.endsWith('.js')).forEach(file => {
   tools.push(require(path.join(toolsDir, file)));
 });
 
-
 let audioConnection = null;
 let currentMessage = null;
 let completionHandler = null;
@@ -24,16 +23,14 @@ function setCompletionHandler(completion) {
 async function readMemory() {
   const filePath = path.join(__dirname, 'memory.txt');
   if (!fs.existsSync(filePath)) {      
-      console.log('Memory file does not exist.');
+
       return '';
   }
   const data = fs.readFileSync(filePath, 'utf8');
-  const facts = data.split('\n').filter(line => line.trim() !== '');
-  console.log('Memory read: ', facts.join(', '));
-  
+  const facts = data.split('\n').map(line => line.trim()).join('; ');
+
   return facts;
 }
-console.log(tools);
 
 /*
 async function joinDiscordChannel(channelName) {
@@ -54,8 +51,8 @@ async function joinDiscordChannel(channelName) {
         console.log('Handler : ');
         console.log(completionHandler);
         audioConnection.receiver.speaking.on('start', (userId) => {
-            const voiceTrascriptor = new VoiceTranscriptor(audioConnection, completionHandler);
-            voiceTrascriptor.listen(userId);
+            const voiceTranscriptor = new VoiceTranscriptor(audioConnection, completionHandler);
+            voiceTranscriptor.listen(userId);
           }); // When someone talks
 
         return "Joined channel " + channelName;
