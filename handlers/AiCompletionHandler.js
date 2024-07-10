@@ -9,6 +9,8 @@ class AiCompletionHandler {
     this.aiClient = aiClient;
     this.prompt = prompt;
     this.tools = tools;
+    console.log("TOOLS");
+    console.log(this.tools);
   }
 
   async getAiSummary(conversation) {
