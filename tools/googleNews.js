@@ -1,17 +1,18 @@
 const { getJson } = require("serpapi");
-const { serpApiKey } = require('../config.json');
+const { serpApiKey, serpApiLang } = require('../config.json');
 
 async function getGoogleNews(query) {
     try {
+        const queryParameters = JSON.parse(query);
 
         const response = await getJson({
             api_key: serpApiKey,
             engine: "google",
-            q: JSON.parse(query).query,
+            q: queryParameters.query,
             location: "France",
             google_domain: "google.fr",
-            gl: "fr",
-            hl: "fr",
+            gl: serpApiLang,
+            hl: serpApiLang,
             tbm: "nws"
           }, (json) => {
             console.log(json);
@@ -33,7 +34,7 @@ const getGoogleNewsTool =
         parameters: {
         type: 'object',
         properties: {
-            query: { type: 'string' },
+            query: { type: 'string' }
         },
         },
     },
