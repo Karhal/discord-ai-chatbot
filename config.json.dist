@@ -7,5 +7,6 @@
 	"maxHistory": 10,
 	"duneApiKey": "",
     "serpApiKey": "",
-    "serpApiLang": ""
+    "serpApiLang": "",
+	"braveSearchApiKey": ""
 }
