@@ -10,5 +10,6 @@
     "serpApiLang": "",
 	"braveSearchApiKey": "",
     "coinApiKey": "",
-    "defaultAsset": ""
+    "defaultAsset": "",
+	"newsApiKey": ""
 }

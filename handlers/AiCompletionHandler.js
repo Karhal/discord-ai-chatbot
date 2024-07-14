@@ -27,8 +27,8 @@ class AiCompletionHandler {
 
     const response =  await this.aiClient.chat.completions.create({
       messages: [
-        { role: 'assistant', content: 'Craft a summary that is detailed, thorough, in-depth, and complex, while maintaining clarity and conciseness. Incorporate main ideas and essential information, eliminating extraneous language and focusing on critical aspects. Rely strictly on the provided text, without including external information. Format the summary in paragraph form for easy understanding.', }, 
-        { role: 'user', content: conversation.join("\n\n"), }
+        { role: 'assistant', content: 'Craft a short summary that is detailed, thorough, in-depth, and complex, while maintaining clarity and conciseness. Incorporate main ideas and essential information, eliminating extraneous language and focusing on critical aspects. Rely strictly on the provided text, without including external information. Format the summary in one paragraph form for easy understanding.', }, 
+        { role: 'user', content: conversation.slice(0, Math.ceil(conversation.length / 2)).join("\n\n"), }
       ],
       model: 'gpt-4o',
     });
@@ -40,8 +40,7 @@ class AiCompletionHandler {
     const memory = await readMemory();
     this.fullPrompt = `${this.prompt}. [PERSISTENT INFORMATION] ${memory} [END OF PERSISTENT INFORMATION]. [START OF SUMMARY] ${this.summary }. Please react to the last message only`;
     this.messagesArray.push(new messageObject('assistant', this.fullPrompt));
-    
-    for (let i = 0; i < this.conversation.length; i++) {
+    for (let i = Math.ceil(this.conversation.length / 2); i < this.conversation.length; i++) {
       this.messagesArray.push(new messageObject('user', this.conversation[i]));
     }
 
