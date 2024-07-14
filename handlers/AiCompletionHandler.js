@@ -1,7 +1,7 @@
 
 const { tools, readMemory } = require('../tools');
 const { aiClient } = require('../clients/ai-client');
-const { prompt } = require('../config.json');
+const { prompt, lang } = require('../config.json');
 
 class messageObject {
   constructor(role, content) {
@@ -27,7 +27,7 @@ class AiCompletionHandler {
 
     const response =  await this.aiClient.chat.completions.create({
       messages: [
-        { role: 'assistant', content: 'Craft a short summary that is detailed, thorough, in-depth, and complex, while maintaining clarity and conciseness. Incorporate main ideas and essential information, eliminating extraneous language and focusing on critical aspects. Rely strictly on the provided text, without including external information. Format the summary in one paragraph form for easy understanding.', }, 
+        { role: 'assistant', content: 'Craft a short summary that is detailed, thorough, in-depth, and complex, while maintaining clarity and conciseness. Incorporate main ideas and essential information, eliminating extraneous language and focusing on critical aspects. Rely strictly on the provided text, without including external information. Format the summary in one paragraph form for easy understanding. Use the followgin language : '+ lang, }, 
         { role: 'user', content: conversation.slice(0, Math.ceil(conversation.length / 2)).join("\n\n"), }
       ],
       model: 'gpt-4o',

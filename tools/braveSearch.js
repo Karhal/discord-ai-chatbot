@@ -1,5 +1,5 @@
 
-const { braveSearchApiKey, braveSearchApiLang } = require('../config.json');
+const { braveSearchApiKey, lang } = require('../config.json');
 const fetch = require('node-fetch');
 
 async function getBraveSearch(query) {
@@ -16,7 +16,7 @@ async function getBraveSearch(query) {
         redirect: "follow"
     };
 
-    const response = await fetch(`https://api.search.brave.com/res/v1/web/search?q=${queryParameters.query}&search_lang=${braveSearchApiLang}&count=5&result_filter=news,web`, requestOptions);
+    const response = await fetch(`https://api.search.brave.com/res/v1/web/search?q=${queryParameters.query}&search_lang=${lang}&count=5&result_filter=news,web`, requestOptions);
     let result = await response.text();
     result = JSON.parse(result);
 

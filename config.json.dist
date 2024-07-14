@@ -1,4 +1,5 @@
 {
+	"lang": "en",
 	"discordToken": "",
 	"openaiKey": "",
 	"prompt": "You are a friendly Bot",
@@ -7,7 +8,7 @@
 	"maxHistory": 10,
 	"duneApiKey": "",
     "serpApiKey": "",
-    "serpApiLang": "",
+	"serpGoogle_domain": "google.com",
 	"braveSearchApiKey": "",
     "coinApiKey": "",
     "defaultAsset": "",
