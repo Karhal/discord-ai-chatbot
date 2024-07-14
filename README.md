@@ -4,7 +4,6 @@ Bienvenue sur le projet Discord-GPT, une intégration avancée de GPT avec Disco
 
 ## Fonctionnalités
 
-- **Transcription Vocale**: Convertit la parole en texte et vice versa, permettant des interactions vocales.
 - **Recherche Brave et Google News**: Intègre des recherches en temps réel pour fournir des informations actualisées.
 - **Suivi des Prix des Cryptomonnaies**: Offre des mises à jour en direct sur les prix des cryptomonnaies.
 - **Génération d'Images**: Crée des images basées sur les descriptions fournies par les utilisateurs.
