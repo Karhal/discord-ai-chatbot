@@ -4,3 +4,4 @@ memory.txt
 .idea
 .nvmrc
 tmp/*
+.DS_Store

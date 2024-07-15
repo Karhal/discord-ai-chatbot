@@ -1,7 +1,7 @@
 
 const { tools, readMemory } = require('../tools');
 const { aiClient } = require('../clients/ai-client');
-const { prompt, lang } = require('../config.json');
+const { prompt, openAiModel, lang } = require('../config.json');
 
 class messageObject {
   constructor(role, content) {
@@ -30,7 +30,7 @@ class AiCompletionHandler {
         { role: 'assistant', content: 'Craft a short summary that is detailed, thorough, in-depth, and complex, while maintaining clarity and conciseness. Incorporate main ideas and essential information, eliminating extraneous language and focusing on critical aspects. Rely strictly on the provided text, without including external information. Format the summary in one paragraph form for easy understanding. Use the followgin language : '+ lang, }, 
         { role: 'user', content: conversation.slice(0, Math.ceil(conversation.length / 2)).join("\n\n"), }
       ],
-      model: 'gpt-4o',
+      model: openAiModel,
     });
     this.summary = response.choices[0].message.content;
   }
@@ -44,11 +44,9 @@ class AiCompletionHandler {
       this.messagesArray.push(new messageObject('user', this.conversation[i]));
     }
 
-    console.log(this.summary);
-    console.log(this.messagesArray);
     const runner = this.aiClient.beta.chat.completions
       .runTools({
-        model: 'gpt-4o',
+        model: openAiModel,
         messages: this.messagesArray,
       tools: this.tools,
     })
