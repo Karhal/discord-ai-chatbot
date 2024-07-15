@@ -18,7 +18,7 @@ async function getCryptoPrice(query) {
 
     let result = await fetch(`https://rest.coinapi.io/v1/exchangerate/${queryParameters.asset}/${defaultAsset}`, requestOptions);
     result = await result.text();
-console.log(result);
+    console.log(result);
     return result;
     }
 

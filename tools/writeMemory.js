@@ -1,32 +1,29 @@
-const fs = require('fs');
-const path = require('path');
+const FileManager = require('../handlers/FileHandler.js');
 
 async function writeMemory(memory) {
 
-    memory = JSON.parse(memory).memoryString;
-    const filePath = path.join(__dirname, 'memory.txt');
-    let facts = [];
-    if (!fs.existsSync(filePath)) {
-        fs.writeFileSync(filePath, '', 'utf8');
+    try {
+      data = JSON.parse(memory);
+      console.log(data);
+      
+      const fileManager = new FileManager('./');
+      fileManager.appendToFile('memory.txt', data.memoryString + '\n');
+      const lines = fileManager.readFile('memory.txt');
+
+      if (lines.split('\n').length > 10) {
+        const lastTenLines = lines.slice(-10);
+        fileManager.writeFile('memory.txt', lastTenLines.join('\n'));
+      }
+    } catch (error) {
+      console.error('Error reading file:', error);
     }
-    const data = fs.readFileSync(filePath, 'utf8');
-    facts = data.split('\n').filter(line => line.trim() !== '');
-  
-    console.log("Memory: " + memory);
-    facts.push(memory);
-  
-    if (facts.length > 10) {
-        facts = facts.slice(facts.length - 10);
-    }
-  
-    fs.writeFileSync(filePath, facts.join('\n'), 'utf8');
   }
   
 const writeMemoryTool = {
     type: 'function',
     function: {
       function: writeMemory,
-      description: "Use this tool when the user is asking to you to remember an information. Store only what the user says and nothing else.",
+      description: "Use this tool when the user asks you to remember something. Remember only what the user says from the last message and nothing else, one information at time. Use the same language used by the user. Example : Hey <bot>, remember that I like to eat pizza. Send to the function '<user> like to eat pizza'",
       parameters: {
         type: 'object',
         properties: {
