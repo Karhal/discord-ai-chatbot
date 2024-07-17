@@ -1,11 +1,10 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 class FileHandler {
   constructor(baseDir) {
     this.baseDir = baseDir;
   }
-
 
   readFile(filePath) {
     try {
@@ -25,7 +24,7 @@ class FileHandler {
     try {
       const fullPath = path.join(this.baseDir, filePath);
       fs.writeFileSync(fullPath, content, 'utf8');
-      return true; 
+      return true;
     } catch (error) {
       console.error('Error writing file:', error);
       return false;
@@ -44,4 +43,4 @@ class FileHandler {
   }
 }
 
-module.exports = FileHandler;
+export default FileHandler;

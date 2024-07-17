@@ -1,20 +1,21 @@
-let audioConnection = null;
-
-function setAudioConnection(connection) {
-    console.log('Setting audio connection');
-    audioConnection = connection;
-    /*audioConnection.receiver.speaking.on('start', (userId) => {
+class AudioManager {
+    constructor() {
+      this.audioConnection = null;
+    }
+  
+    setAudioConnection(connection) {
+      console.log('Setting audio connection');
+      this.audioConnection = connection;
+      /*this.audioConnection.receiver.speaking.on('start', (userId) => {
         console.log('User is speaking');
-        const voiceTrascriptor = new VoiceTranscriptor(audioConnection);
-        voiceTrascriptor.listen(userId);
+        const voiceTranscriptor = new VoiceTranscriptor(this.audioConnection);
+        voiceTranscriptor.listen(userId);
       });*/
-}
-
-function getAudioConnection() {
-    return audioConnection;
-}
-
-module.exports = {
-    setAudioConnection,
-    getAudioConnection,
-};
+    }
+  
+    getAudioConnection() {
+      return this.audioConnection;
+    }
+  }
+  
+  export default new AudioManager();

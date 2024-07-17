@@ -1,23 +1,23 @@
-const FileManager = require('../handlers/FileHandler.js');
+import FileManager from '../handlers/FileHandler.js';
 
-async function writeMemory(memory) {
+const writeMemory = async (memory) => {
 
     try {
-      data = JSON.parse(memory);
+      const data = JSON.parse(memory);
       console.log(data);
       
       const fileManager = new FileManager('./');
-      fileManager.appendToFile('memory.txt', data.memoryString + '\n');
-      const lines = fileManager.readFile('memory.txt');
+      await fileManager.appendToFile('memory.txt', `${data.memoryString}\n`);
+      const lines = await fileManager.readFile('memory.txt');
 
       if (lines.split('\n').length > 10) {
-        const lastTenLines = lines.slice(-10);
-        fileManager.writeFile('memory.txt', lastTenLines.join('\n'));
+        const lastTenLines = lines.split('\n').slice(-10);
+        await fileManager.writeFile('memory.txt', lastTenLines.join('\n'));
       }
     } catch (error) {
       console.error('Error reading file:', error);
     }
-  }
+  };
   
 const writeMemoryTool = {
     type: 'function',
@@ -31,6 +31,6 @@ const writeMemoryTool = {
         },
       },
     },
-  }
+  };
 
-  module.exports = writeMemoryTool;
+export default writeMemoryTool;

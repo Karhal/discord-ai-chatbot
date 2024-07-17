@@ -1,26 +1,33 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const toolsDir = path.join(__dirname, 'tools');
 const tools = [];
 
 fs.readdirSync(toolsDir).filter(file => file.endsWith('.js')).forEach(file => {
-  tools.push(require(path.join(toolsDir, file)));
+  import(path.join(toolsDir, file)).then(module => {
+    tools.push(module.default);
+  });
 });
 
 let audioConnection = null;
 let currentMessage = null;
 let completionHandler = null;
 
-function setCurrentMessage(message) {
+const setCurrentMessage = (message) => {
     currentMessage = message;
-}
+};
 
-function setCompletionHandler(completion) {
+const setCompletionHandler = (completion) => {
     completionHandler = completion;
-}
+};
 
-async function readMemory() {
+const readMemory = async () => {
   const filePath = path.join(__dirname, 'memory.txt');
   if (!fs.existsSync(filePath)) {      
 
@@ -30,7 +37,7 @@ async function readMemory() {
   const facts = data.split('\n').map(line => line.trim()).join('; ');
 
   return facts;
-}
+};
 
 /*
 async function joinDiscordChannel(channelName) {
@@ -62,8 +69,7 @@ async function joinDiscordChannel(channelName) {
 }
 */
 
-
-module.exports = {
+export {
     tools,
     setCurrentMessage,
     setCompletionHandler,

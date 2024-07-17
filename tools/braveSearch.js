@@ -1,8 +1,10 @@
+import config from '../config.json' assert { type: 'json' };
+import fetch from 'node-fetch';
 
-const { braveSearchApiKey, lang } = require('../config.json');
-const fetch = require('node-fetch');
+const braveSearchApiKey = process.env.BRAVE_SEARCH_API_KEY || config.braveSearchApiKey;
+const lang = process.env.LANG || config.lang;
 
-async function getBraveSearch(query) {
+const getBraveSearch = async (query) => {
 
     const queryParameters = JSON.parse(query);
     const myHeaders = new Headers();
@@ -22,7 +24,7 @@ async function getBraveSearch(query) {
 
     console.log({"news":result.news, "web_search": result.web});
     return {"news":result.news, "web_search": result.web};
-}
+};
 
 const getLastNewsTool = 
 {
@@ -37,6 +39,6 @@ const getLastNewsTool =
         },
         },
     },
-}
+};
 
-module.exports = getLastNewsTool;
+export default getLastNewsTool;

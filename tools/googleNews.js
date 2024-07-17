@@ -1,7 +1,10 @@
-const { getJson } = require("serpapi");
-const { serpApiKey, lang, serpGoogle_domain } = require('../config.json');
+import config from '../config.json' assert { type: 'json' };
 
-async function getGoogleNews(query) {
+const serpApiKey = process.env.SERP_API_KEY || config.serpApiKey;
+const lang = process.env.LANG || config.lang;
+const serpGoogle_domain = process.env.SERP_GOOGLE_DOMAIN || config.serpGoogle_domain;
+
+const getGoogleNews = async (query) => {
     try {
         const queryParameters = JSON.parse(query);
 
@@ -13,30 +16,27 @@ async function getGoogleNews(query) {
             gl: lang,
             hl: lang,
             tbm: "nws"
-          }, (json) => {
-            console.log(json);
-          });
+        });
 
         console.log(response);
         return response;
     } catch (error) {
         console.error(error);
     }
-}
+};
 
-const getGoogleNewsTool = 
-{
+const getGoogleNewsTool = {
     type: 'function',
     function: {
         function: getGoogleNews,
         description: "use this tool only when you need to get fresh news from Google",
         parameters: {
-        type: 'object',
-        properties: {
-            query: { type: 'string' }
-        },
+            type: 'object',
+            properties: {
+                query: { type: 'string' }
+            },
         },
     },
-}
+};
 
-module.exports = getGoogleNewsTool;
+export default getGoogleNewsTool;

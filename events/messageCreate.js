@@ -1,12 +1,19 @@
-const { Events } = require('discord.js');
-const aiCompletionHandler  = require('../handlers/AiCompletionHandler');
-const { setCurrentMessage, setCompletionHandler } = require('../tools');
-const { botName, maxHistory } = require('../config.json');
-const path = require('path');
-const fs = require('fs');
-const axios = require('axios');
+import { Events } from 'discord.js';
+import aiCompletionHandler from '../handlers/AiCompletionHandler.js';
+import { setCurrentMessage, setCompletionHandler } from '../tools.js';
+import config from '../config.json' assert { type: 'json' };
+import axios from 'axios';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
 
-module.exports = {
+
+const botName = config.botName;
+const maxHistory = config.maxHistory;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export default {
 	name: Events.MessageCreate,
 	once: false,
 	execute(message) {
