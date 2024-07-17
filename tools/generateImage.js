@@ -5,7 +5,22 @@ const imageSize = process.env.IMAGE_SIZE || config.imageSize;
 
 const generateImage = async (imagePrompt) => {
 
-    const prompt = JSON.parse(imagePrompt);
+    try {
+        const prompt = JSON.parse(imagePrompt);
+        const response = await aiClient.images.generate({
+            model: "dall-e-3",
+            prompt: prompt.imagePrompt,
+            n: 1,
+            size: imageSize,
+        });
+        return { "image_url": response.data[0].url };
+    } catch (error) {
+        console.log(error);
+        if (error && error.status === 400) {
+            return { "error": error.error.message };
+        }
+    }
+    /*const prompt = JSON.parse(imagePrompt);
     console.log(prompt.imagePrompt);
     console.log({
         model: "dall-e-3",
@@ -19,7 +34,7 @@ const generateImage = async (imagePrompt) => {
         n: 1,
         size: imageSize,
     });
-    return { "image_url": response.data[0].url };
+    return { "image_url": response.data[0].url };*/
 };
 
 const generateImageTool = {
