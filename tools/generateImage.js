@@ -20,21 +20,6 @@ const generateImage = async (imagePrompt) => {
             return { "error": error.error.message };
         }
     }
-    /*const prompt = JSON.parse(imagePrompt);
-    console.log(prompt.imagePrompt);
-    console.log({
-        model: "dall-e-3",
-        prompt: prompt.imagePrompt,
-        n: 1,
-        size: imageSize,
-    });
-    const response = await aiClient.images.generate({
-        model: "dall-e-3",
-        prompt: prompt.imagePrompt,
-        n: 1,
-        size: imageSize,
-    });
-    return { "image_url": response.data[0].url };*/
 };
 
 const generateImageTool = {

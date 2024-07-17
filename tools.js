@@ -27,16 +27,22 @@ const setCompletionHandler = (completion) => {
     completionHandler = completion;
 };
 
-const readMemory = async () => {
-  const filePath = path.join(__dirname, 'memory.txt');
-  if (!fs.existsSync(filePath)) {      
-
-      return '';
-  }
-  const data = fs.readFileSync(filePath, 'utf8');
-  const facts = data.split('\n').map(line => line.trim()).join('; ');
-
-  return facts;
+const readMemory = () => {
+  return new Promise((resolve, reject) => {
+    const filePath = path.join(__dirname, 'memory.txt');
+    if (!fs.existsSync(filePath)) {
+      resolve('');
+    } else {
+      fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          const facts = data.split('\n').map(line => line.trim()).join('; ');
+          resolve(facts);
+        }
+      });
+    }
+  });
 };
 
 /*

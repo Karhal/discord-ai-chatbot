@@ -15,7 +15,7 @@ const eventFiles = readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 for (const file of eventFiles) {
     const filePath = join(eventsPath, file);
 	import(filePath).then(module => {
-		const event = module.event || module.default; // Cela gère à la fois les exportations nommées et par défaut
+		const event = module.event || module.default;
 		console.log(event);
 		if (event.once) {
 			discordClient.once(event.name, (...args) => event.execute(...args));

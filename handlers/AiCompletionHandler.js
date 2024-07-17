@@ -24,41 +24,52 @@ class AiCompletionHandler {
     this.summary = null;
   }
 
-  async generateSummary(conversation) {
+  generateSummary(conversation) {
+    return new Promise((resolve, reject) => {
+      this.conversation = conversation;
 
-    this.conversation = conversation;
+      try {
+        const response = this.aiClient.chat.completions.create({
+          messages: [
+            { role: 'assistant', content: 'Craft a short summary that is detailed, thorough, in-depth, and complex, while maintaining clarity and conciseness. Incorporate main ideas and essential information, eliminating extraneous language and focusing on critical aspects. Rely strictly on the provided text, without including external information. Format the summary in one paragraph form for easy understanding. Use the followgin language : '+ lang, }, 
+            { role: 'user', content: conversation.slice(0, Math.ceil(conversation.length / 2)).join("\n\n"), }
+          ],
+          model: openAiModel,
+        }).then((response) => {
+          this.summary = response.choices[0].message.content;
+          resolve();
+        });
 
-    const response =  await this.aiClient.chat.completions.create({
-      messages: [
-        { role: 'assistant', content: 'Craft a short summary that is detailed, thorough, in-depth, and complex, while maintaining clarity and conciseness. Incorporate main ideas and essential information, eliminating extraneous language and focusing on critical aspects. Rely strictly on the provided text, without including external information. Format the summary in one paragraph form for easy understanding. Use the followgin language : '+ lang, }, 
-        { role: 'user', content: conversation.slice(0, Math.ceil(conversation.length / 2)).join("\n\n"), }
-      ],
-      model: openAiModel,
+      } catch (error) {
+        reject(error);
+      }
     });
-    this.summary = response.choices[0].message.content;
   }
 
-  async getAiCompletion() {
+  getAiCompletion() {
+    return new Promise((resolve, reject) => {
 
-    const memory = await readMemory();
-    this.fullPrompt = `${this.prompt}. [PERSISTENT INFORMATION] ${memory} [END OF PERSISTENT INFORMATION]. [START OF SUMMARY] ${this.summary }. Please react to the last message only`;
-    this.messagesArray.push(new messageObject('assistant', this.fullPrompt));
-    for (let i = Math.ceil(this.conversation.length / 2); i < this.conversation.length; i++) {
-      this.messagesArray.push(new messageObject('user', this.conversation[i]));
-    }
-
-    const runner = this.aiClient.beta.chat.completions
-      .runTools({
-        model: openAiModel,
-        messages: this.messagesArray,
-      tools: this.tools,
-    })
-    .on('message', () => {});
-
-    const completion = await runner.finalContent();
-    console.log(this.fullPrompt);
-    console.log(this.messagesArray);
-    return completion;
+      const memory = readMemory().then((memory) => {
+        this.fullPrompt = `${this.prompt}. [PERSISTENT INFORMATION] ${memory} [END OF PERSISTENT INFORMATION]. [START OF SUMMARY] ${this.summary }. Please react to the last message only`;
+        this.messagesArray.push(new messageObject('assistant', this.fullPrompt));
+        for (let i = Math.ceil(this.conversation.length / 2); i < this.conversation.length; i++) {
+          this.messagesArray.push(new messageObject('user', this.conversation[i]));
+        }
+  
+        const runner = this.aiClient.beta.chat.completions
+          .runTools({
+            model: openAiModel,
+            messages: this.messagesArray,
+            tools: this.tools,
+          })
+          .on('message', () => {});
+  
+        const completion = runner.finalContent();
+        console.log(this.fullPrompt);
+        console.log(this.messagesArray);
+        resolve(completion);
+      });
+    });
   }
 }
 

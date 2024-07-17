@@ -7,7 +7,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 
-
 const botName = config.botName;
 const maxHistory = config.maxHistory;
 const __filename = fileURLToPath(import.meta.url);
@@ -83,20 +82,21 @@ export default {
         }).then(() => {
 
             message.channel.send(finalResponse);
-        }).finally(async () => {
+        }).finally(() => {
 
             if(hasImage) {
-                await message.channel.send({ files: [imagePath] });
-                console.log('Image sent');
-                if (fs.existsSync(imagePath)) {
-                    fs.unlink(imagePath, (err) => {
-                        if (err) {
-                            console.error(err);
-                        } else {
-                            console.log('Image deleted:', imagePath);
-                        }
-                    });
-                }
+                message.channel.send({ files: [imagePath] }).then(() => {
+                    console.log('Image sent');
+                    if (fs.existsSync(imagePath)) {
+                        fs.unlink(imagePath, (err) => {
+                            if (err) {
+                                console.error(err);
+                            } else {
+                                console.log('Image deleted:', imagePath);
+                            }
+                        });
+                    }
+                });
             }
             console.log('Done.');
         });
