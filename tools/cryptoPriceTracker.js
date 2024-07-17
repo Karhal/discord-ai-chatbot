@@ -1,8 +1,10 @@
+import config from '../config.json' assert { type: 'json' };
+import fetch from 'node-fetch';
 
-const { coinApiKey, defaultAsset } = require('../config.json');
-const fetch = require('node-fetch');
+const coinApiKey = process.env.COIN_API_KEY || config.coinApiKey;
+const defaultAsset = process.env.DEFAULT_ASSET || config.defaultAsset;
 
-async function getCryptoPrice(query) {
+const getCryptoPrice = async (query) => {
 
     const queryParameters = JSON.parse(query);
     console.log(queryParameters);
@@ -20,7 +22,7 @@ async function getCryptoPrice(query) {
     result = await result.text();
     console.log(result);
     return result;
-    }
+};
 
 const getCryptoPriceTool = 
 {
@@ -35,6 +37,6 @@ const getCryptoPriceTool =
         },
         },
     },
-}
+};
 
-module.exports = getCryptoPriceTool;
+export default getCryptoPriceTool;

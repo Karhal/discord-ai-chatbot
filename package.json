@@ -21,5 +21,6 @@
     "openai": "^4.47.1",
     "puppeteer": "^22.13.0",
     "serpapi": "^2.1.0"
-  }
+  },
+  "type": "module"
 }

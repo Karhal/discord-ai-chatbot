@@ -1,7 +1,10 @@
+import { tools, readMemory } from '../tools.js';
+import { aiClient } from '../clients/ai-client.js';
+import config from '../config.json' assert { type: 'json' };
 
-const { tools, readMemory } = require('../tools');
-const { aiClient } = require('../clients/ai-client');
-const { prompt, openAiModel, lang } = require('../config.json');
+const prompt = process.env.PROMPT || config.prompt;
+const openAiModel = process.env.OPEN_AI_MODEL || config.openAiModel;
+const lang = process.env.LANG || config.lang;
 
 class messageObject {
   constructor(role, content) {
@@ -52,10 +55,13 @@ class AiCompletionHandler {
     })
     .on('message', () => {});
 
-    return await runner.finalContent();
+    const completion = await runner.finalContent();
+    console.log(this.fullPrompt);
+    console.log(this.messagesArray);
+    return completion;
   }
 }
 
 const aiCompletionHandler = new AiCompletionHandler(aiClient, prompt, tools);
 
-module.exports = aiCompletionHandler;
+export default aiCompletionHandler;

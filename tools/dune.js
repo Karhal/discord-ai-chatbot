@@ -1,7 +1,9 @@
-const fetch = require('node-fetch');
-const { duneApiKey } = require('../config.json');
+import fetch from 'node-fetch';
+import config from '../config.json' assert { type: 'json' };
 
-async function fetchDuneData(queryId) {
+const duneApiKey = process.env.DUNE_API_KEY || config.duneApiKey;
+
+const fetchDuneData = async (queryId) => {
 
     const query = JSON.parse(queryId).queryId;
     const myHeaders = new fetch.Headers();
@@ -19,7 +21,7 @@ async function fetchDuneData(queryId) {
     } catch (error) {
         console.error(error);
     }
-}
+};
 
 const fetchDuneDataTool = 
 {
@@ -34,6 +36,6 @@ const fetchDuneDataTool =
         },
         },
     },
-}
+};
 
-module.exports = fetchDuneDataTool;
+export default fetchDuneDataTool;

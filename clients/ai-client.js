@@ -1,14 +1,12 @@
-const OpenAI = require('openai');
-const { openaiKey } = require('../config.json');
+import OpenAI from 'openai';
+import config from '../config.json' assert { type: 'json' };
+import dotenv from 'dotenv';
 
-
-require('dotenv').config();
+const openaiKey = config.openaiKey || process.env.OPENAI_API_KEY;
+dotenv.config();
 
 const aiClient = new OpenAI({
-    apiKey: openaiKey|| process.env.OPENAI_API_KEY,
-  });
+  apiKey: openaiKey || process.env.OPENAI_API_KEY,
+});
 
-module.exports = { 
-  aiClient
-};
-
+export { aiClient };
