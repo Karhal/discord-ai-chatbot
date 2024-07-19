@@ -5,6 +5,7 @@ import config from '../config.json' assert { type: 'json' };
 const prompt = process.env.PROMPT || config.prompt;
 const openAiModel = process.env.OPEN_AI_MODEL || config.openAiModel;
 const lang = process.env.LANG || config.lang;
+const maxHistory = process.env.MAX_HISTORY || config.maxHistory;
 
 class messageObject {
   constructor(role, content) {
@@ -31,8 +32,8 @@ class AiCompletionHandler {
       try {
         const response = this.aiClient.chat.completions.create({
           messages: [
-            { role: 'assistant', content: 'Craft a short summary that is detailed, thorough, in-depth, and complex, while maintaining clarity and conciseness. Incorporate main ideas and essential information, eliminating extraneous language and focusing on critical aspects. Rely strictly on the provided text, without including external information. Format the summary in one paragraph form for easy understanding. Use the followgin language : '+ lang, }, 
-            { role: 'user', content: conversation.slice(0, Math.ceil(conversation.length / 2)).join("\n\n"), }
+            { role: 'assistant', content: 'Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. Rely strictly on the provided text, without including external information. Format the summary in one paragraph form for easy understanding. Use the following language : '+ lang, }, 
+            { role: 'user', content: conversation.slice(0, maxHistory - 5 ).join("\n\n") }
           ],
           model: openAiModel,
         }).then((response) => {
@@ -49,11 +50,15 @@ class AiCompletionHandler {
   getAiCompletion() {
     return new Promise((resolve, reject) => {
 
-      const memory = readMemory().then((memory) => {
-        this.fullPrompt = `${this.prompt}. [PERSISTENT INFORMATION] ${memory} [END OF PERSISTENT INFORMATION]. [START OF SUMMARY] ${this.summary }. Please react to the last message only`;
+      readMemory().then((memory) => {
+        this.fullPrompt = `${this.prompt}.\n\n[PERSISTENT INFORMATION]\n${memory}\n[END OF PERSISTENT INFORMATION]\n\n[CONVERSATION RECAP]\n${this.summary }\n[END OF SUMMARY]\n\nPlease react to the last message only`;
         this.messagesArray.push(new messageObject('assistant', this.fullPrompt));
-        for (let i = Math.ceil(this.conversation.length / 2); i < this.conversation.length; i++) {
-          this.messagesArray.push(new messageObject('user', this.conversation[i]));
+        console.log("Conversation:");
+        console.log(this.conversation);
+        for (let i = this.conversation.length - 5; i < this.conversation.length; i++) {
+          if(this.conversation[i] !== undefined) {
+            this.messagesArray.push(new messageObject('user', this.conversation[i]));
+          }
         }
   
         const runner = this.aiClient.beta.chat.completions
@@ -65,7 +70,6 @@ class AiCompletionHandler {
           .on('message', () => {});
   
         const completion = runner.finalContent();
-        console.log(this.fullPrompt);
         console.log(this.messagesArray);
         resolve(completion);
       });

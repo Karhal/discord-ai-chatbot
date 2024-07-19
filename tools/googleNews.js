@@ -1,7 +1,8 @@
 import config from '../config.json' assert { type: 'json' };
+import { getJson } from "serpapi";
 
 const serpApiKey = process.env.SERP_API_KEY || config.serpApiKey;
-const lang = process.env.LANG || config.lang;
+const lang = config.lang;
 const serpGoogle_domain = process.env.SERP_GOOGLE_DOMAIN || config.serpGoogle_domain;
 
 const getGoogleNews = async (query) => {
@@ -29,7 +30,7 @@ const getGoogleNewsTool = {
     type: 'function',
     function: {
         function: getGoogleNews,
-        description: "use this tool only when you need to get fresh news from Google",
+        description: "Use this tool only when you need to get fresh news from Google. Then interpret the results and provide a summary.",
         parameters: {
             type: 'object',
             properties: {
