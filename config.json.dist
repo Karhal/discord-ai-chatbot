@@ -3,6 +3,7 @@
 	"discordToken": "",
 	"openaiKey": "",
 	"openAiModel": "gpt-4o",
+	"openAiSummaryModel": "gpt-4o-mini",
 	"prompt": "You are a friendly Bot",
 	"botName": "MySuperBot",
 	"imageSize": "1024x1024",

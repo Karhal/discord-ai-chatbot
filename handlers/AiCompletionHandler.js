@@ -4,6 +4,7 @@ import config from '../config.json' assert { type: 'json' };
 
 const prompt = process.env.PROMPT || config.prompt;
 const openAiModel = process.env.OPEN_AI_MODEL || config.openAiModel;
+const openAiSummaryModel = process.env.OPEN_AI_SUMMARY_MODEL || config.openAiSummaryModel || openAiModel;
 const lang = process.env.LANG || config.lang;
 const maxHistory = process.env.MAX_HISTORY || config.maxHistory;
 
@@ -35,7 +36,7 @@ class AiCompletionHandler {
             { role: 'assistant', content: 'Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. Rely strictly on the provided text, without including external information. Format the summary in one paragraph form for easy understanding. Use the following language : '+ lang, }, 
             { role: 'user', content: conversation.slice(0, maxHistory - 5 ).join("\n\n") }
           ],
-          model: openAiModel,
+          model: openAiSummaryModel,
         }).then((response) => {
           this.summary = response.choices[0].message.content;
           resolve();
