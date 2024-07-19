@@ -33,7 +33,7 @@ class AiCompletionHandler {
       try {
         const response = this.aiClient.chat.completions.create({
           messages: [
-            { role: 'assistant', content: 'Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. Rely strictly on the provided text, without including external information. Format the summary in one paragraph form for easy understanding. Use the following language : '+ lang, }, 
+            { role: 'assistant', content: 'Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. Rely strictly on the provided text. Format the summary in one paragraph form for easy understanding. The summary has to be the shortest possible (<100 words) and give a good idea of what the discussion is about. Use the following language : '+ lang, }, 
             { role: 'user', content: conversation.slice(0, maxHistory - 5 ).join("\n\n") }
           ],
           model: openAiSummaryModel,
@@ -52,7 +52,7 @@ class AiCompletionHandler {
     return new Promise((resolve, reject) => {
 
       readMemory().then((memory) => {
-        this.fullPrompt = `${this.prompt}.\n\n[PERSISTENT INFORMATION]\n${memory}\n[END OF PERSISTENT INFORMATION]\n\n[CONVERSATION RECAP]\n${this.summary }\n[END OF SUMMARY]\n\nPlease react to the last message only`;
+        this.fullPrompt = `${this.prompt}.\n\n[MEMORY]\n${memory}\n[/MEMORY]\n\n[RECAP]\n${this.summary }\n[/RECAP]\n\nPlease react to the last message by your answer only and avoid repeating the same information.`;
         this.messagesArray.push(new messageObject('assistant', this.fullPrompt));
         console.log("Conversation:");
         console.log(this.conversation);

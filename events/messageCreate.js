@@ -29,7 +29,8 @@ export default {
             messages = messages.reverse();
             messages.forEach(msg => {
                 const messageDateTime = msg.createdAt.toISOString();
-                discussion.push(msg.author.username + " [" + messageDateTime + "]:" + msg.content);
+                
+                discussion.push(msg.author.username + ": " + msg.content);
             });
         }).then(() => {
 
