@@ -52,7 +52,7 @@ class AiCompletionHandler {
     return new Promise((resolve, reject) => {
 
       readMemory().then((memory) => {
-        this.fullPrompt = `${this.prompt}.\n\n[MEMORY]\n${memory}\n[/MEMORY]\n\n[RECAP]\n${this.summary }\n[/RECAP]\n\n OBLIGATORY: React to the last message only. Write only your response, no name, no date no extra data.`;
+        this.fullPrompt = `${this.prompt}.\n\n[MEMORY]\n${memory}\n[/MEMORY]\n\n[RECAP]\n${this.summary }\n[/RECAP]\n\n [OBLIGATORY]: React to the last message only. Write your responseonly, do NOT add your name.[/OBLIGATORY]\n\n`;
         this.messagesArray.push(new messageObject('assistant', this.fullPrompt));
         console.log("Conversation:");
         console.log(this.conversation);
