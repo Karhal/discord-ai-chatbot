@@ -33,7 +33,7 @@ class AiCompletionHandler {
       try {
         const response = this.aiClient.chat.completions.create({
           messages: [
-            { role: 'assistant', content: 'Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. Rely strictly on the provided text. Format the summary in one paragraph form for easy understanding. The summary has to be the shortest possible (<100 words) and give a good idea of what the discussion is about. Use the following language : '+ lang, }, 
+            { role: 'assistant', content: 'Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. Rely strictly on the provided text. Format the summary in one paragraph form for easy understanding. The summary has to be the shortest possible (<100 words) and give a good idea of what the discussion is about. Use the following language: '+ lang +'\n\nText:"""', }, 
             { role: 'user', content: conversation.slice(0, maxHistory - 5 ).join("\n\n") }
           ],
           model: openAiSummaryModel,
@@ -52,21 +52,21 @@ class AiCompletionHandler {
     return new Promise((resolve, reject) => {
 
       readMemory().then((memory) => {
-        this.fullPrompt = `${this.prompt}.\n\n[MEMORY]\n${memory}\n[/MEMORY]\n\n[RECAP]\n${this.summary }\n[/RECAP]\n\n [OBLIGATORY]: React to the last message only. Write your responseonly, do NOT add your name.[/OBLIGATORY]\n\n`;
+        this.fullPrompt = `${this.prompt}.\n\nMEMORY:"""\n${memory}\n"""\n\nRECAP:"""\n${this.summary }\n"""\n\nOBLIGATORY:"""\nIn this conversation messages are prefixed with the nickname of the user. Do NOT imitate this and write the content of your response only. React to the last message only. Write your response only, do NOT add your name."""\n\n`;
         this.messagesArray.push(new messageObject('assistant', this.fullPrompt));
-        console.log("Conversation:");
-        console.log(this.conversation);
+
         for (let i = this.conversation.length - 5; i < this.conversation.length; i++) {
           if(this.conversation[i] !== undefined) {
             this.messagesArray.push(new messageObject('user', this.conversation[i]));
           }
         }
-  
+  console.log(this.messagesArray);
         const runner = this.aiClient.beta.chat.completions
           .runTools({
             model: openAiModel,
             messages: this.messagesArray,
             tools: this.tools,
+
           })
           .on('message', () => {});
   
