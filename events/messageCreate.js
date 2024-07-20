@@ -28,11 +28,11 @@ export default {
         message.channel.messages.fetch({ limit: maxHistory }).then(messages => {
             messages = messages.reverse();
             messages.forEach(msg => {
-                const messageDateTime = msg.createdAt.toISOString();
                 if(msg.content !== '') {
                     discussion.push(msg.author.username + ": " + msg.content);
                 }
             });
+            aiCompletionHandler.conversation = discussion;
         }).then(() => {
 
             console.log('Building summary...');

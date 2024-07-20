@@ -26,10 +26,9 @@ class AiCompletionHandler {
     this.summary = null;
   }
 
-  generateSummary(conversation) {
+  generateSummary() {
     return new Promise((resolve, reject) => {
-      this.conversation = conversation;
-
+      const conversation = this.conversation;
       try {
         const response = this.aiClient.chat.completions.create({
           messages: [
@@ -60,7 +59,7 @@ class AiCompletionHandler {
             this.messagesArray.push(new messageObject('user', this.conversation[i]));
           }
         }
-  console.log(this.messagesArray);
+        console.log(this.messagesArray);
         const runner = this.aiClient.beta.chat.completions
           .runTools({
             model: openAiModel,
