@@ -32,7 +32,9 @@ export default {
                     discussion.push(msg.author.username + ": " + msg.content);
                 }
             });
+            aiCompletionHandler.messagesArray = [];
             aiCompletionHandler.conversation = discussion;
+            
         }).then(() => {
 
             console.log('Building summary...');

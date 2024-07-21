@@ -28,12 +28,11 @@ class AiCompletionHandler {
 
   generateSummary() {
     return new Promise((resolve, reject) => {
-      const conversation = this.conversation;
       try {
-        const response = this.aiClient.chat.completions.create({
+        this.aiClient.chat.completions.create({
           messages: [
             { role: 'assistant', content: 'Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. Rely strictly on the provided text. Format the summary in one paragraph form for easy understanding. The summary has to be the shortest possible (<100 words) and give a good idea of what the discussion is about. Use the following language: '+ lang +'\n\nText:"""', }, 
-            { role: 'user', content: conversation.slice(0, maxHistory - 5 ).join("\n\n") }
+            { role: 'user', content: this.conversation.slice(0, maxHistory - 5 ).join("\n\n") }
           ],
           model: openAiSummaryModel,
         }).then((response) => {
