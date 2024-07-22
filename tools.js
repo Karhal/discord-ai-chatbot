@@ -28,21 +28,9 @@ const setCompletionHandler = (completion) => {
 };
 
 const readMemory = () => {
-  return new Promise((resolve, reject) => {
-    const filePath = path.join(__dirname, 'memory.txt');
-    if (!fs.existsSync(filePath)) {
-      resolve('');
-    } else {
-      fs.readFile(filePath, 'utf8', (err, data) => {
-        if (err) {
-          reject(err);
-        } else {
-          const facts = data.split('\n').map(line => line.trim()).join('; ');
-          resolve(facts);
-        }
-      });
-    }
-  });
+    const memoryFilePath = path.join(__dirname, 'memory.txt');
+    const memoryData = fs.readFileSync(memoryFilePath, 'utf8');
+    return memoryData;
 };
 
 /*

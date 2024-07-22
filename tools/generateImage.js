@@ -26,7 +26,7 @@ const generateImageTool = {
     type: 'function',
     function: {
         function: generateImage,
-        description: "Use this tool when the user asks you to draw or to show a picture of something. The tool will generate an image based on the prompt you provide.",
+        description: "Use this tool when the user asks you to draw or to show a picture of something. The tool will generate an image based on the prompt you provide. Generate one image at time.",
         parameters: {
             type: 'object',
             properties: {
