@@ -27,7 +27,12 @@ class AiCompletionHandler {
         this.aiClient.chat.completions.create({
           messages: [
             { role: 'assistant', content: 'Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. Rely strictly on the provided text. Format the summary in one paragraph form for easy understanding. The summary has to be the shortest possible (<100 words) and give a good idea of what the discussion is about. Use the following language: '+ lang +'\n\nText:"""', }, 
-            { role: 'user', content: this.messages.filter(msg => msg.channelId === channelId).slice(0, maxHistory - 5 ).map(msg => `${msg.author}: ${msg.content}`).join("\n\n"), },
+            { role: 'user', content: this.messages
+                                     .filter(msg => msg.channelId === channelId)
+                                     .slice(0, maxHistory - 5 )
+                                     .map(msg => `${msg.author}: ${msg.content}`)
+                                     .join("\n\n"), 
+            },
           ],
           model: openAiSummaryModel,
         }).then((response) => {
@@ -43,27 +48,30 @@ class AiCompletionHandler {
   getAiCompletion(summary, channelId) {
 
     const memory = readMemory();
-    const fullPrompt = `${this.prompt}.\n\nMEMORY:"""\n${memory}\n"""\n\nRECAP:"""\n${summary }\n"""\n\nOBLIGATORY:"""\nIn this conversation messages are prefixed with the nickname of the user. Do NOT imitate this and write the content of your response only. React to the last message only. Write your response only, do NOT add your name."""`;
+    const fullPrompt = `${this.prompt}.\n\n
+    MEMORY:"""\n${memory}\n"""\n
+    RECAP:"""\n${summary }\n"""`;
     let conversation = [{ role: 'assistant', content: fullPrompt }];
+    
     conversation = conversation
     .concat(this.messages
     .filter(msg => msg.channelId === channelId).slice(-5)
-    .map(msg => ({ role: msg.role, content: msg.content }))); 
+    .map(msg => ({ role: msg.role, content: `${msg.author}: ${msg.content}` })));
 
     console.log('sent conversation:');
     console.log(conversation);
     console.log('End of conversation');
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
 
         const runner = this.aiClient.beta.chat.completions
           .runTools({
             model: openAiModel,
             messages: conversation,
             tools: this.tools,
-          })
-          .on('message', () => {});
-
-        resolve(runner.finalContent());
+          });
+        let response = await runner.finalContent();
+        response = response.replace(/^[a-zA-Z]*:/g, '');
+        resolve(response);
       });
   }
 }

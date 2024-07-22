@@ -19,7 +19,6 @@ export default {
 	execute(message) {
 
         let finalResponse = '';
-        let hasImage = false;
         let imagePaths = [];
         let channelId = message.channelId;
 
