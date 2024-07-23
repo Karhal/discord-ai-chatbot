@@ -16,7 +16,7 @@ const imageRegex = /(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%
 export default {
 	name: Events.MessageCreate,
 	once: false,
-	execute(message) {
+	async execute(message) {
 
         let finalResponse = '';
         let imagePaths = [];
@@ -26,20 +26,19 @@ export default {
 
         message.channel.sendTyping();
         
-        fetchAndProcessMessages(message).then(() => {
-            console.log('Building summary...');
+        const messagesChannelHistory = await message.channel.messages.fetch({ limit: maxHistory });
+        aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
 
-            return aiCompletionHandler.getSummary(channelId);
-
-        }).then((summary) => {
+        aiCompletionHandler.getSummary(channelId).then((summary) => {
             console.log('Getting completion...');
             message.channel.sendTyping();
-            setCurrentMessage(message);
-            setCompletionHandler(aiCompletionHandler);
+            //setCurrentMessage(message);
+            //setCompletionHandler(aiCompletionHandler);
             
             return aiCompletionHandler.getAiCompletion(summary, channelId);
 
         }).then(async (completion) => {
+
             console.log('Completion received...');
             console.log(completion);
             console.log('images matchs...');
@@ -96,29 +95,4 @@ function saveImage(response) {
     fs.writeFileSync(imagePath, imageData);
 
     return imagePath;
-}
-
-function fetchAndProcessMessages(message) {
-
-    return new Promise((resolve, reject) => {
-        try {
-            message.channel.messages.fetch({ limit: maxHistory }).then(messages => {
-                messages = messages.reverse();
-                messages.forEach(msg => {
-                    if(msg.content !== '') {
-                        const role = msg.author.bot ? 'assistant' : 'user';
-                        aiCompletionHandler.messages.push({ role: role, content: msg.content, dateTime: msg.createdAt, channelId: msg.channelId, author: msg.author.username });
-                        const channelMessages = aiCompletionHandler.messages.filter(msg => msg.channelId === message.channelId);
-                        if (channelMessages.length >= maxHistory) {
-                            aiCompletionHandler.messages = aiCompletionHandler.messages.filter(msg => msg.channelId !== message.channelId);
-                            aiCompletionHandler.messages = [...channelMessages, ...aiCompletionHandler.messages];
-                        }
-                    }
-                });
-            });
-            resolve();
-        } catch (error) {
-            reject(error);
-        }
-    });
 }
