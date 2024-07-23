@@ -68,19 +68,20 @@ class AiCompletionHandler {
       });
   }
 
-  addMessageToChannel(message) {
-    const channelMessages = this.messages.filter(msg => msg.channelId === message.channelId);
+  addMessageToChannel(message, limit = maxHistory) {
+    let channelMessages = this.messages.filter(msg => msg.channelId === message.channelId);
 
-    this.messages.push(message);
-    if (channelMessages.length >= maxHistory) {
-      this.messages = this.messages.filter(msg => msg.channelId !== message.channelId);
-      this.messages = [...channelMessages, ...this.messages];
+    channelMessages.push(message);
+    if (channelMessages.length > limit) {
+      channelMessages.shift();
     }
+    this.messages = this.messages.filter(msg => msg.channelId !== message.channelId);
+    this.messages = [...channelMessages, ...this.messages];
   }
 
-  addMessageArrayToChannel(messages) {
+  addMessageArrayToChannel(messages, limit = maxHistory) {
     messages.forEach(message => {
-      this.addMessageToChannel(message);
+      this.addMessageToChannel(message, limit);
     });
   }
 
@@ -97,7 +98,6 @@ class AiCompletionHandler {
   }
 
   setChannelHistory(channelId, messages) {
-    
     this.eraseMessagesWithChannelId(channelId);
     const handlerMessages = this.createMessagesArrayFromHistory(messages);
     this.addMessageArrayToChannel(handlerMessages);
@@ -114,7 +114,7 @@ class AiCompletionHandler {
     });
 
     return messages;
-}
+  }
 }
 
 const aiCompletionHandler = new AiCompletionHandler(aiClient, prompt, tools);
