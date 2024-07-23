@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import config from '../config.json' assert { type: 'json' };
+import config from '../config.json' with { type: 'json' };
 
 const duneApiKey = process.env.DUNE_API_KEY || config.duneApiKey;
 

@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import config from '../config.json' assert { type: 'json' };
+import config from '../config.json' with { type: 'json' };
 import dotenv from 'dotenv';
 
 const openaiKey = config.openaiKey || process.env.OPENAI_API_KEY;

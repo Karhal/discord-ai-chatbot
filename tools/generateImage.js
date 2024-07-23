@@ -1,5 +1,5 @@
 import { aiClient } from '../clients/ai-client.js';
-import config from '../config.json' assert { type: 'json' };
+import config from '../config.json' with { type: 'json' };
 
 const imageSize = process.env.IMAGE_SIZE || config.imageSize;
 

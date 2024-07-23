@@ -1,7 +1,7 @@
 import { Events } from 'discord.js';
 import aiCompletionHandler from '../handlers/AiCompletionHandler.js';
 import { setCurrentMessage, setCompletionHandler } from '../tools.js';
-import config from '../config.json' assert { type: 'json' };
+import config from '../config.json' with { type: 'json' };
 import axios from 'axios';
 import path from 'path';
 import { fileURLToPath } from 'url';

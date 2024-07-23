@@ -1,4 +1,4 @@
-import config from '../config.json' assert { type: 'json' };
+import config from '../config.json' with { type: 'json' };
 import fetch from 'node-fetch';
 
 const braveSearchApiKey = process.env.BRAVE_SEARCH_API_KEY || config.braveSearchApiKey;
