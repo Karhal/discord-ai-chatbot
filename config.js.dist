@@ -1,0 +1,19 @@
+
+export default {
+    lang: "en",
+    discordToken: "",
+    openaiKey: "",
+    openAiModel: "gpt-4o",
+    openAiSummaryModel: "gpt-4o-mini",
+    prompt: "You are a nice assistant in a discord server",
+    botName: "NiceBot",
+    imageSize: "1024x1024",
+    maxHistory: 10,
+    duneApiKey: "",
+    serpApiKey: "",
+    serpApiLang: "en",
+    braveSearchApiKey: "",
+    braveSearchApiLang: "en",
+    coinApiKey: "",
+    defaultAsset: "USD"
+};
