@@ -22,4 +22,4 @@ Before getting started, make sure you have Node.js installed on your system. You
 
 ## Configuration
 
-Open `config.json` and adjust the settings as needed. You can set your Discord bot token, API keys for the various services, and other customization options.
+Open `config.js` and adjust the settings as needed. You can set your Discord bot token, API keys for the various services, and other customization options.
