@@ -1,4 +1,4 @@
-import config from '../config.json' with { type: 'json' };
+import config from '../config.js';
 import { getJson } from "serpapi";
 
 const serpApiKey = process.env.SERP_API_KEY || config.serpApiKey;

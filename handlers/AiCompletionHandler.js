@@ -1,6 +1,6 @@
 import { tools, readMemory } from '../tools.js';
 import { aiClient } from '../clients/ai-client.js';
-import config from '../config.json' with { type: 'json' };
+import config from '../config.js';
 
 const prompt = process.env.PROMPT || config.prompt;
 const openAiModel = process.env.OPEN_AI_MODEL || config.openAiModel;

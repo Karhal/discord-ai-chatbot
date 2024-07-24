@@ -86,7 +86,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import OpenAI from 'openai';
-import config from '../config.json' with { type: 'json' };
+import config from '../config.js';
 import dotenv from 'dotenv';
 &nbsp;
 const openaiKey = config.openaiKey || <span class="branch-1 cbranch-no" title="branch not covered" >process.env.OPENAI_API_KEY;</span>
