@@ -1,5 +1,5 @@
 import { aiClient } from '../clients/ai-client.js';
-import config from '../config.json' assert { type: 'json' };
+import config from '../config.js';
 
 const imageSize = process.env.IMAGE_SIZE || config.imageSize;
 
@@ -26,7 +26,7 @@ const generateImageTool = {
     type: 'function',
     function: {
         function: generateImage,
-        description: "Use this tool when the user asks you to draw or to show a picture of something. The tool will generate an image based on the prompt you provide. Generate one image at time.",
+        description: "Use this tool when the user asks you to draw or to show a picture of something. The tool will generate an image based on the prompt you provide. The more specific your prompt, the better the image quality. Include details like the setting, objects, colors, mood, and any specific elements you want in the image. Consider Perspective and Composition. Specify Lighting and Time of Day. Use Analogies or Comparisons. Specify Desired Styles or Themes",
         parameters: {
             type: 'object',
             properties: {
