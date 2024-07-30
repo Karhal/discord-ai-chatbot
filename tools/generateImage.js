@@ -13,7 +13,7 @@ const generateImage = async (imagePrompt) => {
             n: 1,
             size: imageSize,
         });
-        return { "image_url": response.data[0].url };
+        return { "image_url": [response.data[0].url] };
     } catch (error) {
         console.log(error);
         if (error && error.status === 400) {

@@ -42,8 +42,8 @@ export default {
             console.log('Completion received...');
             console.log(completion);
             console.log('images matchs...');
-            const imageUrls = completion.match(imageRegex)?.filter(url => url.includes('oaidalleapiprodscus'));
-            finalResponse = completion;
+            const imageUrls = completion.content.match(imageRegex)?.filter(url => url.includes('oaidalleapiprodscus'));
+            finalResponse = completion.content;
 
             if (imageUrls && imageUrls.length > 0) {
                 message.channel.sendTyping();
