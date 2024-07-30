@@ -75,8 +75,8 @@ describe('AiCompletionHandler', () => {
           expect(aiCompletionHandler.messages.filter(msg => msg.channelId === 1).length).toBe(2);
           expect(aiCompletionHandler.messages.filter(msg => msg.channelId === 1)).toEqual(
             [
-              { role: "assistant", content: "second", dateTime: "123", channelId: 1, author: "Lorem" },
-              { role: "user", content: "first", dateTime: "123", channelId: 1, author: "Ipsum"},
+              { role: "assistant", content: '{"author":"Lorem","content":"second"}', dateTime: "123", channelId: 1 },
+              { role: "user", content: '{"author":"Ipsum","content":"first"}', dateTime: "123", channelId: 1},
             ]
           );
       });

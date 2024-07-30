@@ -55,6 +55,7 @@ class AiCompletionHandler {
     `;
     let conversation = [{ role: 'assistant', content: fullPrompt }];
     conversation = conversation.concat(this.getLastMessagesOfAChannel(5, channelId));
+
     console.log('conversation:');
     console.log(conversation);
     return new Promise(async (resolve, reject) => {
@@ -113,7 +114,8 @@ class AiCompletionHandler {
     messagesChannelHistory.reverse().forEach(msg => {
         if(msg.content !== '') {
             const role = msg.author.bot ? 'assistant' : 'user';
-            messages.push({ role: role, content: msg.content, dateTime: msg.createdAt, channelId: msg.channelId, author: msg.author.username });
+            const contentJsonAsString = JSON.stringify({"author": msg.author.username, "content": msg.content});
+            messages.push({ role: role, content: contentJsonAsString, dateTime: msg.createdAt, channelId: msg.channelId });
         }
     });
 
