@@ -49,7 +49,10 @@ class AiCompletionHandler {
     const memory = readMemory();
     const fullPrompt = `${this.prompt}.\n\n
     MEMORY:"""\n${memory}\n"""\n
-    PREVIOUSLY:"""\n${summary }\n"""`;
+    PREVIOUSLY:"""\n${summary }\n"""
+    NOTE:"""\nFormat your response in a JSON object with the key 'content' and the key 'author'.\n"""
+    NOTE:"""\nInterract only to the last message mentionning you. The rest is to give you context.\n"""
+    `;
     let conversation = [{ role: 'assistant', content: fullPrompt }];
     conversation = conversation.concat(this.getLastMessagesOfAChannel(5, channelId));
     console.log('conversation:');
@@ -61,9 +64,10 @@ class AiCompletionHandler {
             model: openAiModel,
             messages: conversation,
             tools: this.tools,
+            response_format: { type: "json_object" }
           });
         let response = await runner.finalContent();
-        response = response.replace(/^[a-zA-Z]*:/g, '');
+        response = JSON.parse(response.replace(/^[a-zA-Z]*:/g, ''));
         resolve(response);
       });
   }
