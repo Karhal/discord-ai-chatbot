@@ -3,7 +3,6 @@ import AiCompletionHandler from '../handlers/AiCompletionHandler.js';
 import { aiClient } from '../clients/ai-client.js';
 import { setCurrentMessage, setCompletionHandler, tools } from '../tools.js';
 import config from '../config.js';
-import axios from 'axios';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
@@ -18,7 +17,6 @@ export default {
 	name: Events.MessageCreate,
 	once: false,
 	async execute(message) {
-
         if (!message.content.toLowerCase().includes(botName.toLowerCase()) || message.author.bot) return;
 
         let images = [];
@@ -28,27 +26,19 @@ export default {
         const messagesChannelHistory = await message.channel.messages.fetch({ limit: maxHistory });
         
         aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
-        aiCompletionHandler.getSummary(channelId).then((summary) => {
-            console.log('Getting completion...');
-            //setCurrentMessage(message);
-            //setCompletionHandler(aiCompletionHandler);
-            return aiCompletionHandler.getAiCompletion(summary, channelId);
-        }).then(async (completion) => {
-            const imagesUrls = extractImages(completion.content);
-            images = await downloadImages(imagesUrls);
-            return completion.content;
-        }).then(async (completion) => {
-            message.channel.sendTyping();
-            completion = cleanImagePathsFromResponse(completion);
-            return completion;
-        }).then(async (completion) => {
-            return await sendResponse(message, completion, images);
-        }).finally(() => {
-            if (images.length > 0) {
-                deleteImages(images);
-            }
-            console.log('Done.');
-        });
+
+        const summary = await aiCompletionHandler.getSummary(channelId).catch(err => console.log(error));
+        let completion = await aiCompletionHandler.getAiCompletion(summary, channelId);
+        const imagesUrls = extractImages(completion.content);
+        images = await downloadImages(imagesUrls);
+        completion = completion.content;
+        message.channel.sendTyping();
+        completion = cleanImagePathsFromResponse(completion);
+        await sendResponse(message, completion, images);
+        if (images.length > 0) {
+            deleteImages(images);
+        }
+        console.log('Done.');
 	},
 };
 
@@ -57,8 +47,9 @@ async function downloadImages(images) {
     if (!images) return [];
     images = await Promise.all(images.map(async image => {
         console.log('Downloading images...');
-        const response = await axios.get(image, { responseType: 'arraybuffer' });
-        return saveImage(response);
+        const response = fetch(image);
+        const responseBuffer = response.arrayBuffer();
+        return saveImage(responseBuffer);
     }));
     console.log('Images downloaded...');
     console.log(images);

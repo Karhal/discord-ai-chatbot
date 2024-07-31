@@ -16,33 +16,22 @@ class AiCompletionHandler {
     this.summary = null;
   }
 
-  getSummary(channelId) {
-
-    return new Promise((resolve, reject) => {
-      try {
+  async getSummary(channelId) {
         console.log('called summary with:');
         console.log(this.getFirstMessagesOfAChannel(5, channelId).map(msg => `${msg.author}: ${msg.content}`).join("\n\n"));
-        this.aiClient.chat.completions.create({
+        const option = {
           messages: [
             { role: 'assistant', content: 'Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. Rely strictly on the provided text. Format the summary in one paragraph form for easy understanding. The summary has to be the shortest possible (<100 words) and give a good idea of what the discussion is about. Use the following language: '+ lang +'\n\nText:"""', }, 
             { role: 'user', content: this.getFirstMessagesOfAChannel(5, channelId).map(msg => `${msg.author}: ${msg.content}`).join("\n\n"), 
             },
           ],
           model: openAiSummaryModel,
-        }).then((response) => {
-          console.log(response.choices[0].message.content);
-          resolve(response.choices[0].message.content);
-        });
-
-      } catch (error) {
-        console.log(error);
-        reject(error);
-      }
-    });
+        };
+        const response = await this.aiClient.chat.completions.create(option);
+        return response?.choices[0]?.message?.content || false;
   }
 
-
-  getAiCompletion(summary, channelId) {
+  async getAiCompletion(summary, channelId) {
 
     const memory = readMemory();
     const fullPrompt = `${this.prompt}.\n\n
@@ -59,19 +48,18 @@ class AiCompletionHandler {
 
     console.log('conversation:');
     console.log(conversation);
-    return new Promise(async (resolve, reject) => {
 
-        const runner = this.aiClient.beta.chat.completions
-          .runTools({
-            model: openAiModel,
-            messages: conversation,
-            tools: this.tools,
-            response_format: { type: "json_object" }
-          });
-        let response = await runner.finalContent();
-        response = JSON.parse(response.replace(/^[a-zA-Z]*:/g, ''));
-        resolve(response);
-      });
+    const option = {
+      model: openAiModel,
+      messages: conversation,
+      tools: this.tools,
+      response_format: { type: "json_object" }
+    };
+    
+    const runner = this.aiClient.beta.chat.completions.runTools(option);
+    let response = await runner.finalContent();
+    response = JSON.parse(response.replace(/^[a-zA-Z]*:/g, ''));
+    return response;
   }
 
   addMessageToChannel(message, limit = maxHistory) {
