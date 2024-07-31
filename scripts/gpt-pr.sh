@@ -37,3 +37,6 @@ curl -s -X POST \
   -H "Content-Type: application/json" \
   -d "$comment_body" \
   "https://api.github.com/repos/$REPO/issues/$PR_NUMBER/comments"
+
+# Just testing the new review
+echo "Hello"
