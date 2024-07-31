@@ -28,27 +28,19 @@ export default {
         const messagesChannelHistory = await message.channel.messages.fetch({ limit: maxHistory });
         
         aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
-        aiCompletionHandler.getSummary(channelId).then((summary) => {
-            console.log('Getting completion...');
-            //setCurrentMessage(message);
-            //setCompletionHandler(aiCompletionHandler);
-            return aiCompletionHandler.getAiCompletion(summary, channelId);
-        }).then(async (completion) => {
-            const imagesUrls = extractImages(completion.content);
-            images = await downloadImages(imagesUrls);
-            return completion.content;
-        }).then(async (completion) => {
-            message.channel.sendTyping();
-            completion = cleanImagePathsFromResponse(completion);
-            return completion;
-        }).then(async (completion) => {
-            return await sendResponse(message, completion, images);
-        }).finally(() => {
-            if (images.length > 0) {
-                deleteImages(images);
-            }
-            console.log('Done.');
-        });
+
+        const summary = await aiCompletionHandler.getSummary(channelId);
+        let completion = await aiCompletionHandler.getAiCompletion(summary, channelId);
+        const imagesUrls = extractImages(completion.content);
+        images = await downloadImages(imagesUrls);
+        completion = completion.content;
+        message.channel.sendTyping();
+        completion = cleanImagePathsFromResponse(completion);
+        await sendResponse(message, completion, images);
+        if (images.length > 0) {
+            deleteImages(images);
+        }
+        console.log('Done.');
 	},
 };
 
