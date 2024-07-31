@@ -17,7 +17,6 @@
     "@google-cloud/speech": "^6.6.0",
     "@google-cloud/text-to-speech": "^5.3.0",
     "discord.js": "^14.15.2",
-    "dotenv": "^16.4.5",
     "eslint": "^9.7.0",
     "libsodium-wrappers": "^0.7.13",
     "openai": "^4.47.1",

@@ -17,7 +17,6 @@ export default {
 	name: Events.MessageCreate,
 	once: false,
 	async execute(message) {
-
         if (!message.content.toLowerCase().includes(botName.toLowerCase()) || message.author.bot) return;
 
         let images = [];
