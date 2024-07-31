@@ -3,7 +3,6 @@ import AiCompletionHandler from '../handlers/AiCompletionHandler.js';
 import { aiClient } from '../clients/ai-client.js';
 import { setCurrentMessage, setCompletionHandler, tools } from '../tools.js';
 import config from '../config.js';
-import axios from 'axios';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
@@ -49,8 +48,9 @@ async function downloadImages(images) {
     if (!images) return [];
     images = await Promise.all(images.map(async image => {
         console.log('Downloading images...');
-        const response = await axios.get(image, { responseType: 'arraybuffer' });
-        return saveImage(response);
+        const response = fetch(image);
+        const responseBuffer = response.arrayBuffer();
+        return saveImage(responseBuffer);
     }));
     console.log('Images downloaded...');
     console.log(images);
