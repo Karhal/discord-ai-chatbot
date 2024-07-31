@@ -1,8 +1,6 @@
-import { tools, readMemory } from '../tools.js';
-import { aiClient } from '../clients/ai-client.js';
+import { readMemory } from '../tools.js';
 import config from '../config.js';
 
-const prompt = process.env.PROMPT || config.prompt;
 const openAiModel = process.env.OPEN_AI_MODEL || config.openAiModel;
 const openAiSummaryModel = process.env.OPEN_AI_SUMMARY_MODEL || config.openAiSummaryModel || openAiModel;
 const lang = process.env.LANG || config.lang;
@@ -50,8 +48,11 @@ class AiCompletionHandler {
     const fullPrompt = `${this.prompt}.\n\n
     MEMORY:"""\n${memory}\n"""\n
     PREVIOUSLY:"""\n${summary }\n"""
-    NOTE:"""\nFormat your response in a JSON object with the key 'content' and the key 'author'.\n"""
-    NOTE:"""\nInterract only to the last message mentionning you. The rest is to give you context.\n"""
+    NOTE:"""\n
+    - Format your response in a JSON object with the key 'content' and the key 'author'.
+    - When you use a tool, use the property 'content' to store its results.
+    - Interract only to the last message mentionning you. The rest is to give you context.
+    - Consider the DateTime given with the last message to avoid being out of context.\n"""
     `;
     let conversation = [{ role: 'assistant', content: fullPrompt }];
     conversation = conversation.concat(this.getLastMessagesOfAChannel(5, channelId));
@@ -114,8 +115,8 @@ class AiCompletionHandler {
     messagesChannelHistory.reverse().forEach(msg => {
         if(msg.content !== '') {
             const role = msg.author.bot ? 'assistant' : 'user';
-            const contentJsonAsString = JSON.stringify({"author": msg.author.username, "content": msg.content});
-            messages.push({ role: role, content: contentJsonAsString, dateTime: msg.createdAt, channelId: msg.channelId });
+            const contentJsonAsString = JSON.stringify({"author": msg.author.username, "content": msg.content, "dateTime": msg.createdAt});
+            messages.push({ role: role, content: contentJsonAsString, channelId: msg.channelId });
         }
     });
 
@@ -123,6 +124,4 @@ class AiCompletionHandler {
   }
 }
 
-const aiCompletionHandler = new AiCompletionHandler(aiClient, prompt, tools);
-
-export default aiCompletionHandler;
+export default AiCompletionHandler;
