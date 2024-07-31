@@ -5,3 +5,4 @@ memory.txt
 .nvmrc
 tmp/*
 .DS_Store
+coverage/*
