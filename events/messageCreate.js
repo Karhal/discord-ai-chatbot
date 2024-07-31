@@ -1,6 +1,7 @@
 import { Events } from 'discord.js';
-import aiCompletionHandler from '../handlers/AiCompletionHandler.js';
-import { setCurrentMessage, setCompletionHandler } from '../tools.js';
+import AiCompletionHandler from '../handlers/AiCompletionHandler.js';
+import { aiClient } from '../clients/ai-client.js';
+import { setCurrentMessage, setCompletionHandler, tools } from '../tools.js';
 import config from '../config.js';
 import axios from 'axios';
 import path from 'path';
@@ -18,81 +19,102 @@ export default {
 	once: false,
 	async execute(message) {
 
-        let finalResponse = '';
-        let imagePaths = [];
-        let channelId = message.channelId;
-
         if (!message.content.toLowerCase().includes(botName.toLowerCase()) || message.author.bot) return;
 
+        let images = [];
+        let channelId = message.channelId;
         message.channel.sendTyping();
-        
+        const aiCompletionHandler = new AiCompletionHandler(aiClient, config.prompt, tools);
         const messagesChannelHistory = await message.channel.messages.fetch({ limit: maxHistory });
+        
         aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
-
         aiCompletionHandler.getSummary(channelId).then((summary) => {
             console.log('Getting completion...');
-            message.channel.sendTyping();
             //setCurrentMessage(message);
             //setCompletionHandler(aiCompletionHandler);
-            
             return aiCompletionHandler.getAiCompletion(summary, channelId);
-
         }).then(async (completion) => {
-
-            console.log('Completion received...');
-            console.log(completion);
-            console.log('images matchs...');
-            const imageUrls = completion.content.match(imageRegex)?.filter(url => url.includes('oaidalleapiprodscus'));
-            finalResponse = completion.content;
-
-            if (imageUrls && imageUrls.length > 0) {
-                message.channel.sendTyping();
-                await Promise.all(imageUrls.map(async imageUrl => {
-                    console.log('Image detected...');
-                    finalResponse = finalResponse.replace(imageUrl, '').replace(/!\[.*\]\(\)/, '');
-                    const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-                    imagePaths.push(saveImage(response));
-                }));
-            }
-            return;
-
-        }).then(async () => {
-            console.log('Image length:');
-            console.log(imagePaths.length);
-            finalResponse = finalResponse.trim().replace(/\n\s*\n/g, '\n');
-            message.channel.send(finalResponse);
-            if(imagePaths.length > 0) {
-                await message.channel.send({ files: imagePaths });
-                console.log('Images sent');
-            }
-            
+            const imagesUrls = extractImages(completion.content);
+            images = await downloadImages(imagesUrls);
+            return completion.content;
+        }).then(async (completion) => {
+            message.channel.sendTyping();
+            completion = cleanImagePathsFromResponse(completion);
+            return completion;
+        }).then(async (completion) => {
+            return await sendResponse(message, completion, images);
         }).finally(() => {
-
-            if(imagePaths.length > 0) {
-                imagePaths.forEach(imagePath => {
-                    if (fs.existsSync(imagePath)) {
-                        fs.unlink(imagePath, (err) => {
-                            if (err) {
-                                console.error(err);
-                            } else {
-                                console.log('Image deleted:', imagePath);
-                            }
-                        });
-                    }
-                });
+            if (images.length > 0) {
+                deleteImages(images);
             }
             console.log('Done.');
         });
 	},
 };
 
+async function downloadImages(images) {
+
+    if (!images) return [];
+    images = await Promise.all(images.map(async image => {
+        console.log('Downloading images...');
+        const response = await axios.get(image, { responseType: 'arraybuffer' });
+        return saveImage(response);
+    }));
+    console.log('Images downloaded...');
+    console.log(images);
+
+    return images;
+}
+
 function saveImage(response) {
     const timestamp = new Date().getTime();
     const imageName = timestamp+'.jpg';
     const imageData = Buffer.from(response.data, 'binary');
     const imagePath = path.join(__dirname, './../tmp', imageName);
+    
     console.log('Saving image to ' + imagePath);
     fs.writeFileSync(imagePath, imageData);
 
     return imagePath;
+}
+
+function cleanImagePathsFromResponse(response) {
+    const regex = /\[.*?\]\(https:\/\/oaidalleapiprodscus\.blob\.core\.windows\.net.*?\)/g;
+    const matches = response.match(regex);
+    console.log('cleaning images...');
+    if (!matches) return response;
+    matches.forEach(match => {
+        response = response.replace(match, '');
+    });
+    return response;
+}
+
+function extractImages(response) {
+    const imageUrls = response.match(imageRegex);
+    console.log('Images extracted...');
+    console.log(imageUrls);
+    return imageUrls;
+}
+
+async function sendResponse(message, response, imagePaths) {
+    response = response.trim().replace(/\n\s*\n/g, '\n');
+    message.channel.send(response);
+    if(imagePaths.length > 0) {
+        await message.channel.send({ files: imagePaths });
+        console.log('Images sent');
+    }
+}
+
+function deleteImages(imagePaths) {
+    imagePaths.forEach(imagePath => {
+        if (fs.existsSync(imagePath)) {
+            fs.unlink(imagePath, (err) => {
+                if (err) {
+                    console.error(err);
+                } else {
+                    console.log('Image deleted:', imagePath);
+                }
+            });
+        }
+    });
 }

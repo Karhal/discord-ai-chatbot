@@ -1,4 +1,4 @@
-import aiCompletionHandler from './../../handlers/AiCompletionHandler.js';
+import AiCompletionHandler from './../../handlers/AiCompletionHandler.js';
 jest.mock('../../clients/ai-client.js');
 jest.mock('../../tools.js');
 
@@ -14,6 +14,7 @@ describe('AiCompletionHandler', () => {
 
   describe('addMessageToChannel', () => {
     it('should add a message to an empty channel', () => {
+      const aiCompletionHandler = new AiCompletionHandler(null, mockPrompt, mockTools);
       const message = { role: "user", content: "lorem", dateTime: "123", channelId: 2, author: "Ipsum" };
       aiCompletionHandler.addMessageToChannel(message);
 
@@ -22,7 +23,7 @@ describe('AiCompletionHandler', () => {
     });
 
     it('should remove the oldest message when exceeding maxHistory', () => {
-
+      const aiCompletionHandler = new AiCompletionHandler(null, mockPrompt, mockTools);
       const firstMessage = { role: "user", content: "first", dateTime: "123", channelId: 1, author: "Ipsum" };
       const secondMessage = { role: "assistant", content: "second", dateTime: "123", channelId: 1, author: "Lorem" };
       aiCompletionHandler.addMessageToChannel(firstMessage, 1);
@@ -34,7 +35,7 @@ describe('AiCompletionHandler', () => {
     });
 
     it('should add an array of messages to the messages array', () => {
-
+      const aiCompletionHandler = new AiCompletionHandler(null, mockPrompt, mockTools);
       const firstMessage = { role: "user", content: "first", dateTime: "123", channelId: 1, author: "Ipsum" };
       const secondMessage = { role: "assistant", content: "second", dateTime: "123", channelId: 1, author: "Lorem" };
       aiCompletionHandler.addMessageArrayToChannel([firstMessage, secondMessage], 2);
@@ -45,7 +46,7 @@ describe('AiCompletionHandler', () => {
     });
 
     it('should give me the X last messages of an given channel', () => {
-
+      const aiCompletionHandler = new AiCompletionHandler(null, mockPrompt, mockTools);
       const firstMessage = { role: "user", content: "first", createdAt: "123", channelId: 1, author: {username: "Ipsum"} };
       const secondMessage = { role: "assistant", content: "second", createdAt: "123", channelId: 1, author: {username: "Ipsum"}  };
       const thirdMessage = { role: "user", content: "third", createdAt: "123", channelId: 1, author: {username: "LoremIpsum"}  };
@@ -56,7 +57,7 @@ describe('AiCompletionHandler', () => {
     });
 
     it('should give me the X first messages of an given channel', () => {
-        
+        const aiCompletionHandler = new AiCompletionHandler(null, mockPrompt, mockTools);
         const firstMessage = { role: "user", content: "first", createdAt: "123", channelId: 1, author: {username: "Ipsum"}};
         const secondMessage = { role: "assistant", content: "second", createdAt: "123", channelId: 1, author:{username: "Lorem"} };
         const thirdMessage = { role: "user", content: "third", createdAt: "123", channelId: 1, author: {username: "LoremIpsum"} };
@@ -67,7 +68,7 @@ describe('AiCompletionHandler', () => {
     });
 
     it('should set a Channel History From a discord messages array', () => {
-          
+          const aiCompletionHandler = new AiCompletionHandler(null, mockPrompt, mockTools);
           const firstDiscordMessage = { content: "first", createdAt: "123", channelId: 1, author: {username: "Ipsum", bot: false }};
           const secondDiscordMessage = { content: "second", createdAt: "123", channelId: 1, author: {username: "Lorem", bot: true }};
           aiCompletionHandler.setChannelHistory(1, [firstDiscordMessage, secondDiscordMessage]);
@@ -75,8 +76,8 @@ describe('AiCompletionHandler', () => {
           expect(aiCompletionHandler.messages.filter(msg => msg.channelId === 1).length).toBe(2);
           expect(aiCompletionHandler.messages.filter(msg => msg.channelId === 1)).toEqual(
             [
-              { role: "assistant", content: '{"author":"Lorem","content":"second"}', dateTime: "123", channelId: 1 },
-              { role: "user", content: '{"author":"Ipsum","content":"first"}', dateTime: "123", channelId: 1},
+              { role: "assistant", content: '{"author":"Lorem","content":"second","dateTime":"123"}', channelId: 1 },
+              { role: "user", content: '{"author":"Ipsum","content":"first","dateTime":"123"}',channelId: 1},
             ]
           );
       });
