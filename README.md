@@ -36,6 +36,11 @@ Open `config.js` and adjust the settings as needed. You can set your Discord bot
 
 - **OpenAI API Key**: Sign up at [OpenAI](https://beta.openai.com/signup/) and generate an API key from the API section.
 - **Brave Search API Key**: Sign up at [Brave Search](https://search.brave.com/) and follow their instructions to obtain an API key.
+- **SerpAPI Token**: Sign up at [SerpAPI](https://serpapi.com/users/sign_up) and follow these steps:
+  1. Create an account or log in if you already have one.
+  2. Navigate to the dashboard.
+  3. Copy the API key provided in the dashboard.
+  4. Paste the API key into your `config.js` file.
 
 ## Running the Bot
 
