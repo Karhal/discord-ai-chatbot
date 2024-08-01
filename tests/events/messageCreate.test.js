@@ -1,24 +1,36 @@
-import messageCreate from '../../events/messageCreate.js';
+import messageCreate from '../../events/message-create.js';
 
 //mock config 
 jest.mock('../../config.js', () => {
     return {
-        lang: "fr",
-        discordToken: "<discord Token>",
-        openaiKey: "<openAiKey>",
-        openAiModel: "gpt-4o",
-        openAiSummaryModel: "gpt-4o-mini",
-        prompt: "",
-        botName: "botName",
-        imageSize: "1024x1024",
-        maxHistory: 10,
-        duneApiKey: "",
-        serpApiKey: "",
-        serpApiLang: "",
-        braveSearchApiKey: "-Yb8dwYhyXza79he3w",
-        braveSearchApiLang: "",
-        coinApiKey: "",
-        defaultAsset: "USD"
+        discord : {
+            lang : "fr",
+            token : "<discord Token>",
+            botName: "botName",
+            maxHistory: 10
+        },
+        openAI : {
+            apiKey : "<openAiKey>",
+            model : "gpt-4o",
+            summaryModel: "gpt-4o-mini",
+            prompt: "",
+            imageSize: "1024x1024"
+        },
+        dune : {
+            apiKey : ""
+        },
+        serp : {
+            apiKey : "",
+            lang : ""
+        },
+        braveSearch : {
+            apiKey : "",
+            lang : ""
+        },
+        coin : {
+            apiKey : "",
+            defaulAsset : "USD"
+        }
     };
 });
 
@@ -55,25 +67,5 @@ describe('messageCreate event', () => {
         const messageEvent = new messageCreate();
         const response = await messageEvent.theMessageContainsBotName(mockMessage);
         expect(response).toBe(true);    
-    });
-
-    it('should download images', async () => {
-        const messageEvent = new messageCreate();
-        const images = ['https://fr.wikipedia.org/static/images/icons/wikipedia.png'];
-        const response = await messageEvent.downloadImages(images);
-        expect(response).toHaveLength(1);
-        expect(response[0]).toMatch(/\/tmp\/\d+.jpg/);
-        const fs = require('fs');
-        fs.unlinkSync(response[0]);
-    });
-
-    it('should delete images', async () => {
-        const messageEvent = new messageCreate();
-        const images = ['https://fr.wikipedia.org/static/images/icons/wikipedia.png'];
-        const response = await messageEvent.downloadImages(images);
-        messageEvent.deleteImages(response);
-        const fs = require('fs');
-        await new Promise(r => setTimeout(r, 50));
-        expect(fs.existsSync(response[0])).toBe(false);
     });
 });

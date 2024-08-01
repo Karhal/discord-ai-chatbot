@@ -1,10 +1,10 @@
 import { readMemory } from '../tools.js';
 import config from '../config.js';
 
-const openAiModel = process.env.OPEN_AI_MODEL || config.openAiModel;
-const openAiSummaryModel = process.env.OPEN_AI_SUMMARY_MODEL || config.openAiSummaryModel || openAiModel;
-const lang = process.env.LANG || config.lang;
-const maxHistory = process.env.MAX_HISTORY || config.maxHistory;
+const openAiModel = config.openAI.model || process.env.OPEN_AI_MODEL;
+const openAiSummaryModel = config.openAI.summaryModel || process.env.OPEN_AI_SUMMARY_MODEL || openAiModel;
+const lang = config.discord.lang || process.env.LANG;
+const maxHistory = config.discord.maxHistory || process.env.MAX_HISTORY;
 
 class AiCompletionHandler {
   
@@ -25,7 +25,7 @@ class AiCompletionHandler {
             { role: 'user', content: this.getFirstMessagesOfAChannel(5, channelId).map(msg => `${msg.author}: ${msg.content}`).join("\n\n"), 
             },
           ],
-          model: openAiSummaryModel,
+          model: openAiSummaryModel
         };
 
         const response = await this.aiClient.message(option);

@@ -18,10 +18,10 @@ export default class EventDiscord {
     }
 
     initOnEvent(){
-        this.client.on(this.eventName,this.handler);
+        this.client.on(this.eventName,this.handler.bind(this));
     }
 
     initOnceEvent(){
-        this.client.once(this.eventName,this.handler);
+        this.client.once(this.eventName,this.handler.bind(this));
     }
 }

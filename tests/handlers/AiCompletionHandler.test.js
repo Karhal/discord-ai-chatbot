@@ -1,4 +1,4 @@
-import AiCompletionHandler from './../../handlers/AiCompletionHandler.js';
+import AiCompletionHandler from './../../handlers/ai-completion-handler.js';
 jest.mock('../../clients/ai-client.js');
 jest.mock('../../tools.js');
 
@@ -10,7 +10,6 @@ describe('AiCompletionHandler', () => {
   beforeEach(() => {
 
   });
-
 
   describe('addMessageToChannel', () => {
     it('should add a message to an empty channel', () => {

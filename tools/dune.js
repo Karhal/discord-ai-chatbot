@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import config from '../config.js';
 
-const duneApiKey = process.env.DUNE_API_KEY || config.duneApiKey;
+const duneApiKey = config.dune.apiKey || process.env.DUNE_API_KEY;
 
 const fetchDuneData = async (queryId) => {
 

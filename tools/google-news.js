@@ -1,9 +1,9 @@
 import config from '../config.js';
 import { getJson } from "serpapi";
 
-const serpApiKey = process.env.SERP_API_KEY || config.serpApiKey;
-const lang = config.lang;
-const serpGoogle_domain = process.env.SERP_GOOGLE_DOMAIN || config.serpGoogle_domain;
+const serpApiKey = config.serp.apiKey || process.env.SERP_API_KEY;
+const lang = config.discord.lang;
+const serpGoogle_domain = config.serp.google_domain || process.env.SERP_GOOGLE_DOMAIN;
 
 const getGoogleNews = async (query) => {
     try {

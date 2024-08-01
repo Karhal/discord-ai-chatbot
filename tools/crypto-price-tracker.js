@@ -1,8 +1,8 @@
 import config from '../config.js';
 import fetch from 'node-fetch';
 
-const coinApiKey = process.env.COIN_API_KEY || config.coinApiKey;
-const defaultAsset = process.env.DEFAULT_ASSET || config.defaultAsset;
+const coinApiKey = config.coin.apiKey || process.env.COIN_API_KEY;
+const defaultAsset = config.coin.defaultAsset || process.env.DEFAULT_ASSET;
 
 const getCryptoPrice = async (query) => {
 
