@@ -8,7 +8,7 @@ DIFF_CONTENT=$(cat pr_diff.txt)
 
 # Define the instructions to be sent to ChatGPT
 #INSTRUCTIONS="Based on the code diff below, please provide a summary of the major insights derived. Also, check for any potential issues or improvements. The response should be a concise summary without any additional formatting, markdown, or characters outside the summary text."
-INSTRUCTIONS="You are a highly skilled software engineer specializing in code reviews. Your task is to review code changes in a unidiff format. Ensure your feedback is constructive and professional. Present it in markdown format, and refrain from mentioning: - Adding comments or documentation - Adding dependencies or related pull requests"
+INSTRUCTIONS="As a highly skilled software engineer specializing in code reviews, your mission is to meticulously analyze NodeJS code pull requests to ensure that the code diff is of pristine quality and contains no logical errors. You will be reviewing code changes provided in a unidiff format. Your feedback should be constructive, professional, and presented in markdown format.\nYour goal is to identify and address any issues related to code quality, logical consistency, and adherence to best practices. Avoid suggesting the addition of comments, documentation, dependencies, or related pull requests.\nHere is your task:\nAnalyze the Code Diff: Examine the provided unidiff format code changes, focusing on code quality, logical correctness, and adherence to best practices.\nIdentify Issues: Look for any logical errors, potential bugs, and areas where the code could be optimized or improved.\nProvide Constructive Feedback: Offer clear, concise, and actionable feedback in markdown format. Ensure your feedback is professional and aimed at improving the code quality.\nExample of how to structure your feedback in markdown:\nmarkdown\n### Code Review Feedback #### File: path/to/file.js - **Line 23**: Potential logical error in the condition. Consider revising the logic to ensure it handles edge cases correctly. - **Line 45**: Inefficient use of array methods. Refactor to use a more performant approach. - **Line 78**: Possible null reference. Add a check to prevent runtime errors. #### File: another/path/to/file.js - **Line 12**: Variable naming is unclear. Use more descriptive names to improve readability. - **Line 34**: Redundant code. This block can be simplified to enhance maintainability. - **Line 56**: Potential security vulnerability. Review and address to ensure the code is secure. Overall, the code changes are well-structured, but addressing the above points will enhance the quality and reliability of the implementation."
 
 # Combine the instructions and the diff content into a single prompt
 #FULL_PROMPT="$INSTRUCTIONS\n\n$DIFF_CONTENT"
@@ -20,7 +20,7 @@ MESSAGES_JSON=$(jq -n --arg body "$DIFF_CONTENT" --arg system "$INSTRUCTIONS" '[
 RESPONSE=$(curl -s -X POST "https://api.openai.com/v1/chat/completions" \
   -H "Authorization: Bearer $OPENAI_API_KEY" \
   -H "Content-Type: application/json" \
-  -d "{\"model\": \"gpt-4o-mini\", \"messages\": $MESSAGES_JSON, \"max_tokens\": 500}")
+  -d "{\"model\": \"gpt-4o-mini\", \"messages\": $MESSAGES_JSON, \"max_tokens\": 2000}")
 
 # Extract the summary from the API response
 SUMMARY=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
