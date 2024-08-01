@@ -5,7 +5,7 @@ const serpApiKey = config.serp.apiKey || process.env.SERP_API_KEY;
 const lang = config.discord.lang;
 const serpGoogle_domain = config.serp.google_domain || process.env.SERP_GOOGLE_DOMAIN;
 
-const getGoogleNews = async (query) => {
+const getGoogleNews = async (query:string) => {
     try {
         const queryParameters = JSON.parse(query);
 

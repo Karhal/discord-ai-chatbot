@@ -27,6 +27,6 @@ export default {
     },
     coin : {
         apiKey : "",
-        defaulAsset : "USD"
+        defaultAsset : "USD"
     }
 };

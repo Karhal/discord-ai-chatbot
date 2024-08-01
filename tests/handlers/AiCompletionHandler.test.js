@@ -1,6 +1,6 @@
-import AiCompletionHandler from './../../handlers/ai-completion-handler.js';
-jest.mock('../../clients/ai-client.js');
-jest.mock('../../tools.js');
+import AiCompletionHandler from './../../dist/handlers/ai-completion-handler.js';
+jest.mock('../../dist/clients/ai-client.js');
+jest.mock('../../dist/tools.js');
 
 describe('AiCompletionHandler', () => {
 

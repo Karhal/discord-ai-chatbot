@@ -1,10 +1,10 @@
 import config from '../config.js';
 import fetch from 'node-fetch';
 
-const braveSearchApiKey = config.braveSearch.apiKey || process.env.BRAVE_SEARCH_API_KEY;
+const braveSearchApiKey = config.braveSearch.apiKey || process.env.BRAVE_SEARCH_API_KEY || '';
 const lang = config.discord.lang;
 
-const getBraveSearch = async (query) => {
+const getBraveSearch = async (query:string) => {
     try {
         const queryParameters = JSON.parse(query);
         const myHeaders = new Headers();
@@ -12,18 +12,18 @@ const getBraveSearch = async (query) => {
         myHeaders.append("Accept-Encoding", "gzip");
         myHeaders.append("X-Subscription-Token", braveSearchApiKey);
 
-        const requestOptions = {
+        const requestOptions:any = {
             method: "GET",
             headers: myHeaders,
             redirect: "follow"
         };
 
         const response = await fetch(`https://api.search.brave.com/res/v1/web/search?q=${queryParameters.query}&search_lang=${lang}&count=5&result_filter=news,web`, requestOptions);
-        let result = await response.text();
-        result = JSON.parse(result);
+        const result = await response.text();
+        const resultJSON:any = JSON.parse(result);
         console.log(result);
-        console.log({"news": result.news, "web_search": result.web});
-        return {"news":result.news, "web_search": result.web};
+        console.log({"news": resultJSON.news, "web_search": resultJSON.web});
+        return {"news":resultJSON.news, "web_search": resultJSON.web};
     } catch (error) {
         throw error;
     }

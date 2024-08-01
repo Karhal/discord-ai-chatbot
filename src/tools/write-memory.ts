@@ -1,6 +1,6 @@
 import FileManager from '../handlers/file-handler.js';
 
-const writeMemory = async (memory) => {
+const writeMemory = async (memory:string) => {
 
     try {
       const data = JSON.parse(memory);
@@ -10,7 +10,7 @@ const writeMemory = async (memory) => {
       await fileManager.appendToFile('memory.txt', `${data.memoryString}\n`);
       const lines = await fileManager.readFile('memory.txt');
 
-      if (lines.split('\n').length > 10) {
+      if (lines && lines.split('\n').length > 10) {
         const lastTenLines = lines.split('\n').slice(-10);
         await fileManager.writeFile('memory.txt', lastTenLines.join('\n'));
       }

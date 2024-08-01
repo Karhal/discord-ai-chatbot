@@ -1,7 +1,7 @@
-import messageCreate from '../../events/message-create.js';
+import messageCreate from '../../dist/events/message-create.js';
 
 //mock config 
-jest.mock('../../config.js', () => {
+jest.mock('../../dist/config.js', () => {
     return {
         discord : {
             lang : "fr",

@@ -1,14 +1,14 @@
 import fetch from 'node-fetch';
 import config from '../config.js';
 
-const duneApiKey = config.dune.apiKey || process.env.DUNE_API_KEY;
+const duneApiKey = config.dune.apiKey || process.env.DUNE_API_KEY || '';
 
-const fetchDuneData = async (queryId) => {
+const fetchDuneData = async (queryId:string) => {
 
     const query = JSON.parse(queryId).queryId;
     const myHeaders = new fetch.Headers();
     myHeaders.append("X-Dune-API-Key", duneApiKey);
-    const requestOptions = {
+    const requestOptions:any = {
         method: "GET",
         headers: myHeaders,
         redirect: "follow"

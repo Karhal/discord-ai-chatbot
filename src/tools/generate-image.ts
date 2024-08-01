@@ -1,6 +1,6 @@
 import AIClient from '../clients/ai-client.js';
 
-const generateImage = async (imagePrompt) => {
+const generateImage = async (imagePrompt:string) => {
 
     try {
         const prompt = JSON.parse(imagePrompt);
@@ -13,11 +13,11 @@ const generateImage = async (imagePrompt) => {
         const client = new AIClient();
         const response = await client.generateImage(prompt.imagePrompt);
 
-        return { "response": response };
-    } catch (error) {
+        return response;
+    } catch (error:any) {
         console.log(error);
         if (error && error.status === 400) {
-            return { "error": error.error.message };
+            return error?.error?.message || null;
         }
     }
 };

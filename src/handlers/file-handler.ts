@@ -1,12 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 
-class FileHandler {
-  constructor(baseDir) {
+export default class FileHandler {
+  baseDir:string
+
+  constructor(baseDir:string) {
     this.baseDir = baseDir;
   }
 
-  readFile(filePath) {
+  readFile(filePath:string) {
     try {
       const fullPath = path.join(this.baseDir, filePath);
       if (!fs.existsSync(fullPath)) {
@@ -20,7 +22,7 @@ class FileHandler {
     }
   }
 
-  writeFile(filePath, content) {
+  writeFile(filePath:string, content:string) {
     try {
       const fullPath = path.join(this.baseDir, filePath);
       fs.writeFileSync(fullPath, content, 'utf8');
@@ -31,7 +33,7 @@ class FileHandler {
     }
   }
 
-  appendToFile(filePath, content) {
+  appendToFile(filePath:string, content:string) {
     try {
       const fullPath = path.join(this.baseDir, filePath);
       fs.appendFileSync(fullPath, content, 'utf8');
@@ -42,5 +44,3 @@ class FileHandler {
     }
   }
 }
-
-export default FileHandler;

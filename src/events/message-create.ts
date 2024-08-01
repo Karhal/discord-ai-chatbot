@@ -1,6 +1,6 @@
 import AiCompletionHandler from '../handlers/ai-completion-handler.js';
 import AIClient from '../clients/ai-client.js';
-import { setCurrentMessage, setCompletionHandler, tools } from '../tools.js';
+import { tools } from '../tools.js';
 import config from '../config.js';
 import EventDiscord from '../clients/events-discord.js';
 import ImageHandler from '../handlers/image-handler.js';
@@ -8,9 +8,9 @@ import { Events } from 'discord.js';
 
 export default class MessageCreate extends EventDiscord {
     eventName = Events.MessageCreate;
-    handler = async function execute(message) {
+    handler = async (message:any) => {
         const maxHistory = config.discord.maxHistory;
-        if (!this.theMessageContainsBotName(message) || message.author.id === this.client.user.id) return;
+        if (!this.theMessageContainsBotName(message) || message.author.id === this?.client?.user?.id) return;
 
         const channelId = message.channelId;
         const messagesChannelHistory = await message.channel.messages.fetch({ limit: maxHistory });
@@ -25,7 +25,7 @@ export default class MessageCreate extends EventDiscord {
             let content = completion.content;
             
             const image = new ImageHandler(message,content);
-            const images = image.getImages();
+            const images = await image.getImages();
 
             message.channel.sendTyping();
             await this.sendResponse(message, content, images);
@@ -37,7 +37,7 @@ export default class MessageCreate extends EventDiscord {
         console.log('Done.');
 	};
 
-    async sendResponse(message, response, imagePaths) {
+    async sendResponse(message:any, response:any, imagePaths:any) {
         response = response.trim().replace(/\n\s*\n/g, '\n');
         message.channel.send(response);
         if(imagePaths.length > 0) {
@@ -47,7 +47,7 @@ export default class MessageCreate extends EventDiscord {
         return true;
     }
 
-    theMessageContainsBotName(message) {
+    theMessageContainsBotName(message:any) {
         const botName = config.discord.botName;
         return message.content.toLowerCase().includes(botName.toLowerCase());
     }

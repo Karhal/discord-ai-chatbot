@@ -3,8 +3,10 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 
 export default class ImageHandler {
+    message: any
+    content: string
 
-    constructor(message,content){
+    constructor(message:any,content:string){
         this.message = message;
         this.content = content;
     }
@@ -13,13 +15,16 @@ export default class ImageHandler {
         let images = await this.getImages();
         if(images && images.length > 0){
             this.message.channel.sendTyping();
-            this.content = this.cleanImagePathsFromResponse();
+            this.cleanImagePathsFromResponse();
         }
         return true;
     }
 
     async getImages(){
         const imagesUrls = this.extractImages();
+        if(!imagesUrls)
+            return []
+
         const images = await this.downloadImages(imagesUrls);
         return images;
     }
@@ -36,7 +41,7 @@ export default class ImageHandler {
         return true;
     }
 
-    deleteImages(imagePaths) {
+    async deleteImages(imagePaths:Array<string>) {
         imagePaths.forEach(imagePath => {
             if (fs.existsSync(imagePath)) {
                 fs.unlink(imagePath, (err) => {
@@ -50,25 +55,30 @@ export default class ImageHandler {
         });
     }
 
-    async downloadImages(images) {
+    async downloadImages(images:RegExpMatchArray) {
         if (!images) return [];
-        images = await Promise.all(images.map(async image => {
+        const findImages = await Promise.all(images.map(async image => {
             console.log('Downloading images ' + image);
             const response = await fetch(image);
             const responseBuffer = await response.arrayBuffer();
             return this.saveImage(responseBuffer);
         }));
-        console.log('Images downloaded',images);
-        return images;
+        console.log('Images downloaded',findImages);
+        return findImages;
     }
     
-    saveImage(response) {
+    saveImage(response:ArrayBuffer) {
         const _filename = fileURLToPath(import.meta.url);
         const __dirname = path.dirname(_filename);
         const timestamp = new Date().getTime();
         const imageName = timestamp+'.jpg';
-        const imageData = Buffer.from(response, 'binary');
-        const imagePath = path.join(__dirname, './../tmp', imageName);
+        const imageData = Buffer.from(response);
+
+        const pathTmpFolder = path.join(__dirname, './../tmp');
+        if(!fs.existsSync(pathTmpFolder)){
+            fs.mkdirSync(pathTmpFolder);
+        }
+        const imagePath = path.join(pathTmpFolder, imageName);
         
         console.log('Saving image to ' + imagePath);
         fs.writeFileSync(imagePath, imageData);

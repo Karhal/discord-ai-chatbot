@@ -51,8 +51,11 @@ The code changes involve refactoring how events are handled in the Discord clien
 # Combine the instructions and the diff content into a single prompt
 #FULL_PROMPT="$INSTRUCTIONS\n\n$DIFF_CONTENT"
 
+touch pr_instruction.txt
+echo $INSTRUCTIONS > pr_instruction.txt
+
 # Create a JSON payload for the OpenAI API request
-MESSAGES_JSON=$(jq -n --arg body "$DIFF_CONTENT" --arg system "$INSTRUCTIONS" '[{"role":"system", "content": $system}, {"role": "user", "content": $body}]')
+MESSAGES_JSON=$(jq --raw-input --slurp -n --argfile body pr_diff.txt --argfile system pr_instruction.txt '[{"role":"system", "content": $system}, {"role": "user", "content": $body}]')
 
 # Call the OpenAI API to get a response based on the provided prompt
 RESPONSE=$(curl -s -X POST "https://api.openai.com/v1/chat/completions" \

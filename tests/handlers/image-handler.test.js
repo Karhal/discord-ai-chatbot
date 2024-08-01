@@ -1,6 +1,6 @@
-import ImageHandler from './../../handlers/image-handler.js';
-jest.mock('../../clients/ai-client.js');
-jest.mock('../../tools.js');
+import ImageHandler from './../../dist/handlers/image-handler.js';
+jest.mock('../../dist/clients/ai-client.js');
+jest.mock('../../dist/tools.js');
 
 it('should download images', async () => {
     const msg = {

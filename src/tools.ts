@@ -7,7 +7,7 @@ import { dirname } from 'path';
 const dirname_ = dirname(fileURLToPath(import.meta.url));
 
 const toolsDir = path.join(dirname_, 'tools');
-const tools = [];
+const tools:any[] = [];
 
 fs.readdirSync(toolsDir).filter(file => file.endsWith('.js')).forEach(file => {
   import(path.join(toolsDir, file)).then(module => {
@@ -19,11 +19,11 @@ let audioConnection = null;
 let currentMessage = null;
 let completionHandler = null;
 
-const setCurrentMessage = (message) => {
+const setCurrentMessage = (message:string) => {
     currentMessage = message;
 };
 
-const setCompletionHandler = (completion) => {
+const setCompletionHandler = (completion:Function) => {
     completionHandler = completion;
 };
 

@@ -1,10 +1,10 @@
 import config from '../config.js';
 import fetch from 'node-fetch';
 
-const coinApiKey = config.coin.apiKey || process.env.COIN_API_KEY;
-const defaultAsset = config.coin.defaultAsset || process.env.DEFAULT_ASSET;
+const coinApiKey = config.coin.apiKey || process.env.COIN_API_KEY || '';
+const defaultAsset = config.coin.defaultAsset || process.env.DEFAULT_ASSET || '';
 
-const getCryptoPrice = async (query) => {
+const getCryptoPrice = async (query:string) => {
 
     const queryParameters = JSON.parse(query);
     console.log(queryParameters);
@@ -12,14 +12,14 @@ const getCryptoPrice = async (query) => {
     myHeaders.append("Accept", "text/plain");
     myHeaders.append("X-CoinAPI-Key", coinApiKey);
 
-    const requestOptions = {
+    const requestOptions:any = {
         method: "GET",
         headers: myHeaders,
         redirect: "follow"
     };
 
-    let result = await fetch(`https://rest.coinapi.io/v1/exchangerate/${queryParameters.asset}/${defaultAsset}`, requestOptions);
-    result = await result.text();
+    const result = await fetch(`https://rest.coinapi.io/v1/exchangerate/${queryParameters.asset}/${defaultAsset}`, requestOptions);
+    const resultJSON = await result.text();
     console.log(result);
     return result;
 };

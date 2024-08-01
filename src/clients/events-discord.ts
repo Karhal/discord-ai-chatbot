@@ -1,9 +1,12 @@
-export default class EventDiscord {
-    eventName = 'eventName';
-    once = false;
-    handler(){};
+import { Client } from 'discord.js';
 
-    constructor(client){
+export default class EventDiscord {
+    eventName:string = 'eventName';
+    once: Boolean = false;
+    handler:Function = function(){};
+    client : Client
+
+    constructor(client:Client){
         this.client = client;
     }
 
