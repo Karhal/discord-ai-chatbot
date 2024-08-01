@@ -47,8 +47,8 @@ async function downloadImages(images) {
     if (!images) return [];
     images = await Promise.all(images.map(async image => {
         console.log('Downloading images...');
-        const response = fetch(image);
-        const responseBuffer = response.arrayBuffer();
+        const response = await fetch(image);
+        const responseBuffer = await response.arrayBuffer();
         return saveImage(responseBuffer);
     }));
     console.log('Images downloaded...');
@@ -60,7 +60,7 @@ async function downloadImages(images) {
 function saveImage(response) {
     const timestamp = new Date().getTime();
     const imageName = timestamp+'.jpg';
-    const imageData = Buffer.from(response.data, 'binary');
+    const imageData = Buffer.from(response, 'binary');
     const imagePath = path.join(__dirname, './../tmp', imageName);
     
     console.log('Saving image to ' + imagePath);
