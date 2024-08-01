@@ -11,10 +11,10 @@ DIFF_CONTENT=$(cat pr_diff.txt)
 INSTRUCTIONS="You are a highly skilled software engineer specializing in code reviews. Your task is to review code changes in a unidiff format. Ensure your feedback is constructive and professional. Present it in markdown format, and refrain from mentioning: - Adding comments or documentation - Adding dependencies or related pull requests"
 
 # Combine the instructions and the diff content into a single prompt
-FULL_PROMPT="$INSTRUCTIONS\n\n$DIFF_CONTENT"
+#FULL_PROMPT="$INSTRUCTIONS\n\n$DIFF_CONTENT"
 
 # Create a JSON payload for the OpenAI API request
-MESSAGES_JSON=$(jq -n --arg body "$PR_BODY" --arg system "$INSTRUCTIONS" '[{"role":"system", "content": $system}, {"role": "user", "content": $body}]')
+MESSAGES_JSON=$(jq -n --arg body "$DIFF_CONTENT" --arg system "$INSTRUCTIONS" '[{"role":"system", "content": $system}, {"role": "user", "content": $body}]')
 
 # Call the OpenAI API to get a response based on the provided prompt
 RESPONSE=$(curl -s -X POST "https://api.openai.com/v1/chat/completions" \
