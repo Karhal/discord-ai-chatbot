@@ -2,8 +2,8 @@ import OpenAI from 'openai';
 import config from '../config.js';
 
 export default class AIClient {
-    static openAiKey = config.openaiKey || process.env.OPENAI_API_KEY;
-    static imageSize = config.imageSize || process.env.IMAGE_SIZE || "1024x1024";
+    static openAiKey = config?.openAI?.apiKey || process.env.OPENAI_API_KEY;
+    static imageSize = config?.openAI?.imageSize || process.env.IMAGE_SIZE || "1024x1024";
 
     constructor(){
       if(!AIClient.openAiKey){

@@ -1,8 +1,8 @@
 import config from '../config.js';
 import fetch from 'node-fetch';
 
-const braveSearchApiKey = process.env.BRAVE_SEARCH_API_KEY || config.braveSearchApiKey;
-const lang = config.lang;
+const braveSearchApiKey = config.braveSearch.apiKey || process.env.BRAVE_SEARCH_API_KEY;
+const lang = config.discord.lang;
 
 const getBraveSearch = async (query) => {
     try {
