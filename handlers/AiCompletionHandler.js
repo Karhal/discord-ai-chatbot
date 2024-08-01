@@ -25,7 +25,7 @@ class AiCompletionHandler {
             { role: 'user', content: this.getFirstMessagesOfAChannel(5, channelId).map(msg => `${msg.author}: ${msg.content}`).join("\n\n"), 
             },
           ],
-          model: openAiSummaryModel,
+          model: openAiSummaryModel
         };
 
         const response = await this.aiClient.message(option);
