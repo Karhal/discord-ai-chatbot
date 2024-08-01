@@ -1,11 +1,11 @@
+import EventDiscord from '../clients/events-discord.js';
 import { Events } from 'discord.js';
 
-export default {
-    name: Events.VoiceStateUpdate,
-    once: false,
-    execute(object) {
+export default class VoiceStateUpdate extends EventDiscord {
+    eventName = Events.VoiceStateUpdate;
+    handler = function execute(object) {
         if (object.member.user.bot) {
             console.log('Bot connected on voice channel ' + object.channel);
         }
-    },
+    };
 };

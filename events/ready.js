@@ -1,9 +1,10 @@
+import EventDiscord from './../clients/events-discord.js';
 import { Events } from 'discord.js';
 
-export default {
-    name: Events.ClientReady,
-    once: true,
-    execute(client) {
+export default class Ready extends EventDiscord {
+    eventName = Events.ClientReady;
+    once = true;
+    handler = function execute(client) {
         console.log(`Ready! Logged in as ${client.user.tag}`);
-    },
+    };
 };
