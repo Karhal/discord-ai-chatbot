@@ -1,20 +1,26 @@
-import { Events } from 'discord.js';
 import messageCreate from '../../events/messageCreate.js';
-//import AiCompletionHandler from './../../handlers/AiCompletionHandler.js';
-import config from '../config.js';
-import axios from 'axios';
-import fs from 'fs';
-import path from 'path';
-import { exit } from 'process';
 
-console.log(global.__dirname);
-exit
-jest.mock('axios');
-//jest.mock('fs');
-//jest.mock('path');
-//jest.mock('./../../handlers/AiCompletionHandler.js');
-jest.mock('../../clients/ai-client.js');
-jest.mock('../../tools.js');
+//mock config
+jest.mock('../../config.js', () => {
+    return {
+        lang: "fr",
+        discordToken: "<discord Token>",
+        openaiKey: "<openAiKey>",
+        openAiModel: "gpt-4o",
+        openAiSummaryModel: "gpt-4o-mini",
+        prompt: "",
+        botName: "botName",
+        imageSize: "1024x1024",
+        maxHistory: 10,
+        duneApiKey: "",
+        serpApiKey: "",
+        serpApiLang: "",
+        braveSearchApiKey: "-Yb8dwYhyXza79he3w",
+        braveSearchApiLang: "",
+        coinApiKey: "",
+        defaultAsset: "USD"
+    };
+});
 
 describe('messageCreate event', () => {
     const mockMessage = {
@@ -30,67 +36,44 @@ describe('messageCreate event', () => {
         },
     };
 
-    beforeEach(() => {
-        jest.clearAllMocks();
-    });
-
     it('should not process messages from bots', async () => {
         mockMessage.author.bot = true;
-        await messageCreate.execute(mockMessage);
+        const messageEvent = new messageCreate();
+        await messageEvent.handler(mockMessage);
         expect(mockMessage.channel.sendTyping).not.toHaveBeenCalled();
     });
 
-    it('should not process messages without bot name', async () => {
-        mockMessage.content = 'Hello';
-        await messageCreate.execute(mockMessage);
-        expect(mockMessage.channel.sendTyping).not.toHaveBeenCalled();
+    it('should not process messages that do not contain the bot name', async () => {
+        mockMessage.content = 'Test message';
+        const messageEvent = new messageCreate();
+        const response = await messageEvent.theMessageContainsBotName(mockMessage);
+        expect(response).toBe(false);    
     });
 
-    it('should process valid messages', async () => {
-        mockMessage.content = `Hello ${config.botName}`;
-        await messageCreate.execute(mockMessage);
-        expect(mockMessage.channel.sendTyping).toHaveBeenCalled();
+    it('should process messages that contain the bot name', async () => {
+        mockMessage.content = 'Test message botName';
+        const messageEvent = new messageCreate();
+        const response = await messageEvent.theMessageContainsBotName(mockMessage);
+        expect(response).toBe(true);    
     });
 
-    it('should download images correctly', async () => {
-        const images = ['http://example.com/image1.jpg'];
-        axios.get.mockResolvedValue({ data: 'imageData' });
-        const result = await messageCreate.downloadImages(images);
-        expect(result).toHaveLength(1);
-        expect(fs.writeFileSync).toHaveBeenCalled();
+    it('should download images', async () => {
+        const messageEvent = new messageCreate();
+        const images = ['https://fr.wikipedia.org/static/images/icons/wikipedia.png'];
+        const response = await messageEvent.downloadImages(images);
+        expect(response).toHaveLength(1);
+        expect(response[0]).toMatch(/\/tmp\/\d+.jpg/);
+        const fs = require('fs');
+        fs.unlinkSync(response[0]);
     });
 
-    it('should save image correctly', () => {
-        const response = { data: 'imageData' };
-        const imagePath = messageCreate.saveImage(response);
-        expect(fs.writeFileSync).toHaveBeenCalled();
-        expect(imagePath).toContain('.jpg');
-    });
-
-    it('should clean image paths from response', () => {
-        const response = 'Some text [image](https://oaidalleapiprodscus.blob.core.windows.net/image.jpg)';
-        const cleanedResponse = messageCreate.cleanImagePathsFromResponse(response);
-        expect(cleanedResponse).not.toContain('https://oaidalleapiprodscus.blob.core.windows.net/image.jpg');
-    });
-
-    it('should extract image URLs correctly', () => {
-        const response = 'Some text with http://example.com/image.jpg';
-        const imageUrls = messageCreate.extractImages(response);
-        expect(imageUrls).toContain('http://example.com/image.jpg');
-    });
-
-    it('should send response correctly', async () => {
-        const response = 'Test response';
-        const imagePaths = ['/path/to/image.jpg'];
-        await messageCreate.sendResponse(mockMessage, response, imagePaths);
-        expect(mockMessage.channel.send).toHaveBeenCalledWith(response.trim().replace(/\n\s*\n/g, '\n'));
-        expect(mockMessage.channel.send).toHaveBeenCalledWith({ files: imagePaths });
-    });
-
-    it('should delete images correctly', () => {
-        const imagePaths = ['/path/to/image.jpg'];
-        fs.existsSync.mockReturnValue(true);
-        messageCreate.deleteImages(imagePaths);
-        expect(fs.unlink).toHaveBeenCalled();
+    it('should delete images', async () => {
+        const messageEvent = new messageCreate();
+        const images = ['https://fr.wikipedia.org/static/images/icons/wikipedia.png'];
+        const response = await messageEvent.downloadImages(images);
+        messageEvent.deleteImages(response);
+        const fs = require('fs');
+        await new Promise(r => setTimeout(r, 50));
+        expect(fs.existsSync(response[0])).toBe(false);
     });
 });

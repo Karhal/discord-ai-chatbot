@@ -3,12 +3,10 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
-//const __filename = fileURLToPath(import.meta.url);
-//const __dirname = dirname(__filename);
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const dirname_ = dirname(fileURLToPath(import.meta.url));
 
-const toolsDir = path.join(__dirname, 'tools');
+const toolsDir = path.join(dirname_, 'tools');
 const tools = [];
 
 fs.readdirSync(toolsDir).filter(file => file.endsWith('.js')).forEach(file => {
@@ -30,7 +28,7 @@ const setCompletionHandler = (completion) => {
 };
 
 const readMemory = () => {
-    const memoryFilePath = path.join(__dirname, 'memory.txt');
+    const memoryFilePath = path.join(dirname_, 'memory.txt');
     if(!fs.existsSync(memoryFilePath)){
         fs.writeFileSync(memoryFilePath,'', 'utf8')
     }
