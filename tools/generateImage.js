@@ -1,7 +1,4 @@
-import { aiClient } from '../clients/ai-client.js';
-import config from '../config.js';
-
-const imageSize = process.env.IMAGE_SIZE || config.imageSize;
+import AIClient from '../clients/ai-client.js';
 
 const generateImage = async (imagePrompt) => {
 
@@ -11,15 +8,12 @@ const generateImage = async (imagePrompt) => {
             model: "dall-e-3",
             prompt: prompt.imagePrompt,
             n: 1,
-            size: imageSize,
+            size: AIClient.imageSize,
         });
-        const response = await aiClient.images.generate({
-            model: "dall-e-3",
-            prompt: prompt.imagePrompt,
-            n: 1,
-            size: imageSize,
-        });
-        return { "response": response.data[0].url };
+        const client = new AIClient();
+        const response = await client.generateImage(prompt.imagePrompt);
+
+        return { "response": response };
     } catch (error) {
         console.log(error);
         if (error && error.status === 400) {

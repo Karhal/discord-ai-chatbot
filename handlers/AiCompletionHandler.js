@@ -27,8 +27,9 @@ class AiCompletionHandler {
           ],
           model: openAiSummaryModel,
         };
-        const response = await this.aiClient.chat.completions.create(option);
-        return response?.choices[0]?.message?.content || false;
+
+        const response = await this.aiClient.message(option);
+        return response;
   }
 
   async getAiCompletion(summary, channelId) {
@@ -56,7 +57,7 @@ class AiCompletionHandler {
       response_format: { type: "json_object" }
     };
     
-    const runner = this.aiClient.beta.chat.completions.runTools(option);
+    const runner = this.aiClient.client.beta.chat.completions.runTools(option);
     let response = await runner.finalContent();
     response = JSON.parse(response.replace(/^[a-zA-Z]*:/g, ''));
     return response;
