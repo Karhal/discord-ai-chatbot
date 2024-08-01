@@ -6,3 +6,4 @@ memory.txt
 tmp/*
 .DS_Store
 coverage/*
+src/config.ts
