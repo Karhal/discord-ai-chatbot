@@ -17,7 +17,7 @@ const imageRegex = /(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%
 export default class MessageCreate extends EventDiscord {
     eventName = Events.MessageCreate;
     handler = async (message) => {
-        if (! this.theMessageContainsBotName(message) || message.author.bot) return;
+        if (!this.theMessageContainsBotName(message)) return;
 
         let images = [];
         let channelId = message.channelId;
