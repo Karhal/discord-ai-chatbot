@@ -23,3 +23,37 @@ Before getting started, make sure you have Node.js installed on your system. You
 ## Configuration
 
 Open `config.js` and adjust the settings as needed. You can set your Discord bot token, API keys for the various services, and other customization options.
+
+### Creating a Discord Bot Token
+
+1. Go to the [Discord Developer Portal](https://discord.com/developers/applications).
+2. Click on "New Application" and give your application a name.
+3. Navigate to the "Bot" section on the left sidebar and click "Add Bot".
+4. Click "Yes, do it!" to confirm.
+5. Under the "Token" section, click "Copy" to copy your bot token. This token will be used in your `config.js` file.
+
+### Obtaining API Keys
+
+- **OpenAI API Key**: Sign up at [OpenAI](https://beta.openai.com/signup/) and generate an API key from the API section.
+- **Brave Search API Key**: Sign up at [Brave Search](https://search.brave.com/) and follow their instructions to obtain an API key.
+
+## Running the Bot
+
+1. Ensure all necessary API keys and configurations are set in `config.js`.
+2. Run `npm run start` to launch the bot.
+3. Invite the bot to your Discord server using the OAuth2 URL generated in the Discord Developer Portal.
+
+## Troubleshooting
+
+- **Bot Not Responding**: Ensure the bot is online and the token in `config.js` is correct.
+- **API Errors**: Double-check that all API keys are correctly entered and have the necessary permissions.
+- **Dependencies Issues**: Run `npm install` again to ensure all dependencies are correctly installed.
+- **Discord permissions**: Be sure your bot has a correct role in Discord and can write messages and embed files.
+
+## Contributing
+
+We welcome contributions! Please fork the repository and submit a pull request with your changes.
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for more details.

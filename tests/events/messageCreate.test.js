@@ -1,6 +1,6 @@
 import messageCreate from '../../events/messageCreate.js';
 
-//mock config
+//mock config 
 jest.mock('../../config.js', () => {
     return {
         lang: "fr",
