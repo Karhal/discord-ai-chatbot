@@ -38,7 +38,6 @@ export default class DiscordClient {
         return true;
     }
 
-
     loginClient(){
         this.client.login(this.login);
     }

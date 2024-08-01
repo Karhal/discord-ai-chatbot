@@ -1,5 +1,5 @@
 import AiCompletionHandler from '../handlers/AiCompletionHandler.js';
-import { aiClient } from '../clients/ai-client.js';
+import AIClient from '../clients/ai-client.js';
 import { setCurrentMessage, setCompletionHandler, tools } from '../tools.js';
 import config from '../config.js';
 import path from 'path';
@@ -22,7 +22,7 @@ export default class MessageCreate extends EventDiscord {
         let images = [];
         let channelId = message.channelId;
         message.channel.sendTyping();
-        const aiCompletionHandler = new AiCompletionHandler(aiClient, config.prompt, tools);
+        const aiCompletionHandler = new AiCompletionHandler(new AIClient(), config.prompt, tools);
         const messagesChannelHistory = await message.channel.messages.fetch({ limit: maxHistory });
         
         aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
@@ -31,6 +31,7 @@ export default class MessageCreate extends EventDiscord {
         let completion = await aiCompletionHandler.getAiCompletion(summary, channelId);
         const imagesUrls = this.extractImages(completion.content);
         images = await this.downloadImages(imagesUrls);
+
         completion = completion.content;
         message.channel.sendTyping();
         completion = this.cleanImagePathsFromResponse(completion);
