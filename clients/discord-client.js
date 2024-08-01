@@ -26,8 +26,13 @@ export default class DiscordClient {
         const me = this;
         for (const file of eventFiles) {
             const filePath = join(eventsPath, file);
-            const myModule = await import(filePath);
-            new myModule.default(this.client).init();
+            try {
+                const myModule = await import(filePath);
+                new myModule.default(this.client).init();
+            }
+            catch(ex){
+                console.log('Error on loading event ' + file, ex)
+            }
         }
 
         return true;

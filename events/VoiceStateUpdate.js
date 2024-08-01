@@ -9,4 +9,3 @@ export default class VoiceStateUpdate extends EventDiscord {
         }
     };
 };
-

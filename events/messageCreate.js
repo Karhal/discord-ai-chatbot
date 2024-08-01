@@ -22,7 +22,7 @@ export default class MessageCreate extends EventDiscord {
         
         aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
 
-        const summary = await aiCompletionHandler.getSummary(channelId).catch(err => console.log(error));
+        const summary = await aiCompletionHandler.getSummary(channelId).catch(err => console.log(err));
         let completion = await aiCompletionHandler.getAiCompletion(summary, channelId);
         const imagesUrls = extractImages(completion.content);
         images = await downloadImages(imagesUrls);
