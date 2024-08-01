@@ -1,4 +1,3 @@
-import { Events } from 'discord.js';
 import AiCompletionHandler from '../handlers/AiCompletionHandler.js';
 import { aiClient } from '../clients/ai-client.js';
 import { setCurrentMessage, setCompletionHandler, tools } from '../tools.js';
@@ -7,16 +6,12 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 
-const botName = config.botName;
-const maxHistory = config.maxHistory;
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const imageRegex = /(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$])/igm;
+import EventDiscord from './../clients/events-discord.js';
+import { Events } from 'discord.js';
 
-export default {
-	name: Events.MessageCreate,
-	once: false,
-	async execute(message) {
+export default class MessageCreate extends EventDiscord {
+    eventName = Events.MessageCreate;
+    handler = async function execute(message) {
         if (!message.content.toLowerCase().includes(botName.toLowerCase()) || message.author.bot) return;
 
         let images = [];
@@ -39,8 +34,15 @@ export default {
             deleteImages(images);
         }
         console.log('Done.');
-	},
+	};
 };
+
+
+const botName = config.botName;
+const maxHistory = config.maxHistory;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const imageRegex = /(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$])/igm;
 
 async function downloadImages(images) {
 

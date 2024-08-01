@@ -26,19 +26,13 @@ export default class DiscordClient {
         const me = this;
         for (const file of eventFiles) {
             const filePath = join(eventsPath, file);
-            import(filePath).then(module => {
-                const event = module.event || module.default;
-                if (event.once) {
-                    me.client.once(event.name, (...args) => event.execute(...args));
-                } else {
-                    me.client.on(event.name, (...args) => event.execute(...args));
-                }
-                console.log(event.name + ' added');
-            }).catch(error => console.error(`${file}:`, error));
+            const myModule = await import(filePath);
+            new myModule.default(this.client).init();
         }
 
         return true;
     }
+
 
     loginClient(){
         this.client.login(this.login);
