@@ -34,19 +34,36 @@ Open `config.js` and adjust the settings as needed. You can set your Discord bot
 
 ### Obtaining API Keys
 
-- **OpenAI API Key**: Sign up at [OpenAI](https://beta.openai.com/signup/) and generate an API key from the API section.
-- **Brave Search API Key**: Sign up at [Brave Search](https://search.brave.com/) and follow their instructions to obtain an API key.
-- **SerpAPI Token**: Sign up at [SerpAPI](https://serpapi.com/users/sign_up) and follow these steps:
-  1. Create an account or log in if you already have one.
-  2. Navigate to the dashboard.
-  3. Copy the API key provided in the dashboard.
-  4. Paste the API key into your `config.js` file.
+- **OpenAI API Key**: 
+  1. Sign up at [OpenAI](https://beta.openai.com/signup/).
+  2. Navigate to the API section and generate an API key.
+  3. Copy the API key and paste it into your `config.js` file.
+
+- **Brave Search API Key**: 
+  1. Sign up at [Brave Search](https://search.brave.com/).
+  2. Follow their instructions to obtain an API key.
+  3. Copy the API key and paste it into your `config.js` file.
+
+- **SerpAPI Token**: 
+  1. Sign up at [SerpAPI](https://serpapi.com/users/sign_up).
+  2. Create an account or log in if you already have one.
+  3. Navigate to the dashboard.
+  4. Copy the API key provided in the dashboard.
+  5. Paste the API key into your `config.js` file.
 
 ## Running the Bot
 
 1. Ensure all necessary API keys and configurations are set in `config.js`.
 2. Run `npm run start` to launch the bot.
 3. Invite the bot to your Discord server using the OAuth2 URL generated in the Discord Developer Portal.
+
+## Running Tests
+
+To ensure everything is working correctly, you can run the provided tests.
+
+1. Run `npm test` to execute the tests once.
+2. Run `npm run test:watch` to run the tests in watch mode, which will re-run tests on file changes.
+
 
 ## Troubleshooting
 
