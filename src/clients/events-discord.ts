@@ -3,7 +3,7 @@ import { Client } from "discord.js";
 export default class EventDiscord {
   eventName: string;
   once: boolean;
-  handler: Function;
+  handler: Function = function(){};
   client: Client;
 
   constructor(client: Client) {

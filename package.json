@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "npm run build && node dist/index.js",
-    "test": "cp src/config.ts.dist dist/config.js && jest",
+    "test": "cp src/config.ts.dist src/config.ts && npm run build && jest",
     "test:watch": "jest --watch",
     "start:dev": "npx nodemon",
     "build": "tsup src/index.ts --minify",
