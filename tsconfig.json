@@ -18,4 +18,4 @@
       "synchronousWatchDirectory": true,
       "excludeDirectories": ["node_modules", "coverage"]
     }
-  }
+}
