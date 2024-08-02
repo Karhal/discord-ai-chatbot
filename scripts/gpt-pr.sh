@@ -5,7 +5,7 @@ set -e
 
 # Read the PR diff content from the in the workflow
 DIFF_CONTENT=$(cat pr_diff.txt)
-
+echo "$DIFF_CONTENT"
 # Define the instructions to be sent to ChatGPT
 #INSTRUCTIONS="Based on the code diff below, please provide a summary of the major insights derived. Also, check for any potential issues or improvements. The response should be a concise summary without any additional formatting, markdown, or characters outside the summary text."
 INSTRUCTIONS="As a highly skilled software engineer specializing in code reviews, your mission is to meticulously analyze NodeJS code pull requests to ensure that the code diff is of pristine quality and contains no logical errors. You will be reviewing code changes provided in a unidiff format. Your feedback should be constructive, professional, and presented in markdown format.
