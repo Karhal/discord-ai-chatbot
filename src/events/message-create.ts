@@ -4,11 +4,11 @@ import { tools } from "../tools.js";
 import config from "../config.js";
 import EventDiscord from "../clients/events-discord.js";
 import ImageHandler from "../handlers/image-handler.js";
-import { Events } from "discord.js";
+import { Events, Message } from "discord.js";
 
 export default class MessageCreate extends EventDiscord {
   eventName = Events.MessageCreate;
-  handler = async (message: any) => {
+  handler = async (message: Message) => {
     const maxHistory = config.discord.maxHistory;
     if (
       !this.theMessageContainsBotName(message) ||
@@ -50,7 +50,7 @@ export default class MessageCreate extends EventDiscord {
     console.log("Done.");
   };
 
-  async sendResponse(message: any, response: any, imagePaths: any) {
+  async sendResponse(message: Message, response: string, imagePaths: string[]) {
     response = response.trim().replace(/\n\s*\n/g, "\n");
     message.channel.send(response);
     if (imagePaths.length > 0) {
@@ -60,7 +60,7 @@ export default class MessageCreate extends EventDiscord {
     return true;
   }
 
-  theMessageContainsBotName(message: any) {
+  theMessageContainsBotName(message: Message) {
     const botName = config.discord.botName;
     return message.content.toLowerCase().includes(botName.toLowerCase());
   }
