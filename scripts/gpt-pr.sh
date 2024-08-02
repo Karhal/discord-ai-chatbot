@@ -55,7 +55,8 @@ touch pr_instruction.txt
 echo $INSTRUCTIONS > pr_instruction.txt
 
 # Create a JSON payload for the OpenAI API request
-MESSAGES_JSON=$(jq --raw-input --slurp -n --argfile body pr_diff.txt --argfile system pr_instruction.txt '[{"role":"system", "content": $system}, {"role": "user", "content": $body}]')
+#MESSAGES_JSON=$(jq --raw-input --slurp -n --argfile body pr_diff.txt --argfile system pr_instruction.txt '[{"role":"system", "content": $system}, {"role": "user", "content": $body}]')
+MESSAGES_JSON=$(jq --raw-input --slurp -n --arg system_content "$(cat pr_instruction.txt)" --arg user_content "$(cat pr_diff.txt)" '[{"role":"system", "content": $system_content}, {"role": "user", "content": $user_content}]')
 
 # Call the OpenAI API to get a response based on the provided prompt
 RESPONSE=$(curl -s -X POST "https://api.openai.com/v1/chat/completions" \
