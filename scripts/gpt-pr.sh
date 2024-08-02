@@ -5,7 +5,7 @@ set -e
 
 # Read the PR diff content from the in the workflow
 DIFF_CONTENT=$(cat pr_diff.txt)
-
+echo "$DIFF_CONTENT"
 # Define the instructions to be sent to ChatGPT
 #INSTRUCTIONS="Based on the code diff below, please provide a summary of the major insights derived. Also, check for any potential issues or improvements. The response should be a concise summary without any additional formatting, markdown, or characters outside the summary text."
 INSTRUCTIONS="As a highly skilled software engineer specializing in code reviews, your mission is to meticulously analyze NodeJS code pull requests to ensure that the code diff is of pristine quality and contains no logical errors. You will be reviewing code changes provided in a unidiff format. Your feedback should be constructive, professional, and presented in markdown format.
@@ -55,7 +55,8 @@ touch pr_instruction.txt
 echo $INSTRUCTIONS > pr_instruction.txt
 
 # Create a JSON payload for the OpenAI API request
-MESSAGES_JSON=$(jq --raw-input --slurp -n --argfile body pr_diff.txt --argfile system pr_instruction.txt '[{"role":"system", "content": $system}, {"role": "user", "content": $body}]')
+#MESSAGES_JSON=$(jq --raw-input --slurp -n --argfile body pr_diff.txt --argfile system pr_instruction.txt '[{"role":"system", "content": $system}, {"role": "user", "content": $body}]')
+MESSAGES_JSON=$(jq --raw-input --slurp -n --arg system_content "$(cat pr_instruction.txt)" --arg user_content "$(cat pr_diff.txt)" '[{"role":"system", "content": $system_content}, {"role": "user", "content": $user_content}]')
 
 # Call the OpenAI API to get a response based on the provided prompt
 RESPONSE=$(curl -s -X POST "https://api.openai.com/v1/chat/completions" \

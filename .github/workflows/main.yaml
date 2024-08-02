@@ -3,7 +3,7 @@ name: New PR
 on:
   pull_request:
     types: [opened, reopened, synchronize]
-    branches: [main]
+    branches: [main, go-ts]
 
 permissions:
   contents: write
