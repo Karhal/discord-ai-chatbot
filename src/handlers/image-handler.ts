@@ -1,5 +1,4 @@
 import path from "path";
-import { fileURLToPath } from "url";
 import fs from "fs";
 
 export default class ImageHandler {
@@ -70,13 +69,12 @@ export default class ImageHandler {
   }
 
   saveImage(response: ArrayBuffer) {
-    const _filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(_filename);
+
     const timestamp = new Date().getTime();
     const imageName = timestamp + ".jpg";
     const imageData = Buffer.from(response);
 
-    const pathTmpFolder = path.join(__dirname, "./../tmp");
+    const pathTmpFolder = "./../tmp";
     if (!fs.existsSync(pathTmpFolder)) {
       fs.mkdirSync(pathTmpFolder);
     }

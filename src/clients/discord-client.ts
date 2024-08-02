@@ -30,9 +30,8 @@ export default class DiscordClient {
   }
 
   async loadEvents() {
-    const __dirname = dirname(fileURLToPath(import.meta.url));
-    const eventsPath = join(__dirname, "..", "events");
-    const eventFiles = readdirSync(eventsPath).filter((file) =>
+    const eventsPath = "./../events";
+    const eventFiles = readdirSync("./../events").filter((file) =>
       file.endsWith(".js"),
     );
 

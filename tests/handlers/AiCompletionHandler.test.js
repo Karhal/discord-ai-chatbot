@@ -1,15 +1,16 @@
+/* eslint-disable no-undef */
 import AiCompletionHandler from './../../dist/handlers/ai-completion-handler.js';
-jest.mock('../../dist/clients/ai-client.js');
-jest.mock('../../dist/tools.js');
+jest.mock('./../../dist/clients/ai-client.js');
+jest.mock('./../../dist/tools.js');
 
 describe('AiCompletionHandler', () => {
 
   const mockPrompt = 'Test prompt';
   const mockTools = {};
 
-  beforeEach(() => {
+  /*beforeEach(() => {
 
-  });
+  });*/
 
   describe('addMessageToChannel', () => {
     it('should add a message to an empty channel', () => {

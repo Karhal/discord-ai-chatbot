@@ -1,12 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 
-
-const dirname_ = dirname(fileURLToPath(import.meta.url));
-
-const toolsDir = path.join(dirname_, 'tools');
+const toolsDir = './tools';
 const tools:any[] = [];
 
 fs.readdirSync(toolsDir).filter(file => file.endsWith('.js')).forEach(file => {

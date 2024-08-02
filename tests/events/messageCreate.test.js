@@ -1,7 +1,8 @@
-import messageCreate from '../../dist/events/message-create.js';
+/* eslint-disable no-undef */
+import messageCreate from './../../dist/events/message-create.js';
 
 //mock config 
-jest.mock('../../dist/config.js', () => {
+jest.mock('./../../dist/config.js', () => {
     return {
         discord : {
             lang : "fr",
