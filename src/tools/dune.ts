@@ -1,16 +1,16 @@
-import fetch from "node-fetch";
-import config from "../config.js";
+import fetch from 'node-fetch';
+import config from '../config';
 
-const duneApiKey = config.dune.apiKey || process.env.DUNE_API_KEY || "";
+const duneApiKey = config.dune.apiKey || process.env.DUNE_API_KEY || '';
 
 const fetchDuneData = async (queryId: string) => {
   const query = JSON.parse(queryId).queryId;
   const myHeaders = new fetch.Headers();
-  myHeaders.append("X-Dune-API-Key", duneApiKey);
+  myHeaders.append('X-Dune-API-Key', duneApiKey);
   const requestOptions: any = {
-    method: "GET",
+    method: 'GET',
     headers: myHeaders,
-    redirect: "follow",
+    redirect: 'follow',
   };
 
   try {
@@ -20,20 +20,21 @@ const fetchDuneData = async (queryId: string) => {
     );
     const result = await response.text();
     return result;
-  } catch (error) {
+  }
+  catch (error) {
     console.error(error);
   }
 };
 
 const fetchDuneDataTool = {
-  type: "function",
+  type: 'function',
   function: {
     function: fetchDuneData,
-    description: "use this tool only when asked to get data from Dune API",
+    description: 'use this tool only when asked to get data from Dune API',
     parameters: {
-      type: "object",
+      type: 'object',
       properties: {
-        queryId: { type: "string" },
+        queryId: { type: 'string' },
       },
     },
   },

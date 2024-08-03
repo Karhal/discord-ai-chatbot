@@ -1,5 +1,5 @@
-import config from "../config.js";
-import { getJson } from "serpapi";
+import config from '../config';
+import { getJson } from 'serpapi';
 
 const serpApiKey = config.serp.apiKey || process.env.SERP_API_KEY;
 const lang = config.discord.lang;
@@ -12,31 +12,32 @@ const getGoogleNews = async (query: string) => {
 
     const response = await getJson({
       api_key: serpApiKey,
-      engine: "google",
+      engine: 'google',
       q: queryParameters.query,
       google_domain: serpGoogle_domain,
       gl: lang,
       hl: lang,
-      tbm: "nws",
+      tbm: 'nws',
     });
 
     console.log(response);
     return response;
-  } catch (error) {
+  }
+  catch (error) {
     console.error(error);
   }
 };
 
 const getGoogleNewsTool = {
-  type: "function",
+  type: 'function',
   function: {
     function: getGoogleNews,
     description:
-      "Use this tool only when you need to get fresh news from Google. Then interpret the results and provide a summary.",
+      'Use this tool only when you need to get fresh news from Google. Then interpret the results and provide a summary.',
     parameters: {
-      type: "object",
+      type: 'object',
       properties: {
-        query: { type: "string" },
+        query: { type: 'string' },
       },
     },
   },

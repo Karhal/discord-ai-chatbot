@@ -1,21 +1,21 @@
-import config from "../config.js";
-import fetch from "node-fetch";
+import config from '../config';
+import fetch from 'node-fetch';
 
-const coinApiKey = config.coin.apiKey || process.env.COIN_API_KEY || "";
+const coinApiKey = config.coin.apiKey || process.env.COIN_API_KEY || '';
 const defaultAsset =
-  config.coin.defaultAsset || process.env.DEFAULT_ASSET || "";
+  config.coin.defaultAsset || process.env.DEFAULT_ASSET || '';
 
 const getCryptoPrice = async (query: string) => {
   const queryParameters = JSON.parse(query);
   console.log(queryParameters);
   const myHeaders = new Headers();
-  myHeaders.append("Accept", "text/plain");
-  myHeaders.append("X-CoinAPI-Key", coinApiKey);
+  myHeaders.append('Accept', 'text/plain');
+  myHeaders.append('X-CoinAPI-Key', coinApiKey);
 
   const requestOptions: any = {
-    method: "GET",
+    method: 'GET',
     headers: myHeaders,
-    redirect: "follow",
+    redirect: 'follow',
   };
 
   const result = await fetch(
@@ -28,15 +28,15 @@ const getCryptoPrice = async (query: string) => {
 };
 
 const getCryptoPriceTool = {
-  type: "function",
+  type: 'function',
   function: {
     function: getCryptoPrice,
     description:
-      "use this tool only when you need to get the price of an asset. Use short ticker like BTC, ETH, etc.",
+      'use this tool only when you need to get the price of an asset. Use short ticker like BTC, ETH, etc.',
     parameters: {
-      type: "object",
+      type: 'object',
       properties: {
-        asset: { type: "string" },
+        asset: { type: 'string' },
       },
     },
   },

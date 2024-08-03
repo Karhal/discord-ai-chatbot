@@ -1,5 +1,5 @@
-import path from "path";
-import fs from "fs";
+import path from 'path';
+import fs from 'fs';
 
 export default class ImageHandler {
   message: any;
@@ -34,7 +34,7 @@ export default class ImageHandler {
     if (!matches) return true;
 
     matches.forEach((match) => {
-      this.content = this.content.replace(match, "");
+      this.content = this.content.replace(match, '');
     });
 
     return true;
@@ -46,8 +46,9 @@ export default class ImageHandler {
         fs.unlink(imagePath, (err) => {
           if (err) {
             console.error(err);
-          } else {
-            console.log("Image deleted:", imagePath);
+          }
+          else {
+            console.log('Image deleted:', imagePath);
           }
         });
       }
@@ -58,29 +59,28 @@ export default class ImageHandler {
     if (!images) return [];
     const findImages = await Promise.all(
       images.map(async (image) => {
-        console.log("Downloading images " + image);
+        console.log('Downloading images ' + image);
         const response = await fetch(image);
         const responseBuffer = await response.arrayBuffer();
         return this.saveImage(responseBuffer);
       }),
     );
-    console.log("Images downloaded", findImages);
+    console.log('Images downloaded', findImages);
     return findImages;
   }
 
   saveImage(response: ArrayBuffer) {
-
     const timestamp = new Date().getTime();
-    const imageName = timestamp + ".jpg";
+    const imageName = timestamp + '.jpg';
     const imageData = Buffer.from(response);
 
-    const pathTmpFolder = "./../tmp";
+    const pathTmpFolder = './../tmp';
     if (!fs.existsSync(pathTmpFolder)) {
       fs.mkdirSync(pathTmpFolder);
     }
     const imagePath = path.join(pathTmpFolder, imageName);
 
-    console.log("Saving image to " + imagePath);
+    console.log('Saving image to ' + imagePath);
     fs.writeFileSync(imagePath, imageData);
 
     return imagePath;

@@ -1,5 +1,5 @@
-import fs from "fs";
-import path from "path";
+import fs from 'fs';
+import path from 'path';
 
 export default class FileHandler {
   baseDir: string;
@@ -14,10 +14,11 @@ export default class FileHandler {
       if (!fs.existsSync(fullPath)) {
         return null;
       }
-      const data = fs.readFileSync(fullPath, "utf8");
+      const data = fs.readFileSync(fullPath, 'utf8');
       return data;
-    } catch (error) {
-      console.error("Error reading file:", error);
+    }
+    catch (error) {
+      console.error('Error reading file:', error);
       return null;
     }
   }
@@ -25,10 +26,11 @@ export default class FileHandler {
   writeFile(filePath: string, content: string) {
     try {
       const fullPath = path.join(this.baseDir, filePath);
-      fs.writeFileSync(fullPath, content, "utf8");
+      fs.writeFileSync(fullPath, content, 'utf8');
       return true;
-    } catch (error) {
-      console.error("Error writing file:", error);
+    }
+    catch (error) {
+      console.error('Error writing file:', error);
       return false;
     }
   }
@@ -36,10 +38,11 @@ export default class FileHandler {
   appendToFile(filePath: string, content: string) {
     try {
       const fullPath = path.join(this.baseDir, filePath);
-      fs.appendFileSync(fullPath, content, "utf8");
+      fs.appendFileSync(fullPath, content, 'utf8');
       return true;
-    } catch (error) {
-      console.error("Error appending to file:", error);
+    }
+    catch (error) {
+      console.error('Error appending to file:', error);
       return false;
     }
   }
