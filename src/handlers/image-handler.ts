@@ -66,13 +66,25 @@ export default class ImageHandler {
   async downloadImages(images: RegExpMatchArray) {
     if (!images) return [];
     const findImages = await Promise.all(
-      images.map(async (image) => {
-        console.log('Downloading images ' + image);
-        this.message.channel.sendTyping();
-        const response = await fetch(image);
-        const responseBuffer = await response.arrayBuffer();
-        return this.saveImage(responseBuffer);
-      })
+      images
+        .map(async (image) => {
+          console.log('Downloading images ' + image);
+          this.message.channel.sendTyping();
+          const response = await fetch(image);
+          if (response.status === 200) {
+            const responseBuffer = await response.arrayBuffer();
+            return this.saveImage(responseBuffer);
+          }
+          else {
+            console.log(
+              'error download image',
+              response.status,
+              response.statusText
+            );
+            return null;
+          }
+        })
+        .filter((img) => img !== null)
     );
     console.log('Images downloaded', findImages);
     return findImages;
