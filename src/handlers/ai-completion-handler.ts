@@ -24,12 +24,6 @@ class AiCompletionHandler {
   }
 
   async getSummary(channelId: any) {
-    console.log('called summary with:');
-    console.log(
-      this.getFirstMessagesOfAChannel(5, channelId)
-        .map((msg) => `${msg.author}: ${msg.content}`)
-        .join('\n\n'),
-    );
     const option = {
       messages: [
         {
@@ -42,7 +36,7 @@ class AiCompletionHandler {
         {
           role: 'user',
           content: this.getFirstMessagesOfAChannel(5, channelId)
-            .map((msg) => `${msg.author}: ${msg.content}`)
+            .map((msg) => `${msg.content.author}: ${msg.content}`)
             .join('\n\n'),
         },
       ],
@@ -68,9 +62,6 @@ class AiCompletionHandler {
     conversation = conversation.concat(
       this.getLastMessagesOfAChannel(5, channelId) || [],
     );
-
-    console.log('conversation:');
-    console.log(conversation);
 
     const option = {
       model: openAiModel,
