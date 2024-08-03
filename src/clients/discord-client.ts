@@ -1,15 +1,17 @@
 import { Client, GatewayIntentBits } from 'discord.js';
 import Ready from '../events/ready';
 import MessageCreate from '../events/message-create';
+import AIClient from './ai-client';
 
 export default class DiscordClient {
   ready: boolean;
-  client: Client;
+  discordClient: Client;
   login: string;
+  aiClient: AIClient = new AIClient();
 
   constructor(login: string) {
     this.ready = false;
-    this.client = new Client({
+    this.discordClient = new Client({
       intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
@@ -22,26 +24,26 @@ export default class DiscordClient {
 
   async init() {
     await this.loadEvents();
-    this.loginClient();
+    this.loginDiscord();
     this.ready = true;
     return true;
   }
 
   async loadEvents() {
-    this.client.once('ready', (event) => {
-      const ready = new Ready(this.client);
+    this.discordClient.once('ready', (event) => {
+      const ready = new Ready(this.discordClient, this.aiClient);
       ready.handler();
     });
 
-    this.client.once('messageCreate', (event) => {
-      const ready = new MessageCreate(this.client);
+    this.discordClient.on('messageCreate', (event) => {
+      const ready = new MessageCreate(this.discordClient, this.aiClient);
       ready.handler(event);
     });
 
     return true;
   }
 
-  loginClient() {
-    this.client.login(this.login);
+  loginDiscord() {
+    this.discordClient.login(this.login);
   }
 }

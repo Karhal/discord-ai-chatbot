@@ -12,7 +12,7 @@ export default class MessageCreate extends EventDiscord {
     const maxHistory = config.discord.maxHistory;
     if (
       !this.theMessageContainsBotName(message) ||
-      message.author.id === this?.client?.user?.id
+      message.author.id === this.discordClient?.user?.id
     ) {
       return;
     }
@@ -24,7 +24,7 @@ export default class MessageCreate extends EventDiscord {
     message.channel.sendTyping();
 
     const aiCompletionHandler = new AiCompletionHandler(
-      new AIClient(),
+      this.aiClient,
       config.openAI.prompt,
       tools,
     );
@@ -37,8 +37,8 @@ export default class MessageCreate extends EventDiscord {
         channelId,
       );
       const content = completion.content;
-
-      const image = new ImageHandler(message, content);
+      console.log('completion', completion);
+      const image = new ImageHandler(this.aiClient, message, content);
       const images = await image.getImages();
 
       message.channel.sendTyping();
