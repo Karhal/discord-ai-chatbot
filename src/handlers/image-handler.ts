@@ -6,6 +6,8 @@ export default class ImageHandler {
   message: any;
   content: string;
   aiClient: AIClient;
+  imagesUrls: RegExpMatchArray | null = null;
+  downloadedImages: string[] = [];
 
   constructor(aiClient: AIClient, message: any, content: string) {
     this.aiClient = aiClient;
@@ -13,21 +15,23 @@ export default class ImageHandler {
     this.content = content;
   }
 
-  async getImage() {
-    const images = await this.getImages();
-    if (images && images.length > 0) {
-      this.message.channel.sendTyping();
+  async getImageFromMSG() {
+    const find = await this.getImages();
+    if (find) {
       this.cleanImagePathsFromResponse();
     }
     return true;
   }
 
   async getImages() {
-    const imagesUrls = this.extractImages();
-    if (!imagesUrls) return [];
+    this.extractImages();
+    if (!this.imagesUrls?.length) return [];
 
-    const images = await this.downloadImages(imagesUrls);
-    return images;
+    this.downloadedImages = await this.downloadImages(this.imagesUrls);
+    if (this.downloadedImages.length) {
+      return true;
+    }
+    return false;
   }
 
   cleanImagePathsFromResponse() {
@@ -39,12 +43,11 @@ export default class ImageHandler {
     matches.forEach((match) => {
       this.content = this.content.replace(match, '');
     });
-
     return true;
   }
 
-  async deleteImages(imagePaths: Array<string>) {
-    imagePaths.forEach((imagePath) => {
+  async deleteImages() {
+    this.downloadedImages.forEach((imagePath) => {
       if (fs.existsSync(imagePath)) {
         fs.unlink(imagePath, (err) => {
           if (err) {
@@ -63,6 +66,7 @@ export default class ImageHandler {
     const findImages = await Promise.all(
       images.map(async (image) => {
         console.log('Downloading images ' + image);
+        this.message.channel.sendTyping();
         const response = await fetch(image);
         const responseBuffer = await response.arrayBuffer();
         return this.saveImage(responseBuffer);
@@ -92,7 +96,6 @@ export default class ImageHandler {
   extractImages() {
     const imageRegex =
       /(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$])/gim;
-    const imageUrls = this.content.match(imageRegex);
-    return imageUrls;
+    this.imagesUrls = this.content.match(imageRegex);
   }
 }
