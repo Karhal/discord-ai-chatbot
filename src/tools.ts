@@ -9,12 +9,12 @@ tools.push(writeMemoryTool);
 tools.push(generateImageTool);
 
 const readMemory = () => {
-	const memoryFilePath = path.join(__dirname, 'memory.txt');
-	if (!fs.existsSync(memoryFilePath)) {
-		fs.writeFileSync(memoryFilePath, '', 'utf8');
-	}
-	const memoryData = fs.readFileSync(memoryFilePath, 'utf8');
-	return memoryData;
+  const memoryFilePath = path.join(__dirname, 'memory.txt');
+  if (!fs.existsSync(memoryFilePath)) {
+    fs.writeFileSync(memoryFilePath, '', 'utf8');
+  }
+  const memoryData = fs.readFileSync(memoryFilePath, 'utf8');
+  return memoryData;
 };
 
 export { tools, readMemory };

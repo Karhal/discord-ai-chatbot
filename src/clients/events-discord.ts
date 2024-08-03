@@ -1,24 +1,25 @@
-import { Client } from "discord.js";
+import { Client } from 'discord.js';
 
 export default class EventDiscord {
   eventName: string;
   once: boolean;
-  handler: Function = function(){};
+  handler: Function = function() {};
   client: Client;
 
   constructor(client: Client) {
     this.client = client;
-    this.eventName = "eventName";
+    this.eventName = 'eventName';
     this.once = false;
   }
 
   init() {
     if (!this.once) {
       this.initOnEvent();
-    } else {
+    }
+    else {
       this.initOnceEvent();
     }
-    console.log(this.eventName + " added");
+    console.log(this.eventName + ' added');
   }
 
   initOnEvent() {
