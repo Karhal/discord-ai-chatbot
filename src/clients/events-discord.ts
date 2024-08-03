@@ -1,13 +1,16 @@
 import { Client } from 'discord.js';
+import AIClient from './ai-client';
 
 export default class EventDiscord {
   eventName: string;
   once: boolean;
   handler: Function = function() {};
-  client: Client;
+  discordClient: Client;
+  aiClient: AIClient;
 
-  constructor(client: Client) {
-    this.client = client;
+  constructor(discordClient: Client, aiClient: AIClient) {
+    this.discordClient = discordClient;
+    this.aiClient = aiClient;
     this.eventName = 'eventName';
     this.once = false;
   }
@@ -23,10 +26,10 @@ export default class EventDiscord {
   }
 
   initOnEvent() {
-    this.client.on(this.eventName, this.handler.bind(this));
+    this.discordClient.on(this.eventName, this.handler.bind(this));
   }
 
   initOnceEvent() {
-    this.client.once(this.eventName, this.handler.bind(this));
+    this.discordClient.once(this.eventName, this.handler.bind(this));
   }
 }

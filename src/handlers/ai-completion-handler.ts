@@ -1,5 +1,6 @@
 import { readMemory } from '../tools';
 import config from '../config';
+import AIClient from './../clients/ai-client';
 
 const openAiModel = config.openAI.model || process.env.OPEN_AI_MODEL;
 const openAiSummaryModel =
@@ -10,13 +11,13 @@ const lang = config.discord.lang || process.env.LANG;
 const maxHistory = config.discord.maxHistory || process.env.MAX_HISTORY;
 
 class AiCompletionHandler {
-  aiClient: any;
+  aiClient: AIClient;
   prompt: string;
   messages: Array<any> = [];
   summary: any | null = null;
   tools: any[];
 
-  constructor(aiClient: any, prompt: string, tools: Array<any>) {
+  constructor(aiClient: AIClient, prompt: string, tools: Array<any>) {
     this.aiClient = aiClient;
     this.prompt = prompt;
     this.tools = tools;

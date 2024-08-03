@@ -1,11 +1,14 @@
 import path from 'path';
 import fs from 'fs';
+import AIClient from '../clients/ai-client';
 
 export default class ImageHandler {
   message: any;
   content: string;
+  aiClient: AIClient;
 
-  constructor(message: any, content: string) {
+  constructor(aiClient: AIClient, message: any, content: string) {
+    this.aiClient = aiClient;
     this.message = message;
     this.content = content;
   }
