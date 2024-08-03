@@ -1,9 +1,15 @@
 {
-    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
-    "editor.formatOnType": false, // required
-    "editor.formatOnPaste": true, // optional
-    "editor.formatOnSave": true, // optional
-    "editor.formatOnSaveMode": "file", // required to format on save
-    "files.autoSave": "onFocusChange", // optional but recommended
-    "vs-code-prettier-eslint.prettierLast": false // set as "true" to run 'prettier' last not first
-  }
+	"editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
+	"editor.formatOnType": false, // required
+	"editor.formatOnPaste": true, // optional
+	"editor.formatOnSave": true, // optional
+	"editor.formatOnSaveMode": "file", // required to format on save
+	"files.autoSave": "onFocusChange", // optional but recommended
+	"vs-code-prettier-eslint.prettierLast": false, // set as "true" to run 'prettier' last not first
+	"json.schemas": [
+		{
+			"url": "https://cdn.jsdelivr.net/npm/tsup/schema.json",
+			"fileMatch": ["package.json", "tsup.config.json"]
+		}
+	]
+}
