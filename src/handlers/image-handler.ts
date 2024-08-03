@@ -15,12 +15,13 @@ export default class ImageHandler {
     this.content = content;
   }
 
-  async getImageFromMSG() {
+  async getImageFromMSG(): Promise<boolean> {
     const find = await this.getImages();
     if (find) {
       this.cleanImagePathsFromResponse();
+      return true;
     }
-    return true;
+    return false;
   }
 
   async getImages() {
@@ -28,6 +29,7 @@ export default class ImageHandler {
     if (!this.imagesUrls?.length) return [];
 
     this.downloadedImages = await this.downloadImages(this.imagesUrls);
+    console.log('downloaded images', this.downloadedImages);
     if (this.downloadedImages.length) {
       return true;
     }
@@ -70,7 +72,7 @@ export default class ImageHandler {
         const response = await fetch(image);
         const responseBuffer = await response.arrayBuffer();
         return this.saveImage(responseBuffer);
-      }),
+      })
     );
     console.log('Images downloaded', findImages);
     return findImages;
@@ -97,5 +99,6 @@ export default class ImageHandler {
     const imageRegex =
       /(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$])/gim;
     this.imagesUrls = this.content.match(imageRegex);
+    console.log('image extract', this.imagesUrls);
   }
 }
