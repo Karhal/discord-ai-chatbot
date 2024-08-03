@@ -66,8 +66,13 @@ export default class MessageCreate extends EventDiscord {
 
   theMessageContainsBotName(message: Message) {
     const botName = this.discordClient.user?.username;
-    if (botName) {
-      return message.content.toLowerCase().includes(botName.toLowerCase());
+    const botId = this.discordClient.user?.id;
+    if (!!botName || !!botId) {
+      return (
+        (!!botName &&
+          message.content.toLowerCase().includes(botName.toLowerCase())) ||
+        (!!botId && message.content.toLowerCase().includes('<@' + botId + '>'))
+      );
     }
     return false;
   }
