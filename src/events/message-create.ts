@@ -19,22 +19,23 @@ export default class MessageCreate extends EventDiscord {
 
     const channelId = message.channelId;
     const messagesChannelHistory = await message.channel.messages.fetch({
-      limit: maxHistory,
+      limit: maxHistory
     });
     message.channel.sendTyping();
 
     const aiCompletionHandler = new AiCompletionHandler(
       this.aiClient,
       config.openAI.prompt,
-      tools,
+      tools
     );
+
     aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
 
     const summary = await aiCompletionHandler.getSummary(channelId);
     if (summary) {
       const completion = await aiCompletionHandler.getAiCompletion(
         summary,
-        channelId,
+        channelId
       );
       let content = completion.content;
       const imageEngine = new ImageHandler(this.aiClient, message, content);
