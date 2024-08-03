@@ -1,17 +1,21 @@
 import { readMemory } from '../tools';
 import config from '../config';
 import AIClient from './../clients/ai-client';
+import { AIClientType } from '../types/AIClientType';
+import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources';
+import { Message } from 'discord.js';
 
-const openAiModel = config.openAI.model || process.env.OPEN_AI_MODEL;
-const openAiSummaryModel =
+const openAiModel: string =
+  config.openAI.model || process.env.OPEN_AI_MODEL || 'davinci';
+const openAiSummaryModel: string =
   config.openAI.summaryModel ||
   process.env.OPEN_AI_SUMMARY_MODEL ||
   openAiModel;
-const lang = config.discord.lang || process.env.LANG;
-const maxHistory = config.discord.maxHistory || process.env.MAX_HISTORY;
-
+const lang: string = config.discord.lang || process.env.LANG || 'en';
+const maxHistory: number =
+  config.discord.maxHistory || Number(process.env.MAX_HISTORY) || 10;
 class AiCompletionHandler {
-  aiClient: AIClient;
+  aiClient: AIClientType;
   prompt: string;
   messages: Array<any> = [];
   summary: any | null = null;
@@ -24,7 +28,7 @@ class AiCompletionHandler {
   }
 
   async getSummary(channelId: any) {
-    const option = {
+    const option: ChatCompletionCreateParamsNonStreaming = {
       messages: [
         {
           role: 'assistant',
@@ -48,7 +52,7 @@ class AiCompletionHandler {
   }
 
   async getAiCompletion(summary: any, channelId: any) {
-    const memory = readMemory();
+    const memory: string = readMemory();
     const fullPrompt = `${this.prompt}.\n\n
     MEMORY:"""\n${memory}\n"""\n
     PREVIOUSLY:"""\n${summary}\n"""
@@ -126,7 +130,7 @@ class AiCompletionHandler {
       .slice(0, count);
   }
 
-  setChannelHistory(channelId: any, messages: any) {
+  setChannelHistory(channelId: any, messages: Message[]) {
     this.eraseMessagesWithChannelId(channelId);
     const handlerMessages = this.createMessagesArrayFromHistory(messages);
     this.addMessageArrayToChannel(handlerMessages);
@@ -139,9 +143,9 @@ class AiCompletionHandler {
       .forEach(
         (msg: {
           content: string;
-          author: { bot: any; username: any };
-          createdAt: any;
-          channelId: any;
+          author: { bot: string; username: string };
+          createdAt: Date;
+          channelId: string;
         }) => {
           if (msg.content !== '') {
             const role = msg.author.bot ? 'assistant' : 'user';

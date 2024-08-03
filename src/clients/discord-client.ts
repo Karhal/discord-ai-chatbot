@@ -30,14 +30,14 @@ export default class DiscordClient {
   }
 
   async loadEvents() {
-    this.discordClient.once('ready', (event) => {
-      const ready = new Ready(this.discordClient, this.aiClient);
-      ready.handler();
+    this.discordClient.once('ready', () => {
+      const eventHandler = new Ready(this.discordClient, this.aiClient);
+      eventHandler.handler();
     });
 
     this.discordClient.on('messageCreate', (event) => {
-      const ready = new MessageCreate(this.discordClient, this.aiClient);
-      ready.handler(event);
+      const eventHandler = new MessageCreate(this.discordClient, this.aiClient);
+      eventHandler.handler(event);
     });
 
     return true;

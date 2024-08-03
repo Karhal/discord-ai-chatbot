@@ -1,28 +1,29 @@
 import { Client } from 'discord.js';
 import AIClient from './ai-client';
 
-export default class EventDiscord {
+interface EventDiscordType {
   eventName: string;
+  aiClient: AIClient,
   once: boolean;
-  handler: Function = function() {};
+  handler: Function;
   discordClient: Client;
-  aiClient: AIClient;
+  init: () => void;
+  initOnEvent: () => void;
+  initOnceEvent: () => void;
+}
 
-  constructor(discordClient: Client, aiClient: AIClient) {
-    this.discordClient = discordClient;
-    this.aiClient = aiClient;
-    this.eventName = 'eventName';
-    this.once = false;
-  }
+export default abstract class EventDiscord implements EventDiscordType {
+  constructor(
+    public discordClient: Client,
+    public aiClient: AIClient,
+    public once: boolean = false,
+    public eventName: string = "eventName",
+    public handler: Function = function () {}
+  ) {}
 
   init() {
-    if (!this.once) {
-      this.initOnEvent();
-    }
-    else {
-      this.initOnceEvent();
-    }
-    console.log(this.eventName + ' added');
+    this.once ? this.initOnceEvent() : this.initOnEvent();
+    console.log(this.eventName + " added");
   }
 
   initOnEvent() {

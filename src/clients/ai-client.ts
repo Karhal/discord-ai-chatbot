@@ -1,5 +1,7 @@
-import OpenAI from 'openai';
-import config from '../config';
+import OpenAI from "openai";
+import config from "../config";
+import { AIClientType } from "../types/AIClientType";
+import { ChatCompletionCreateParamsNonStreaming } from "openai/resources";
 type openAIImageSize =
   | '1024x1024'
   | '256x256'
@@ -9,11 +11,11 @@ type openAIImageSize =
   | null
   | undefined;
 
-export default class AIClient {
+export default class AIClient implements AIClientType {
   static openAiKey?: string =
     config?.openAI?.apiKey || process.env.OPENAI_API_KEY;
   static imageSize: openAIImageSize = '1024x1024';
-  client?: OpenAI;
+  client: OpenAI;
 
   constructor() {
     if (config?.openAI?.imageSize || process.env.IMAGE_SIZE) {
@@ -21,7 +23,7 @@ export default class AIClient {
         process.env.IMAGE_SIZE) as openAIImageSize;
     }
     if (!AIClient.openAiKey) {
-      console.log('No Open AI key configured');
+      throw new Error("No Open AI key configured");
     }
     else {
       this.client = new OpenAI({
@@ -31,7 +33,7 @@ export default class AIClient {
   }
 
   async message(
-    option: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming
+    option: ChatCompletionCreateParamsNonStreaming
   ): Promise<string | null> {
     if (!this.client) return null;
 

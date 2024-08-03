@@ -6,12 +6,20 @@
 		"outDir": "./dist",
 		"removeComments": true,
 		"resolveJsonModule": true,
+		"moduleResolution": "node",
 		"esModuleInterop": true,
+		"noUnusedLocals": true,
 		"forceConsistentCasingInFileNames": true,
+		"noUnusedParameters": true,
+		"strictPropertyInitialization": true,
 		"strict": true,
-		"strictNullChecks": true,
 		"skipLibCheck": true
 	},
-	"include": ["src/**/*"],
-	"exclude": ["node_modules", "**/*.spec.ts"]
+	"include": [
+		"src/**/*"
+	],
+	"exclude": [
+		"node_modules",
+		"**/*.spec.ts"
+	]
 }
