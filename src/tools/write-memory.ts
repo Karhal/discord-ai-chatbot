@@ -1,4 +1,4 @@
-import FileManager from "../handlers/file-handler.js";
+import FileManager from "../handlers/file-handler";
 
 const writeMemory = async (memory: string) => {
   try {

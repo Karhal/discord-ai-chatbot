@@ -1,7 +1,14 @@
 import path from "path";
 import fs from "fs";
 
-export default class ImageHandler {
+type ImageHandlerType = {
+  content: string;
+  message: any;
+  getImage: () => Promise<boolean>;
+  getImages: () => Promise<any[]>;
+};
+
+export default class ImageHandler implements ImageHandlerType {
   message: any;
   content: string;
 
@@ -62,14 +69,13 @@ export default class ImageHandler {
         const response = await fetch(image);
         const responseBuffer = await response.arrayBuffer();
         return this.saveImage(responseBuffer);
-      }),
+      })
     );
     console.log("Images downloaded", findImages);
     return findImages;
   }
 
   saveImage(response: ArrayBuffer) {
-
     const timestamp = new Date().getTime();
     const imageName = timestamp + ".jpg";
     const imageData = Buffer.from(response);

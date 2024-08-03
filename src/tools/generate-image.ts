@@ -1,4 +1,4 @@
-import AIClient from "../clients/ai-client.js";
+import AIClient from "../clients/ai-client";
 
 const generateImage = async (imagePrompt: string) => {
   try {

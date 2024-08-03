@@ -1,23 +1,25 @@
 import { Client } from "discord.js";
 
-export default class EventDiscord {
+interface EventDiscordType {
   eventName: string;
   once: boolean;
-  handler: Function = function(){};
+  handler: Function;
   client: Client;
+  init: () => void;
+  initOnEvent: () => void;
+  initOnceEvent: () => void;
+}
 
-  constructor(client: Client) {
-    this.client = client;
-    this.eventName = "eventName";
-    this.once = false;
-  }
+export default abstract class EventDiscord implements EventDiscordType {
+  constructor(
+    public client: Client,
+    public once: boolean = false,
+    public eventName: string = "eventName",
+    public handler: Function = function () {}
+  ) {}
 
   init() {
-    if (!this.once) {
-      this.initOnEvent();
-    } else {
-      this.initOnceEvent();
-    }
+    this.once ? this.initOnceEvent() : this.initOnEvent();
     console.log(this.eventName + " added");
   }
 
