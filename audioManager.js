@@ -1,21 +1,21 @@
 class AudioManager {
-    constructor() {
-      this.audioConnection = null;
-    }
-  
-    setAudioConnection(connection) {
-      console.log('Setting audio connection');
-      this.audioConnection = connection;
-      /*this.audioConnection.receiver.speaking.on('start', (userId) => {
+  constructor() {
+    this.audioConnection = null;
+  }
+
+  setAudioConnection(connection) {
+    console.log('Setting audio connection');
+    this.audioConnection = connection;
+    /*this.audioConnection.receiver.speaking.on('start', (userId) => {
         console.log('User is speaking');
         const voiceTranscriptor = new VoiceTranscriptor(this.audioConnection);
         voiceTranscriptor.listen(userId);
       });*/
-    }
-  
-    getAudioConnection() {
-      return this.audioConnection;
-    }
   }
-  
-  export default new AudioManager();
+
+  getAudioConnection() {
+    return this.audioConnection;
+  }
+}
+
+export default new AudioManager();
