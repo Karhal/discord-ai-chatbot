@@ -9,7 +9,7 @@ tools.push(writeMemoryTool);
 tools.push(generateImageTool);
 
 const readMemory = () => {
-  const memoryFilePath = path.join(__dirname, 'memory.txt');
+  const memoryFilePath = './memory.txt';
   if (!fs.existsSync(memoryFilePath)) {
     fs.writeFileSync(memoryFilePath, '', 'utf8');
   }
