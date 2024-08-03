@@ -15,12 +15,12 @@ const getCryptoPrice = async (query: string) => {
   const requestOptions: any = {
     method: 'GET',
     headers: myHeaders,
-    redirect: 'follow',
+    redirect: 'follow'
   };
 
   const result = await fetch(
     `https://rest.coinapi.io/v1/exchangerate/${queryParameters.asset}/${defaultAsset}`,
-    requestOptions,
+    requestOptions
   );
   const resultJSON = await result.text();
   console.log(result);
@@ -36,10 +36,10 @@ const getCryptoPriceTool = {
     parameters: {
       type: 'object',
       properties: {
-        asset: { type: 'string' },
-      },
-    },
-  },
+        asset: { type: 'string' }
+      }
+    }
+  }
 };
 
 export default getCryptoPriceTool;

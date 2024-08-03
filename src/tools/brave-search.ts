@@ -15,12 +15,12 @@ const getBraveSearch = async (query: string) => {
   const requestOptions: any = {
     method: 'GET',
     headers: myHeaders,
-    redirect: 'follow',
+    redirect: 'follow'
   };
 
   const response = await fetch(
     `https://api.search.brave.com/res/v1/web/search?q=${queryParameters.query}&search_lang=${lang}&count=5&result_filter=news,web`,
-    requestOptions,
+    requestOptions
   );
   const result = await response.text();
   const resultJSON: any = JSON.parse(result);
@@ -38,10 +38,10 @@ const getLastNewsTool = {
     parameters: {
       type: 'object',
       properties: {
-        query: { type: 'string' },
-      },
-    },
-  },
+        query: { type: 'string' }
+      }
+    }
+  }
 };
 
 export default getLastNewsTool;

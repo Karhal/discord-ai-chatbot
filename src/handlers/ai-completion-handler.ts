@@ -31,16 +31,16 @@ class AiCompletionHandler {
           content:
             'Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. Rely strictly on the provided text. Format the summary in one paragraph form for easy understanding. The summary has to be the shortest possible (<100 words) and give a good idea of what the discussion is about. Use the following language: ' +
             lang +
-            '\n\nText:"""',
+            '\n\nText:"""'
         },
         {
           role: 'user',
           content: this.getFirstMessagesOfAChannel(5, channelId)
             .map((msg) => `${msg.content.author}: ${msg.content}`)
-            .join('\n\n'),
-        },
+            .join('\n\n')
+        }
       ],
-      model: openAiSummaryModel,
+      model: openAiSummaryModel
     };
 
     const response = await this.aiClient.message(option);
@@ -60,14 +60,14 @@ class AiCompletionHandler {
     `;
     let conversation = [{ role: 'assistant', content: fullPrompt }];
     conversation = conversation.concat(
-      this.getLastMessagesOfAChannel(5, channelId) || [],
+      this.getLastMessagesOfAChannel(5, channelId) || []
     );
 
     const option = {
       model: openAiModel,
       messages: conversation,
       tools: this.tools,
-      response_format: { type: 'json_object' },
+      response_format: { type: 'json_object' }
     };
 
     const runner = this.aiClient.client.beta.chat.completions.runTools(option);
@@ -79,7 +79,7 @@ class AiCompletionHandler {
   addMessageToChannel(message: any, limit = maxHistory) {
     if (this.messages) {
       const channelMessages = this.messages.filter(
-        (msg) => msg.channelId === message.channelId,
+        (msg) => msg.channelId === message.channelId
       );
 
       channelMessages.push(message);
@@ -90,7 +90,7 @@ class AiCompletionHandler {
         }
       }
       this.messages = this.messages.filter(
-        (msg) => msg.channelId !== message.channelId,
+        (msg) => msg.channelId !== message.channelId
       );
       this.messages = [...channelMessages, ...this.messages];
     }
@@ -105,7 +105,7 @@ class AiCompletionHandler {
   eraseMessagesWithChannelId(channelId: any) {
     if (this.messages) {
       this.messages = this.messages.filter(
-        (msg) => msg.channelId !== channelId,
+        (msg) => msg.channelId !== channelId
       );
     }
   }
@@ -148,15 +148,15 @@ class AiCompletionHandler {
             const contentJsonAsString = JSON.stringify({
               author: msg.author.username,
               content: msg.content,
-              dateTime: msg.createdAt,
+              dateTime: msg.createdAt
             });
             messages.push({
               role: role,
               content: contentJsonAsString,
-              channelId: msg.channelId,
+              channelId: msg.channelId
             });
           }
-        },
+        }
       );
 
     return messages;

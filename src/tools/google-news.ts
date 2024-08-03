@@ -17,7 +17,7 @@ const getGoogleNews = async (query: string) => {
       google_domain: serpGoogle_domain,
       gl: lang,
       hl: lang,
-      tbm: 'nws',
+      tbm: 'nws'
     });
 
     console.log(response);
@@ -37,10 +37,10 @@ const getGoogleNewsTool = {
     parameters: {
       type: 'object',
       properties: {
-        query: { type: 'string' },
-      },
-    },
-  },
+        query: { type: 'string' }
+      }
+    }
+  }
 };
 
 export default getGoogleNewsTool;
