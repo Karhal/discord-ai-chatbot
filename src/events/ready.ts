@@ -6,6 +6,6 @@ export default class Ready extends EventDiscord {
   eventName = Events.ClientReady;
   once = true;
   handler = () => {
-    console.log(`Ready! Logged in as ${this.client.user?.tag}`);
+    console.log(`Ready! Logged in as ${this.discordClient?.user?.tag}`);
   };
 }
