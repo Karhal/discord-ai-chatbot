@@ -28,10 +28,10 @@ const writeMemoryTool = {
     parameters: {
       type: 'object',
       properties: {
-        memoryString: { type: 'string' },
-      },
-    },
-  },
+        memoryString: { type: 'string' }
+      }
+    }
+  }
 };
 
 export default writeMemoryTool;

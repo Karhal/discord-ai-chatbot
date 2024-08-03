@@ -16,8 +16,8 @@ export default class DiscordClient {
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
-        GatewayIntentBits.GuildVoiceStates,
-      ],
+        GatewayIntentBits.GuildVoiceStates
+      ]
     });
     this.login = login;
   }

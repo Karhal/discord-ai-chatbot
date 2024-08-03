@@ -25,13 +25,13 @@ export default class AIClient {
     }
     else {
       this.client = new OpenAI({
-        apiKey: AIClient.openAiKey,
+        apiKey: AIClient.openAiKey
       });
     }
   }
 
   async message(
-    option: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming,
+    option: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming
   ): Promise<string | null> {
     if (!this.client) return null;
 
@@ -46,7 +46,7 @@ export default class AIClient {
       model: 'dall-e-3',
       prompt: prompt,
       n: 1,
-      size: AIClient.imageSize,
+      size: AIClient.imageSize
     });
     return response?.data[0]?.url || null;
   }

@@ -10,13 +10,13 @@ const fetchDuneData = async (queryId: string) => {
   const requestOptions: any = {
     method: 'GET',
     headers: myHeaders,
-    redirect: 'follow',
+    redirect: 'follow'
   };
 
   try {
     const response = await fetch(
       `https://api.dune.com/api/v1/query/${query}/results?limit=1`,
-      requestOptions,
+      requestOptions
     );
     const result = await response.text();
     return result;
@@ -34,10 +34,10 @@ const fetchDuneDataTool = {
     parameters: {
       type: 'object',
       properties: {
-        queryId: { type: 'string' },
-      },
-    },
-  },
+        queryId: { type: 'string' }
+      }
+    }
+  }
 };
 
 export default fetchDuneDataTool;

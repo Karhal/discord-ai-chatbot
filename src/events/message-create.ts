@@ -19,31 +19,35 @@ export default class MessageCreate extends EventDiscord {
 
     const channelId = message.channelId;
     const messagesChannelHistory = await message.channel.messages.fetch({
-      limit: maxHistory,
+      limit: maxHistory
     });
     message.channel.sendTyping();
 
     const aiCompletionHandler = new AiCompletionHandler(
       this.aiClient,
       config.openAI.prompt,
-      tools,
+      tools
     );
+
     aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
 
     const summary = await aiCompletionHandler.getSummary(channelId);
     if (summary) {
       const completion = await aiCompletionHandler.getAiCompletion(
         summary,
-        channelId,
+        channelId
       );
-      const content = completion.content;
-      const image = new ImageHandler(this.aiClient, message, content);
-      const images = await image.getImages();
+      let content = completion.content;
+      const imageEngine = new ImageHandler(this.aiClient, message, content);
+      const findImages = await imageEngine.getImageFromMSG();
+      if (findImages) {
+        content = imageEngine.content;
+      }
 
       message.channel.sendTyping();
-      await this.sendResponse(message, content, images);
-      if (images && images.length > 0) {
-        image.deleteImages(images);
+      await this.sendResponse(message, content, imageEngine.downloadedImages);
+      if (findImages) {
+        imageEngine.deleteImages();
       }
     }
 
@@ -54,6 +58,7 @@ export default class MessageCreate extends EventDiscord {
     response = response.trim().replace(/\n\s*\n/g, '\n');
     message.channel.send(response);
     if (imagePaths.length > 0) {
+      message.channel.sendTyping();
       await message.channel.send({ files: imagePaths });
       console.log('Images sent');
     }

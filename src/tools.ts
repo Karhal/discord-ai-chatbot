@@ -1,5 +1,4 @@
 import fs from 'fs';
-import path from 'path';
 import writeMemoryTool from './tools/write-memory';
 import generateImageTool from './tools/generate-image';
 

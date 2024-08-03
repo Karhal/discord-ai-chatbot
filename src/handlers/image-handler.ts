@@ -6,6 +6,8 @@ export default class ImageHandler {
   message: any;
   content: string;
   aiClient: AIClient;
+  imagesUrls: RegExpMatchArray | null = null;
+  downloadedImages: string[] = [];
 
   constructor(aiClient: AIClient, message: any, content: string) {
     this.aiClient = aiClient;
@@ -13,21 +15,25 @@ export default class ImageHandler {
     this.content = content;
   }
 
-  async getImage() {
-    const images = await this.getImages();
-    if (images && images.length > 0) {
-      this.message.channel.sendTyping();
+  async getImageFromMSG(): Promise<boolean> {
+    const find = await this.getImages();
+    if (find) {
       this.cleanImagePathsFromResponse();
+      return true;
     }
-    return true;
+    return false;
   }
 
   async getImages() {
-    const imagesUrls = this.extractImages();
-    if (!imagesUrls) return [];
+    this.extractImages();
+    if (!this.imagesUrls?.length) return [];
 
-    const images = await this.downloadImages(imagesUrls);
-    return images;
+    this.downloadedImages = await this.downloadImages(this.imagesUrls);
+    console.log('downloaded images', this.downloadedImages);
+    if (this.downloadedImages.length) {
+      return true;
+    }
+    return false;
   }
 
   cleanImagePathsFromResponse() {
@@ -39,12 +45,11 @@ export default class ImageHandler {
     matches.forEach((match) => {
       this.content = this.content.replace(match, '');
     });
-
     return true;
   }
 
-  async deleteImages(imagePaths: Array<string>) {
-    imagePaths.forEach((imagePath) => {
+  async deleteImages() {
+    this.downloadedImages.forEach((imagePath) => {
       if (fs.existsSync(imagePath)) {
         fs.unlink(imagePath, (err) => {
           if (err) {
@@ -61,12 +66,25 @@ export default class ImageHandler {
   async downloadImages(images: RegExpMatchArray) {
     if (!images) return [];
     const findImages = await Promise.all(
-      images.map(async (image) => {
-        console.log('Downloading images ' + image);
-        const response = await fetch(image);
-        const responseBuffer = await response.arrayBuffer();
-        return this.saveImage(responseBuffer);
-      }),
+      images
+        .map(async (image) => {
+          console.log('Downloading images ' + image);
+          this.message.channel.sendTyping();
+          const response = await fetch(image);
+          if (response.status === 200) {
+            const responseBuffer = await response.arrayBuffer();
+            return this.saveImage(responseBuffer);
+          }
+          else {
+            console.log(
+              'error download image',
+              response.status,
+              response.statusText
+            );
+            return null;
+          }
+        })
+        .filter((img) => img !== null)
     );
     console.log('Images downloaded', findImages);
     return findImages;
@@ -92,7 +110,7 @@ export default class ImageHandler {
   extractImages() {
     const imageRegex =
       /(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$])/gim;
-    const imageUrls = this.content.match(imageRegex);
-    return imageUrls;
+    this.imagesUrls = this.content.match(imageRegex);
+    console.log('image extract', this.imagesUrls);
   }
 }

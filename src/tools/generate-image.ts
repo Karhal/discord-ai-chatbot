@@ -7,7 +7,7 @@ const generateImage = async (imagePrompt: string) => {
       model: 'dall-e-3',
       prompt: prompt.imagePrompt,
       n: 1,
-      size: AIClient.imageSize,
+      size: AIClient.imageSize
     });
     const client = new AIClient();
     const response = await client.generateImage(prompt.imagePrompt);
@@ -31,10 +31,10 @@ const generateImageTool = {
     parameters: {
       type: 'object',
       properties: {
-        imagePrompt: { type: 'string' },
-      },
-    },
-  },
+        imagePrompt: { type: 'string' }
+      }
+    }
+  }
 };
 
 export default generateImageTool;
