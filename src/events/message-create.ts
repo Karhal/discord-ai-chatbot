@@ -1,5 +1,4 @@
 import AiCompletionHandler from '../handlers/ai-completion-handler';
-import AIClient from '../clients/ai-client';
 import { tools } from '../tools';
 import config from '../config';
 import EventDiscord from '../clients/events-discord';
@@ -66,7 +65,10 @@ export default class MessageCreate extends EventDiscord {
   }
 
   theMessageContainsBotName(message: Message) {
-    const botName = config.discord.botName;
-    return message.content.toLowerCase().includes(botName.toLowerCase());
+    const botName = this.discordClient.user?.username;
+    if (botName) {
+      return message.content.toLowerCase().includes(botName.toLowerCase());
+    }
+    return false;
   }
 }

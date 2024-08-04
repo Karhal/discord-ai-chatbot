@@ -1,4 +1,3 @@
-import DiscordClient from '../clients/discord-client.js';
 import EventDiscord from '../clients/events-discord';
 import { Events } from 'discord.js';
 

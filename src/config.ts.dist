@@ -2,7 +2,6 @@
 export default {
     discord : {
         token : "",
-        botName: "NiceBot",
         maxHistory: 10,
         lang: "en"
     },
