@@ -2,7 +2,14 @@ import path from 'path';
 import fs from 'fs';
 import AIClient from '../clients/ai-client';
 
-export default class ImageHandler {
+type ImageHandlerType = {
+  content: string;
+  message: any;
+  getImage: () => Promise<boolean>;
+  getImages: () => Promise<any[]>;
+};
+
+export default class ImageHandler implements ImageHandlerType {
   message: any;
   content: string;
   aiClient: AIClient;

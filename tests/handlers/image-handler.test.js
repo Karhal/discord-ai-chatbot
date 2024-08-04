@@ -6,8 +6,8 @@ jest.mock('./../../src/tools');
 it('should download images', async () => {
   const msg = {
     channel: {
-      sendTyping: function () {},
-    },
+      sendTyping: function() {}
+    }
   };
   const imgHandler = new ImageHandler(null, msg, '');
   const images = ['https://fr.wikipedia.org/static/images/icons/wikipedia.png'];
@@ -21,8 +21,8 @@ it('should download images', async () => {
 it('should delete images', async () => {
   const msg = {
     channel: {
-      sendTyping: function () {},
-    },
+      sendTyping: function() {}
+    }
   };
   const imgHandler = new ImageHandler(null, msg, '');
   const images = ['https://fr.wikipedia.org/static/images/icons/wikipedia.png'];
