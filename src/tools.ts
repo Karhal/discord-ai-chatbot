@@ -1,8 +1,9 @@
 import fs from 'fs';
 import writeMemoryTool from './tools/write-memory';
 import generateImageTool from './tools/generate-image';
+import { ToolsAI } from './types';
 
-const tools: any[] = [];
+const tools: ToolsAI[] = [];
 
 tools.push(writeMemoryTool);
 tools.push(generateImageTool);
