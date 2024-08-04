@@ -31,20 +31,23 @@ Open `config.ts` and adjust the settings as needed. You can set your Discord bot
 3. Navigate to the "Bot" section on the left sidebar and click "Add Bot".
 4. Click "Yes, do it!" to confirm.
 5. Under the "Token" section, click "Copy" to copy your bot token. This token will be used in your `config.ts` file.
+6. On discord go to moderator view and copy bot Id to put in config
 
 ### Obtaining API Keys
 
-- **OpenAI API Key**: 
+- **OpenAI API Key**:
+
   1. Sign up at [OpenAI](https://beta.openai.com/signup/).
   2. Navigate to the API section and generate an API key.
   3. Copy the API key and paste it into your `config.ts` file.
 
-- **Brave Search API Key**: 
+- **Brave Search API Key**:
+
   1. Sign up at [Brave Search](https://search.brave.com/).
   2. Follow their instructions to obtain an API key.
   3. Copy the API key and paste it into your `config.ts` file.
 
-- **SerpAPI Token**: 
+- **SerpAPI Token**:
   1. Sign up at [SerpAPI](https://serpapi.com/users/sign_up).
   2. Create an account or log in if you already have one.
   3. Navigate to the dashboard.
@@ -63,7 +66,6 @@ To ensure everything is working correctly, you can run the provided tests.
 
 1. Run `npm test` to execute the tests once.
 2. Run `npm run test:watch` to run the tests in watch mode, which will re-run tests on file changes.
-
 
 ## Troubleshooting
 

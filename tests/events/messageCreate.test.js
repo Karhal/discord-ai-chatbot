@@ -63,7 +63,7 @@ describe('messageCreate event', () => {
     expect(mockMessage.channel.sendTyping).not.toHaveBeenCalled();
   });
 
-  it('should not process messages that do not contain the bot name', async () => {
+  it('should not process messages that do not contain the bot name and bot is not tagged', async () => {
     mockMessage.content = 'Test message';
     const messageEvent = new messageCreate();
     messageEvent.discordClient = mockDiscordClient;
@@ -72,7 +72,15 @@ describe('messageCreate event', () => {
   });
 
   it('should process messages that contain the bot name', async () => {
-    mockMessage.content = 'Test message botName';
+    mockMessage.content = 'Test message ' + mockDiscordClient.user.username;
+    const messageEvent = new messageCreate();
+    messageEvent.discordClient = mockDiscordClient;
+    const response = await messageEvent.theMessageContainsBotName(mockMessage);
+    expect(response).toBe(true);
+  });
+
+  it('should process messages that contain the bot id', async () => {
+    mockMessage.content = 'Test message <@' + mockDiscordClient.user.id + '>';
     const messageEvent = new messageCreate();
     messageEvent.discordClient = mockDiscordClient;
     const response = await messageEvent.theMessageContainsBotName(mockMessage);
