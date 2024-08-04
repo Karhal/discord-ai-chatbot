@@ -20,7 +20,7 @@ describe('AiCompletionHandler', () => {
         content: 'lorem',
         dateTime: '123',
         channelId: 2,
-        author: 'Ipsum',
+        author: 'Ipsum'
       };
       aiCompletionHandler.addMessageToChannel(message);
 
@@ -38,14 +38,14 @@ describe('AiCompletionHandler', () => {
         content: 'first',
         dateTime: '123',
         channelId: 1,
-        author: 'Ipsum',
+        author: 'Ipsum'
       };
       const secondMessage = {
         role: 'assistant',
         content: 'second',
         dateTime: '123',
         channelId: 1,
-        author: 'Lorem',
+        author: 'Lorem'
       };
       aiCompletionHandler.addMessageToChannel(firstMessage, 1);
       aiCompletionHandler.addMessageToChannel(secondMessage, 1);
@@ -72,14 +72,14 @@ describe('AiCompletionHandler', () => {
         content: 'first',
         dateTime: '123',
         channelId: 1,
-        author: 'Ipsum',
+        author: 'Ipsum'
       };
       const secondMessage = {
         role: 'assistant',
         content: 'second',
         dateTime: '123',
         channelId: 1,
-        author: 'Lorem',
+        author: 'Lorem'
       };
       aiCompletionHandler.addMessageArrayToChannel(
         [firstMessage, secondMessage],
@@ -108,21 +108,21 @@ describe('AiCompletionHandler', () => {
         content: 'first',
         createdAt: '123',
         channelId: 1,
-        author: { username: 'Ipsum' },
+        author: { username: 'Ipsum' }
       };
       const secondMessage = {
         role: 'assistant',
         content: 'second',
         createdAt: '123',
         channelId: 1,
-        author: { username: 'Ipsum' },
+        author: { username: 'Ipsum' }
       };
       const thirdMessage = {
         role: 'user',
         content: 'third',
         createdAt: '123',
         channelId: 1,
-        author: { username: 'LoremIpsum' },
+        author: { username: 'LoremIpsum' }
       };
       aiCompletionHandler.addMessageArrayToChannel(
         [firstMessage, secondMessage, thirdMessage],
@@ -148,21 +148,21 @@ describe('AiCompletionHandler', () => {
         content: 'first',
         createdAt: '123',
         channelId: 1,
-        author: { username: 'Ipsum' },
+        author: { username: 'Ipsum' }
       };
       const secondMessage = {
         role: 'assistant',
         content: 'second',
         createdAt: '123',
         channelId: 1,
-        author: { username: 'Lorem' },
+        author: { username: 'Lorem' }
       };
       const thirdMessage = {
         role: 'user',
         content: 'third',
         createdAt: '123',
         channelId: 1,
-        author: { username: 'LoremIpsum' },
+        author: { username: 'LoremIpsum' }
       };
       aiCompletionHandler.addMessageArrayToChannel(
         [firstMessage, secondMessage, thirdMessage],
@@ -187,17 +187,17 @@ describe('AiCompletionHandler', () => {
         content: 'first',
         createdAt: '123',
         channelId: 1,
-        author: { username: 'Ipsum', bot: false },
+        author: { username: 'Ipsum', bot: false }
       };
       const secondDiscordMessage = {
         content: 'second',
         createdAt: '123',
         channelId: 1,
-        author: { username: 'Lorem', bot: true },
+        author: { username: 'Lorem', bot: true }
       };
       aiCompletionHandler.setChannelHistory(1, [
         firstDiscordMessage,
-        secondDiscordMessage,
+        secondDiscordMessage
       ]);
 
       expect(
@@ -209,13 +209,13 @@ describe('AiCompletionHandler', () => {
         {
           role: 'assistant',
           content: '{"author":"Lorem","content":"second","dateTime":"123"}',
-          channelId: 1,
+          channelId: 1
         },
         {
           role: 'user',
           content: '{"author":"Ipsum","content":"first","dateTime":"123"}',
-          channelId: 1,
-        },
+          channelId: 1
+        }
       ]);
     });
   });

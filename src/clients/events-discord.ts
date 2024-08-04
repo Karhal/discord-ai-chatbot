@@ -3,7 +3,7 @@ import AIClient from './ai-client';
 
 interface EventDiscordType {
   eventName: string;
-  aiClient: AIClient,
+  aiClient: AIClient;
   once: boolean;
   handler: Function;
   discordClient: Client;
@@ -17,13 +17,13 @@ export default abstract class EventDiscord implements EventDiscordType {
     public discordClient: Client,
     public aiClient: AIClient,
     public once: boolean = false,
-    public eventName: string = "eventName",
-    public handler: Function = function () {}
+    public eventName: string = 'eventName',
+    public handler: Function = function() {}
   ) {}
 
   init() {
     this.once ? this.initOnceEvent() : this.initOnEvent();
-    console.log(this.eventName + " added");
+    console.log(this.eventName + ' added');
   }
 
   initOnEvent() {

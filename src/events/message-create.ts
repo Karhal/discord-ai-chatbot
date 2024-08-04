@@ -17,7 +17,7 @@ export default class MessageCreate extends EventDiscord {
     }
 
     const channelId: string = message.channelId;
-    const messagesChannelHistory : Collection<
+    const messagesChannelHistory: Collection<
       string,
       Message<boolean>
     > = await message.channel.messages.fetch({
@@ -56,7 +56,11 @@ export default class MessageCreate extends EventDiscord {
     console.log('Done.');
   };
 
-  async sendResponse(message: Message, response: string, imagePaths: string[]): Promise<boolean> {
+  async sendResponse(
+    message: Message,
+    response: string,
+    imagePaths: string[]
+  ): Promise<boolean> {
     response = response.trim().replace(/\n\s*\n/g, '\n');
     message.channel.send(response);
     if (imagePaths.length > 0) {

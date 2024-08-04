@@ -1,7 +1,7 @@
-import OpenAI from "openai";
-import config from "../config";
-import { AIClientType } from "../types/AIClientType";
-import { ChatCompletionCreateParamsNonStreaming } from "openai/resources";
+import OpenAI from 'openai';
+import config from '../config';
+import { AIClientType } from '../types/AIClientType';
+import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources';
 type openAIImageSize =
   | '1024x1024'
   | '256x256'
@@ -23,7 +23,7 @@ export default class AIClient implements AIClientType {
         process.env.IMAGE_SIZE) as openAIImageSize;
     }
     if (!AIClient.openAiKey) {
-      throw new Error("No Open AI key configured");
+      throw new Error('No Open AI key configured');
     }
     else {
       this.client = new OpenAI({
