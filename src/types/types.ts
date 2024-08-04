@@ -5,7 +5,7 @@ type ToolsAI = {
     description: string;
     parameters: {
       type: string;
-      properties: Object;
+      properties: object;
     };
   };
 };

@@ -4,6 +4,7 @@ import AIClient from './../clients/ai-client';
 import { AIClientType } from '../types/AIClientType';
 import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources';
 import { Message } from 'discord.js';
+import { ToolsAI } from '../types/types';
 
 const openAiModel: string =
   config.openAI.model || process.env.OPEN_AI_MODEL || 'davinci';
@@ -18,16 +19,16 @@ class AiCompletionHandler {
   aiClient: AIClientType;
   prompt: string;
   messages: Array<any> = [];
-  summary: any | null = null;
-  tools: any[];
+  summary: string | null = null;
+  tools: ToolsAI[];
 
-  constructor(aiClient: AIClient, prompt: string, tools: Array<any>) {
+  constructor(aiClient: AIClient, prompt: string, tools: ToolsAI[]) {
     this.aiClient = aiClient;
     this.prompt = prompt;
     this.tools = tools;
   }
 
-  async getSummary(channelId: any) {
+  async getSummary(channelId: string) {
     const option: ChatCompletionCreateParamsNonStreaming = {
       messages: [
         {
@@ -51,7 +52,7 @@ class AiCompletionHandler {
     return response;
   }
 
-  async getAiCompletion(summary: any, channelId: any) {
+  async getAiCompletion(summary: string, channelId: string) {
     const memory: string = readMemory();
     const fullPrompt = `${this.prompt}.\n\n
     MEMORY:"""\n${memory}\n"""\n
@@ -76,7 +77,9 @@ class AiCompletionHandler {
 
     const runner = this.aiClient.client.beta.chat.completions.runTools(option);
     let response = await runner.finalContent();
-    response = JSON.parse(response.replace(/^[a-zA-Z]*:/g, ''));
+    if (response) {
+      response = JSON.parse(response.replace(/^[a-zA-Z]*:/g, ''));
+    }
     return response;
   }
 
@@ -106,7 +109,7 @@ class AiCompletionHandler {
     });
   }
 
-  eraseMessagesWithChannelId(channelId: any) {
+  eraseMessagesWithChannelId(channelId: string) {
     if (this.messages) {
       this.messages = this.messages.filter(
         (msg) => msg.channelId !== channelId
@@ -114,7 +117,7 @@ class AiCompletionHandler {
     }
   }
 
-  getLastMessagesOfAChannel(count: any, channelId: any) {
+  getLastMessagesOfAChannel(count: number, channelId: string) {
     if (!this.messages) return [];
 
     return this.messages
@@ -122,7 +125,7 @@ class AiCompletionHandler {
       .slice(-count);
   }
 
-  getFirstMessagesOfAChannel(count: any, channelId: any) {
+  getFirstMessagesOfAChannel(count: number, channelId: string) {
     if (!this.messages) return [];
 
     return this.messages
@@ -130,14 +133,14 @@ class AiCompletionHandler {
       .slice(0, count);
   }
 
-  setChannelHistory(channelId: any, messages: Message[]) {
+  setChannelHistory(channelId: string, messages: Message[]) {
     this.eraseMessagesWithChannelId(channelId);
     const handlerMessages = this.createMessagesArrayFromHistory(messages);
     this.addMessageArrayToChannel(handlerMessages);
   }
 
   createMessagesArrayFromHistory(messagesChannelHistory: any) {
-    const messages: { role: string; content: string; channelId: any }[] = [];
+    const messages: { role: string; content: string; channelId: string }[] = [];
     messagesChannelHistory
       .reverse()
       .forEach(

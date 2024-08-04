@@ -1,22 +1,23 @@
 import path from 'path';
 import fs from 'fs';
 import AIClient from '../clients/ai-client';
+import { Message } from 'discord.js';
 
 type ImageHandlerType = {
   content: string;
-  message: any;
-  getImage: () => Promise<boolean>;
-  getImages: () => Promise<any[]>;
+  message: Message;
+  getImageFromMSG: () => Promise<boolean>;
+  getImages: () => Promise<boolean>;
 };
 
 export default class ImageHandler implements ImageHandlerType {
-  message: any;
+  message: Message;
   content: string;
   aiClient: AIClient;
   imagesUrls: RegExpMatchArray | null = null;
   downloadedImages: string[] = [];
 
-  constructor(aiClient: AIClient, message: any, content: string) {
+  constructor(aiClient: AIClient, message: Message, content: string) {
     this.aiClient = aiClient;
     this.message = message;
     this.content = content;
@@ -31,9 +32,9 @@ export default class ImageHandler implements ImageHandlerType {
     return false;
   }
 
-  async getImages() {
+  async getImages(): Promise<boolean> {
     this.extractImages();
-    if (!this.imagesUrls?.length) return [];
+    if (!this.imagesUrls?.length) return false;
 
     this.downloadedImages = await this.downloadImages(this.imagesUrls);
     console.log('downloaded images', this.downloadedImages);
@@ -43,19 +44,20 @@ export default class ImageHandler implements ImageHandlerType {
     return false;
   }
 
-  cleanImagePathsFromResponse() {
+  cleanImagePathsFromResponse(): void {
+    console.log('before', this.content);
     const regex =
       /\[.*?\]\(https:\/\/oaidalleapiprodscus\.blob\.core\.windows\.net.*?\)/g;
     const matches = this.content.match(regex);
-    if (!matches) return true;
-
-    matches.forEach((match) => {
-      this.content = this.content.replace(match, '');
-    });
-    return true;
+    if (matches) {
+      matches.forEach((match) => {
+        this.content = this.content.replace(match, '');
+      });
+    }
+    console.log('after', this.content);
   }
 
-  async deleteImages() {
+  deleteImages(): void {
     this.downloadedImages.forEach((imagePath) => {
       if (fs.existsSync(imagePath)) {
         fs.unlink(imagePath, (err) => {
@@ -70,29 +72,29 @@ export default class ImageHandler implements ImageHandlerType {
     });
   }
 
-  async downloadImages(images: RegExpMatchArray) {
+  async downloadImages(images: RegExpMatchArray): Promise<string[]> {
     if (!images) return [];
-    const findImages = await Promise.all(
-      images
-        .map(async (image) => {
-          console.log('Downloading images ' + image);
-          this.message.channel.sendTyping();
-          const response = await fetch(image);
-          if (response.status === 200) {
-            const responseBuffer = await response.arrayBuffer();
-            return this.saveImage(responseBuffer);
-          }
-          else {
-            console.log(
-              'error download image',
-              response.status,
-              response.statusText
-            );
-            return null;
-          }
-        })
-        .filter((img) => img !== null)
+    const findImagesWithNull: (string | null)[] = await Promise.all(
+      images.map(async (image) => {
+        console.log('Downloading images ' + image);
+        this.message.channel.sendTyping();
+        const response = await fetch(image);
+        if (response.status === 200) {
+          const responseBuffer = await response.arrayBuffer();
+          return this.saveImage(responseBuffer);
+        }
+        else {
+          console.log(
+            'error download image',
+            response.status,
+            response.statusText
+          );
+          return null;
+        }
+      })
     );
+
+    const findImages = findImagesWithNull.filter((img) => img !== null);
     console.log('Images downloaded', findImages);
     return findImages;
   }
@@ -116,8 +118,8 @@ export default class ImageHandler implements ImageHandlerType {
 
   extractImages() {
     const imageRegex =
-      /(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$])/gim;
+      /(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$]?)/gim;
     this.imagesUrls = this.content.match(imageRegex);
-    console.log('image extract', this.imagesUrls);
+    console.log('image extract', this.imagesUrls, this.content);
   }
 }
