@@ -1,5 +1,7 @@
 import OpenAI from 'openai';
 import config from '../config';
+import { ConsoleLogger } from '../console-logger';
+
 type openAIImageSize =
   | '1024x1024'
   | '256x256'
@@ -21,7 +23,7 @@ export default class AIClient {
         process.env.IMAGE_SIZE) as openAIImageSize;
     }
     if (!AIClient.openAiKey) {
-      console.log('No Open AI key configured');
+      ConsoleLogger.log('ERROR', 'No Open AI key configured');
     }
     else {
       this.client = new OpenAI({

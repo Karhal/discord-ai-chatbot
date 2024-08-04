@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import AIClient from '../clients/ai-client';
+import { ConsoleLogger } from '../console-logger';
 
 export default class ImageHandler {
   message: any;
@@ -29,7 +30,7 @@ export default class ImageHandler {
     if (!this.imagesUrls?.length) return [];
 
     this.downloadedImages = await this.downloadImages(this.imagesUrls);
-    console.log('downloaded images', this.downloadedImages);
+    ConsoleLogger.log('VERBOSE', 'downloaded images', this.downloadedImages);
     if (this.downloadedImages.length) {
       return true;
     }
@@ -56,7 +57,7 @@ export default class ImageHandler {
             console.error(err);
           }
           else {
-            console.log('Image deleted:', imagePath);
+            ConsoleLogger.log('VERBOSE', 'Image deleted:', imagePath);
           }
         });
       }
@@ -68,7 +69,7 @@ export default class ImageHandler {
     const findImages = await Promise.all(
       images
         .map(async (image) => {
-          console.log('Downloading images ' + image);
+          ConsoleLogger.log('VERBOSE', 'Downloading images ' + image);
           this.message.channel.sendTyping();
           const response = await fetch(image);
           if (response.status === 200) {
@@ -76,7 +77,8 @@ export default class ImageHandler {
             return this.saveImage(responseBuffer);
           }
           else {
-            console.log(
+            ConsoleLogger.log(
+              'ERROR',
               'error download image',
               response.status,
               response.statusText
@@ -86,7 +88,7 @@ export default class ImageHandler {
         })
         .filter((img) => img !== null)
     );
-    console.log('Images downloaded', findImages);
+    ConsoleLogger.log('CALL', 'Images downloaded', findImages);
     return findImages;
   }
 
@@ -101,7 +103,7 @@ export default class ImageHandler {
     }
     const imagePath = path.join(pathTmpFolder, imageName);
 
-    console.log('Saving image to ' + imagePath);
+    ConsoleLogger.log('VERBOSE', 'Saving image to ' + imagePath);
     fs.writeFileSync(imagePath, imageData);
 
     return imagePath;
@@ -111,6 +113,6 @@ export default class ImageHandler {
     const imageRegex =
       /(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$])/gim;
     this.imagesUrls = this.content.match(imageRegex);
-    console.log('image extract', this.imagesUrls);
+    ConsoleLogger.log('VERBOSE', 'image extract', this.imagesUrls);
   }
 }

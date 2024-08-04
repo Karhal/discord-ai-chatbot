@@ -1,21 +1,23 @@
 import AIClient from '../clients/ai-client';
+import { ConsoleLogger } from '../console-logger';
 
 const generateImage = async (imagePrompt: string) => {
   try {
     const prompt = JSON.parse(imagePrompt);
-    console.log({
+    ConsoleLogger.log('VERBOSE', {
       model: 'dall-e-3',
       prompt: prompt.imagePrompt,
       n: 1,
       size: AIClient.imageSize
     });
+
     const client = new AIClient();
     const response = await client.generateImage(prompt.imagePrompt);
 
     return response;
   }
   catch (error: any) {
-    console.log(error);
+    ConsoleLogger.log('ERROR', 'Error call dal-e', error);
     if (error && error.status === 400) {
       return error?.error?.message || null;
     }

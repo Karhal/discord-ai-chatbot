@@ -1,9 +1,10 @@
+import { ConsoleLogger } from '../console-logger';
 import FileManager from '../handlers/file-handler';
 
 const writeMemory = async (memory: string) => {
   try {
     const data = JSON.parse(memory);
-    console.log(data);
+    ConsoleLogger.log('VERBOSE', 'Write to memory', data);
 
     const fileManager = new FileManager('./');
     await fileManager.appendToFile('memory.txt', `${data.memoryString}\n`);

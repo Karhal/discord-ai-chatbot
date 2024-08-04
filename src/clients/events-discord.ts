@@ -1,5 +1,6 @@
 import { Client } from 'discord.js';
 import AIClient from './ai-client';
+import { ConsoleLogger } from '../console-logger';
 
 export default class EventDiscord {
   eventName: string;
@@ -22,7 +23,7 @@ export default class EventDiscord {
     else {
       this.initOnceEvent();
     }
-    console.log(this.eventName + ' added');
+    ConsoleLogger.log('INFOS', this.eventName + ' added');
   }
 
   initOnEvent() {

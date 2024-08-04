@@ -5,6 +5,7 @@ import config from '../config';
 import EventDiscord from '../clients/events-discord';
 import ImageHandler from '../handlers/image-handler';
 import { Events, Message } from 'discord.js';
+import { ConsoleLogger } from '../console-logger';
 
 export default class MessageCreate extends EventDiscord {
   eventName = Events.MessageCreate;
@@ -32,6 +33,7 @@ export default class MessageCreate extends EventDiscord {
     aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
 
     const summary = await aiCompletionHandler.getSummary(channelId);
+    ConsoleLogger.log('VERBOSE', 'Conversation', summary);
     if (summary) {
       const completion = await aiCompletionHandler.getAiCompletion(
         summary,
@@ -51,7 +53,7 @@ export default class MessageCreate extends EventDiscord {
       }
     }
 
-    console.log('Done.');
+    ConsoleLogger.log('VERBOSE', 'Done.');
   };
 
   async sendResponse(message: Message, response: string, imagePaths: string[]) {
@@ -60,7 +62,7 @@ export default class MessageCreate extends EventDiscord {
     if (imagePaths.length > 0) {
       message.channel.sendTyping();
       await message.channel.send({ files: imagePaths });
-      console.log('Images sent');
+      ConsoleLogger.log('VERBOSE', 'Images sent');
     }
     return true;
   }
