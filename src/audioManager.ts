@@ -1,7 +1,6 @@
 class AudioManager {
-  constructor() {
-    this.audioConnection = null;
-  }
+  audioConnection = null;
+  constructor() {}
 
   setAudioConnection(connection) {
     console.log('Setting audio connection');
