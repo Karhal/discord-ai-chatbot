@@ -7,31 +7,30 @@ jest.mock('./../../src/config', () => {
     discord: {
       lang: 'fr',
       token: '<discord Token>',
-      botName: 'botName',
-      maxHistory: 10,
+      maxHistory: 10
     },
     openAI: {
       apiKey: '<openAiKey>',
       model: 'gpt-4o',
       summaryModel: 'gpt-4o-mini',
       prompt: '',
-      imageSize: '1024x1024',
+      imageSize: '1024x1024'
     },
     dune: {
-      apiKey: '',
+      apiKey: ''
     },
     serp: {
       apiKey: '',
-      lang: '',
+      lang: ''
     },
     braveSearch: {
       apiKey: '',
-      lang: '',
+      lang: ''
     },
     coin: {
       apiKey: '',
-      defaulAsset: 'USD',
-    },
+      defaulAsset: 'USD'
+    }
   };
 });
 
@@ -44,14 +43,22 @@ describe('messageCreate event', () => {
       sendTyping: jest.fn(),
       send: jest.fn(),
       messages: {
-        fetch: jest.fn().mockResolvedValue([]),
-      },
-    },
+        fetch: jest.fn().mockResolvedValue([])
+      }
+    }
+  };
+
+  const mockDiscordClient = {
+    user: {
+      id: '9999999999',
+      username: 'botName'
+    }
   };
 
   it('should not process messages from bots', async () => {
     mockMessage.author.bot = true;
     const messageEvent = new messageCreate();
+    messageEvent.discordClient = mockDiscordClient;
     await messageEvent.handler(mockMessage);
     expect(mockMessage.channel.sendTyping).not.toHaveBeenCalled();
   });
@@ -59,6 +66,7 @@ describe('messageCreate event', () => {
   it('should not process messages that do not contain the bot name', async () => {
     mockMessage.content = 'Test message';
     const messageEvent = new messageCreate();
+    messageEvent.discordClient = mockDiscordClient;
     const response = await messageEvent.theMessageContainsBotName(mockMessage);
     expect(response).toBe(false);
   });
@@ -66,6 +74,7 @@ describe('messageCreate event', () => {
   it('should process messages that contain the bot name', async () => {
     mockMessage.content = 'Test message botName';
     const messageEvent = new messageCreate();
+    messageEvent.discordClient = mockDiscordClient;
     const response = await messageEvent.theMessageContainsBotName(mockMessage);
     expect(response).toBe(true);
   });
