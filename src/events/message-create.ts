@@ -40,17 +40,12 @@ export default class MessageCreate extends EventDiscord {
         channelId
       );
       let content = completion.content;
-      const imageEngine = new ImageHandler(this.aiClient, message, content);
-      const findImages = await imageEngine.getImageFromMSG();
-      if (findImages) {
-        content = imageEngine.content;
-      }
-
+      console.log('completion', completion);
+      const imageHandler = new ImageHandler(content);
+      content = await imageHandler.handleMessageImages();
       message.channel.sendTyping();
-      await this.sendResponse(message, content, imageEngine.downloadedImages);
-      if (findImages) {
-        imageEngine.deleteImages();
-      }
+      await this.sendResponse(message, content, imageHandler.downloadedImages);
+      imageHandler.deleteImages();
     }
 
     console.log('Done.');
