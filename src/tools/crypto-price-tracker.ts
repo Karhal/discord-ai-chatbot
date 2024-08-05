@@ -1,5 +1,4 @@
 import config from '../config';
-import fetch from 'node-fetch';
 
 const coinApiKey = config.coin.apiKey || process.env.COIN_API_KEY || '';
 const defaultAsset =
@@ -12,7 +11,7 @@ const getCryptoPrice = async (query: string) => {
   myHeaders.append('Accept', 'text/plain');
   myHeaders.append('X-CoinAPI-Key', coinApiKey);
 
-  const requestOptions: any = {
+  const requestOptions: RequestInit = {
     method: 'GET',
     headers: myHeaders,
     redirect: 'follow'
@@ -23,8 +22,8 @@ const getCryptoPrice = async (query: string) => {
     requestOptions
   );
   const resultJSON = await result.text();
-  console.log(result);
-  return result;
+  console.log(resultJSON);
+  return resultJSON;
 };
 
 const getCryptoPriceTool = {
