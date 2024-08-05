@@ -50,6 +50,8 @@ export default class AIClient implements AIClientType {
       n: 1,
       size: AIClient.imageSize
     });
-    return response?.data[0]?.url || null;
+    return response?.data[0]?.url
+      ? JSON.stringify({ image_url: response.data[0].url })
+      : null;
   }
 }

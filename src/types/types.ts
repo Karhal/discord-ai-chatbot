@@ -10,4 +10,16 @@ type ToolsAI = {
   };
 };
 
-export { ToolsAI };
+type Completion = {
+  author: string;
+  content: string;
+  dateTime: Date;
+};
+
+type MessageInput = {
+  role: string;
+  content: string;
+  channelId: string;
+};
+
+export { ToolsAI, Completion, MessageInput };
