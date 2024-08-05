@@ -53,7 +53,7 @@ test('should extract multiple image URLs from content', () => {
     'https://example.com/image1.jpg',
     'https://example.com/image2.png'
   ];
-  const result = imgHandler.extractImages(content);
+  const result = imgHandler.getExtractedImagesUrls(content);
   expect(result).toEqual(expected);
 });
 
@@ -70,7 +70,7 @@ test('should return null when no image URLs are present', () => {
   };
   const imgHandler = new ImageHandler(discordMessage);
   const content = 'There are no images here.';
-  const result = imgHandler.extractImages(content);
+  const result = imgHandler.getExtractedImagesUrls(content);
   expect(result).toBeNull();
 });
 

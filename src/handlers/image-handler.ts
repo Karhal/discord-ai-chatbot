@@ -19,7 +19,7 @@ export default class ImageHandler implements ImageHandlerType {
   }
 
   async handleMessageImages(): Promise<string> {
-    const imagesUrls = this.extractImages(this.message);
+    const imagesUrls = this.getExtractedImagesUrls(this.message);
     if (!imagesUrls?.length) return this.message;
 
     this.downloadedImages = await this.downloadImages(imagesUrls);
@@ -31,7 +31,7 @@ export default class ImageHandler implements ImageHandlerType {
   }
 
   async getImages(content: string): Promise<Array<string>> {
-    const imagesUrls = this.extractImages(content);
+    const imagesUrls = this.getExtractedImagesUrls(content);
     if (!imagesUrls?.length) return [];
 
     this.downloadedImages = await this.downloadImages(imagesUrls);
@@ -111,7 +111,7 @@ export default class ImageHandler implements ImageHandlerType {
     return imagePath;
   }
 
-  extractImages(content: string) {
+  getExtractedImagesUrls(content: string) {
     const imageRegex =
       /(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$]?)/gim;
     const imagesUrls = content.match(imageRegex);
