@@ -1,41 +1,60 @@
 import path from 'path';
 import fs from 'fs';
 import AIClient from '../clients/ai-client';
+import { Message } from 'discord.js';
 
 type ImageHandlerType = {
-  getImages: (content: string) => Promise<Array<string>>;
+  content: string;
+  message: Message;
+  getImageFromMSG: () => Promise<boolean>;
+  getImages: () => Promise<boolean>;
 };
 
 export default class ImageHandler implements ImageHandlerType {
+  message: Message;
+  content: string;
   aiClient: AIClient;
   imagesUrls: RegExpMatchArray | null = null;
   downloadedImages: string[] = [];
 
-  constructor(aiClient: AIClient) {
+  constructor(aiClient: AIClient, message: Message, content: string) {
     this.aiClient = aiClient;
+    this.message = message;
+    this.content = content;
   }
 
-  async getImages(content: string): Promise<Array<string>> {
-    const imagesUrls = this.extractImages(content);
-    if (!imagesUrls?.length) return [];
-
-    this.downloadedImages = await this.downloadImages(imagesUrls);
-    if (this.downloadedImages.length) {
-      return imagesUrls;
+  async getImageFromMSG(): Promise<boolean> {
+    const find = await this.getImages();
+    if (find) {
+      this.cleanImagePathsFromResponse();
+      return true;
     }
-    return [];
+    return false;
   }
 
-  cleanImagePathsFromResponse(content: string): string {
+  async getImages(): Promise<boolean> {
+    this.extractImages();
+    if (!this.imagesUrls?.length) return false;
+
+    this.downloadedImages = await this.downloadImages(this.imagesUrls);
+    console.log('downloaded images', this.downloadedImages);
+    if (this.downloadedImages.length) {
+      return true;
+    }
+    return false;
+  }
+
+  cleanImagePathsFromResponse(): void {
+    console.log('before', this.content);
     const regex =
-      /!?\[.*?\]\(https:\/\/oaidalleapiprodscus\.blob\.core\.windows\.net.*?\)/g;
-    const matches = content.match(regex);
+      /\[.*?\]\(https:\/\/oaidalleapiprodscus\.blob\.core\.windows\.net.*?\)/g;
+    const matches = this.content.match(regex);
     if (matches) {
       matches.forEach((match) => {
-        content = content.replace(match, '');
+        this.content = this.content.replace(match, '');
       });
     }
-    return content;
+    console.log('after', this.content);
   }
 
   deleteImages(): void {
@@ -53,11 +72,12 @@ export default class ImageHandler implements ImageHandlerType {
     });
   }
 
-  async downloadImages(images: string[]): Promise<string[]> {
+  async downloadImages(images: RegExpMatchArray): Promise<string[]> {
     if (!images) return [];
     const findImagesWithNull: (string | null)[] = await Promise.all(
       images.map(async (image) => {
         console.log('Downloading images ' + image);
+        this.message.channel.sendTyping();
         const response = await fetch(image);
         if (response.status === 200) {
           const responseBuffer = await response.arrayBuffer();
@@ -96,10 +116,10 @@ export default class ImageHandler implements ImageHandlerType {
     return imagePath;
   }
 
-  extractImages(content: string) {
+  extractImages() {
     const imageRegex =
       /(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$]?)/gim;
-    const imagesUrls = content.match(imageRegex);
-    return imagesUrls;
+    this.imagesUrls = this.content.match(imageRegex);
+    console.log('image extract', this.imagesUrls, this.content);
   }
 }

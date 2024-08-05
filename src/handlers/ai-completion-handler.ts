@@ -3,8 +3,8 @@ import config from '../config';
 import AIClient from './../clients/ai-client';
 import { AIClientType } from '../types/AIClientType';
 import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources';
-import { Collection, Message } from 'discord.js';
-import { ToolsAI, Completion, MessageInput } from '../types/types';
+import { Message } from 'discord.js';
+import { ToolsAI } from '../types/types';
 
 const openAiModel: string =
   config.openAI.model || process.env.OPEN_AI_MODEL || 'davinci';
@@ -18,7 +18,7 @@ const maxHistory: number =
 class AiCompletionHandler {
   aiClient: AIClientType;
   prompt: string;
-  messages: any[] = [];
+  messages: Array<any> = [];
   summary: string | null = null;
   tools: ToolsAI[];
 
@@ -52,17 +52,13 @@ class AiCompletionHandler {
     return response;
   }
 
-  async getAiCompletion(
-    summary: string,
-    channelId: string
-  ): Promise<Completion> {
+  async getAiCompletion(summary: string, channelId: string) {
     const memory: string = readMemory();
     const fullPrompt = `${this.prompt}.\n\n
     MEMORY:"""\n${memory}\n"""\n
     PREVIOUSLY:"""\n${summary}\n"""
     NOTE:"""\n
-    - Format your response in a JSON object only with the keys 'content' and the key 'author'.
-    - If you have an image to add, use the key 'content' to store the image URL.
+    - Format your response in a JSON object with the key 'content' and the key 'author'.
     - When you use a tool, use the property 'content' to store its results.
     - Interract only to the last message mentionning you. The rest is to give you context.
     - Consider the DateTime given with the last message to avoid being out of context.\n"""
@@ -72,20 +68,22 @@ class AiCompletionHandler {
       this.getLastMessagesOfAChannel(5, channelId) || []
     );
 
-    const options = {
+    const option = {
       model: openAiModel,
       messages: conversation,
       tools: this.tools,
       response_format: { type: 'json_object' }
     };
 
-    const runner = this.aiClient.client.beta.chat.completions.runTools(options);
-    const response = await runner.finalContent();
-    console.log('response', response);
-    return JSON.parse(response as string);
+    const runner = this.aiClient.client.beta.chat.completions.runTools(option);
+    let response = await runner.finalContent();
+    if (response) {
+      response = JSON.parse(response.replace(/^[a-zA-Z]*:/g, ''));
+    }
+    return response;
   }
 
-  addMessageToChannel(message: MessageInput, limit = maxHistory) {
+  addMessageToChannel(message: any, limit = maxHistory) {
     if (this.messages) {
       const channelMessages = this.messages.filter(
         (msg) => msg.channelId === message.channelId
@@ -105,7 +103,7 @@ class AiCompletionHandler {
     }
   }
 
-  addMessageArrayToChannel(messages: Array<MessageInput>, limit = maxHistory) {
+  addMessageArrayToChannel(messages: Array<any>, limit = maxHistory) {
     messages.forEach((message) => {
       this.addMessageToChannel(message, limit);
     });
@@ -135,34 +133,38 @@ class AiCompletionHandler {
       .slice(0, count);
   }
 
-  setChannelHistory(
-    channelId: string,
-    messages: Collection<string, Message<boolean>>
-  ) {
+  setChannelHistory(channelId: string, messages: Message[]) {
     this.eraseMessagesWithChannelId(channelId);
     const handlerMessages = this.createMessagesArrayFromHistory(messages);
     this.addMessageArrayToChannel(handlerMessages);
   }
 
-  createMessagesArrayFromHistory(
-    messagesChannelHistory: Collection<string, Message<boolean>>
-  ) {
-    const messages: MessageInput[] = [];
-    messagesChannelHistory.reverse().forEach((msg: Message) => {
-      if (msg.content !== '') {
-        const role = msg.author.bot ? 'assistant' : 'user';
-        const contentJsonAsString = JSON.stringify({
-          author: msg.author.username,
-          content: msg.content,
-          dateTime: msg.createdAt
-        });
-        messages.push({
-          role: role,
-          content: contentJsonAsString,
-          channelId: msg.channelId
-        });
-      }
-    });
+  createMessagesArrayFromHistory(messagesChannelHistory: any) {
+    const messages: { role: string; content: string; channelId: string }[] = [];
+    messagesChannelHistory
+      .reverse()
+      .forEach(
+        (msg: {
+          content: string;
+          author: { bot: string; username: string };
+          createdAt: Date;
+          channelId: string;
+        }) => {
+          if (msg.content !== '') {
+            const role = msg.author.bot ? 'assistant' : 'user';
+            const contentJsonAsString = JSON.stringify({
+              author: msg.author.username,
+              content: msg.content,
+              dateTime: msg.createdAt
+            });
+            messages.push({
+              role: role,
+              content: contentJsonAsString,
+              channelId: msg.channelId
+            });
+          }
+        }
+      );
 
     return messages;
   }
