@@ -4,6 +4,9 @@ import fs from 'fs';
 type ImageHandlerType = {
   message: string;
   getImages: (content: string) => Promise<Array<string>>;
+  handleMessageImages: () => Promise<string>;
+  cleanImagePathsFromResponse: (content: string) => string;
+  deleteImages: () => void;
 };
 
 export default class ImageHandler implements ImageHandlerType {
