@@ -19,26 +19,41 @@ export default class ImageHandler implements ImageHandlerType {
   }
 
   async handleMessageImages(): Promise<string> {
-    const imagesUrls = this.getExtractedImagesUrls(this.message);
-    if (!imagesUrls?.length) return this.message;
+    try {
+      const imagesUrls = await this.extractImageUrls(this.message);
+      if (!imagesUrls.length) return this.message;
 
-    this.downloadedImages = await this.downloadImages(imagesUrls);
-    if (this.downloadedImages.length) {
-      this.message = this.cleanImagePathsFromResponse(this.message);
+      this.downloadedImages = await this.downloadImages(imagesUrls);
+      if (this.downloadedImages.length) {
+        this.message = this.cleanImagePathsFromResponse(this.message);
+      }
+
+      return this.message;
     }
-
-    return this.message;
+    catch (error) {
+      console.error('Error handling message images:', {
+        message: this.message,
+        error
+      });
+      throw error;
+    }
   }
 
   async getImages(content: string): Promise<Array<string>> {
-    const imagesUrls = this.getExtractedImagesUrls(content);
-    if (!imagesUrls?.length) return [];
+    try {
+      const imagesUrls = this.getExtractedImagesUrls(content);
+      if (!imagesUrls?.length) return [];
 
-    this.downloadedImages = await this.downloadImages(imagesUrls);
-    if (this.downloadedImages.length) {
-      return imagesUrls;
+      this.downloadedImages = await this.downloadImages(imagesUrls);
+      if (this.downloadedImages.length) {
+        return imagesUrls;
+      }
+      return [];
     }
-    return [];
+    catch (error) {
+      console.error('Error getting images:', error);
+      throw error;
+    }
   }
 
   cleanImagePathsFromResponse(content: string): string {
@@ -95,26 +110,36 @@ export default class ImageHandler implements ImageHandlerType {
   }
 
   saveImage(response: ArrayBuffer) {
-    const timestamp = new Date().getTime();
-    const imageName = timestamp + '.jpg';
-    const imageData = Buffer.from(response);
+    try {
+      const timestamp = new Date().getTime();
+      const imageName = `${timestamp}.jpg`;
+      const imageData = Buffer.from(response);
 
-    const pathTmpFolder = './../tmp';
-    if (!fs.existsSync(pathTmpFolder)) {
-      fs.mkdirSync(pathTmpFolder);
+      const pathTmpFolder = path.resolve(__dirname, './../tmp');
+      if (!fs.existsSync(pathTmpFolder)) {
+        fs.mkdirSync(pathTmpFolder);
+      }
+      const imagePath = path.join(pathTmpFolder, imageName);
+
+      console.log('Saving image to ' + imagePath);
+      fs.writeFileSync(imagePath, imageData);
+
+      return imagePath;
     }
-    const imagePath = path.join(pathTmpFolder, imageName);
-
-    console.log('Saving image to ' + imagePath);
-    fs.writeFileSync(imagePath, imageData);
-
-    return imagePath;
+    catch (error) {
+      console.error('Error saving image:', error);
+      throw error;
+    }
   }
 
-  getExtractedImagesUrls(content: string) {
+  getExtractedImagesUrls(content: string): string[] {
     const imageRegex =
       /(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$]?)/gim;
     const imagesUrls = content.match(imageRegex);
-    return imagesUrls;
+    return imagesUrls || [];
+  }
+
+  private extractImageUrls(content: string): string[] {
+    return this.getExtractedImagesUrls(content);
   }
 }
