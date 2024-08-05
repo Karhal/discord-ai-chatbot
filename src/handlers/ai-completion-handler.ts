@@ -82,7 +82,17 @@ class AiCompletionHandler {
     const runner = this.aiClient.client.beta.chat.completions.runTools(options);
     const response = await runner.finalContent();
     console.log('response', response);
-    return JSON.parse(response as string);
+
+    if (response) {
+      const responseJson = JSON.parse(response);
+      if (responseJson.image_url) {
+        responseJson.content += ` ${responseJson.image_url}`;
+        delete responseJson.image_url;
+      }
+      return responseJson as Completion;
+    }
+
+    return { content: '', author: '', dateTime: new Date() };
   }
 
   addMessageToChannel(message: MessageInput, limit = maxHistory) {

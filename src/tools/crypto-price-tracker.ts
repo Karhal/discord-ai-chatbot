@@ -23,8 +23,8 @@ const getCryptoPrice = async (query: string) => {
     requestOptions
   );
   const resultJSON = await result.text();
-  console.log(result);
-  return result;
+  console.log(resultJSON);
+  return resultJSON;
 };
 
 const getCryptoPriceTool = {
