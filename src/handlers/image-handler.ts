@@ -1,18 +1,30 @@
 import path from 'path';
 import fs from 'fs';
-import AIClient from '../clients/ai-client';
 
 type ImageHandlerType = {
+  message: string;
   getImages: (content: string) => Promise<Array<string>>;
 };
 
 export default class ImageHandler implements ImageHandlerType {
-  aiClient: AIClient;
   imagesUrls: RegExpMatchArray | null = null;
   downloadedImages: string[] = [];
+  message: string;
 
-  constructor(aiClient: AIClient) {
-    this.aiClient = aiClient;
+  constructor(message: string) {
+    this.message = message;
+  }
+
+  async handleMessageImages(): Promise<string> {
+    const imagesUrls = this.extractImages(this.message);
+    if (!imagesUrls?.length) return this.message;
+
+    this.downloadedImages = await this.downloadImages(imagesUrls);
+    if (this.downloadedImages.length) {
+      this.message = this.cleanImagePathsFromResponse(this.message);
+    }
+
+    return this.message;
   }
 
   async getImages(content: string): Promise<Array<string>> {
