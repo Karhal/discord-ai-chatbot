@@ -18,7 +18,7 @@ const maxHistory: number =
 class AiCompletionHandler {
   aiClient: AIClientType;
   prompt: string;
-  messages: any[] = [];
+  messages: MessageInput[] = [];
   summary: string | null = null;
   tools: ToolsAI[];
 
@@ -41,7 +41,10 @@ class AiCompletionHandler {
         {
           role: 'user',
           content: this.getFirstMessagesOfAChannel(5, channelId)
-            .map((msg) => `${msg.content.author}: ${msg.content}`)
+            .map(function(msg) {
+              const contentParsed = JSON.parse(msg.content);
+              return contentParsed.author + ': ' + msg.content;
+            })
             .join('\n\n')
         }
       ],
