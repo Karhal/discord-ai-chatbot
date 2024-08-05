@@ -8,7 +8,7 @@ const generateImage = async (imagePrompt: string) => {
 
     return response;
   }
-  catch (error: any) {
+  catch (error: unknow) {
     console.log(error);
     if (error && error.status === 400) {
       return error?.error?.message || null;
