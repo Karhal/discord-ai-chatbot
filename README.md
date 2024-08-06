@@ -7,7 +7,7 @@ Welcome to the Discord-GPT project, an advanced integration of GPT with Discord 
 - **Brave and Google News Search**: Integrates real-time searches to provide updated information.
 - **Cryptocurrency Price Tracking**: Offers live updates on cryptocurrency prices.
 - **Image Generation**: Creates images based on descriptions provided by users.
-- **Customization**: Allows extensive customization through `config.js`, including language choice, API keys, and more.
+- **Customization**: Allows extensive customization through `config.ts`, including language choice, API keys, and more.
 
 ## Prerequisites
 
@@ -17,12 +17,12 @@ Before getting started, make sure you have Node.js installed on your system. You
 
 1. Clone this repository to your local machine.
 2. Run `npm install` to install all necessary dependencies.
-3. Copy `config.js.dist` to `config.js` and fill it with your own values.
+3. Copy `src/config.ts.dist` to `src/config.ts` and fill it with your own values.
 4. Launch the bot with `npm run start`.
 
 ## Configuration
 
-Open `config.js` and adjust the settings as needed. You can set your Discord bot token, API keys for the various services, and other customization options.
+Open `config.ts` and adjust the settings as needed. You can set your Discord bot token, API keys for the various services, and other customization options.
 
 ### Creating a Discord Bot Token
 
@@ -30,30 +30,33 @@ Open `config.js` and adjust the settings as needed. You can set your Discord bot
 2. Click on "New Application" and give your application a name.
 3. Navigate to the "Bot" section on the left sidebar and click "Add Bot".
 4. Click "Yes, do it!" to confirm.
-5. Under the "Token" section, click "Copy" to copy your bot token. This token will be used in your `config.js` file.
+5. Under the "Token" section, click "Copy" to copy your bot token. This token will be used in your `config.ts` file.
+6. On discord go to moderator view and copy bot Id to put in config
 
 ### Obtaining API Keys
 
-- **OpenAI API Key**: 
+- **OpenAI API Key**:
+
   1. Sign up at [OpenAI](https://beta.openai.com/signup/).
   2. Navigate to the API section and generate an API key.
-  3. Copy the API key and paste it into your `config.js` file.
+  3. Copy the API key and paste it into your `config.ts` file.
 
-- **Brave Search API Key**: 
+- **Brave Search API Key**:
+
   1. Sign up at [Brave Search](https://search.brave.com/).
   2. Follow their instructions to obtain an API key.
-  3. Copy the API key and paste it into your `config.js` file.
+  3. Copy the API key and paste it into your `config.ts` file.
 
-- **SerpAPI Token**: 
+- **SerpAPI Token**:
   1. Sign up at [SerpAPI](https://serpapi.com/users/sign_up).
   2. Create an account or log in if you already have one.
   3. Navigate to the dashboard.
   4. Copy the API key provided in the dashboard.
-  5. Paste the API key into your `config.js` file.
+  5. Paste the API key into your `config.ts` file.
 
 ## Running the Bot
 
-1. Ensure all necessary API keys and configurations are set in `config.js`.
+1. Ensure all necessary API keys and configurations are set in `config.ts`.
 2. Run `npm run start` to launch the bot.
 3. Invite the bot to your Discord server using the OAuth2 URL generated in the Discord Developer Portal.
 
@@ -64,10 +67,9 @@ To ensure everything is working correctly, you can run the provided tests.
 1. Run `npm test` to execute the tests once.
 2. Run `npm run test:watch` to run the tests in watch mode, which will re-run tests on file changes.
 
-
 ## Troubleshooting
 
-- **Bot Not Responding**: Ensure the bot is online and the token in `config.js` is correct.
+- **Bot Not Responding**: Ensure the bot is online and the token in `config.ts` is correct.
 - **API Errors**: Double-check that all API keys are correctly entered and have the necessary permissions.
 - **Dependencies Issues**: Run `npm install` again to ensure all dependencies are correctly installed.
 - **Discord permissions**: Be sure your bot has a correct role in Discord and can write messages and embed files.

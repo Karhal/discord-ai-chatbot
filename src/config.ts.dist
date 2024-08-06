@@ -1,0 +1,31 @@
+
+export default {
+    discord : {
+        token : "",
+        maxHistory: 10,
+        lang: "en"
+    },
+    openAI : {
+        apiKey : "",
+        model : "gpt-4o",
+        summaryModel : "gpt-4o-mini",
+        prompt : "You are a nice assistant in a discord server",
+        imageSize: "1024x1024",
+    },
+    dune : {
+        apiKey : ""
+    },
+    serp : {
+        apiKey : "",
+        lang : "",
+        google_domain: ""
+    },
+    braveSearch : {
+        apiKey : "",
+        lang : ""
+    },
+    coin : {
+        apiKey : "",
+        defaultAsset : "USD"
+    }
+};

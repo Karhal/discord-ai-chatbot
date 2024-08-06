@@ -1,8 +1,8 @@
-config.js
 node_modules
 memory.txt
 .idea
 .nvmrc
-tmp/*
 .DS_Store
 coverage/*
+src/config.ts
+dist
