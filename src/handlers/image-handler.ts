@@ -39,23 +39,6 @@ export default class ImageHandler implements ImageHandlerType {
     }
   }
 
-  async getImages(content: string): Promise<Array<string>> {
-    try {
-      const imagesUrls = this.getExtractedImagesUrls(content);
-      if (!imagesUrls?.length) return [];
-
-      this.downloadedImages = await this.downloadImages(imagesUrls);
-      if (this.downloadedImages.length) {
-        return imagesUrls;
-      }
-      return [];
-    }
-    catch (error) {
-      console.error('Error getting images:', error);
-      throw error;
-    }
-  }
-
   cleanImagePathsFromResponse(content: string): string {
     const regex =
       /!?\[.*?\]\(https:\/\/oaidalleapiprodscus\.blob\.core\.windows\.net.*?\)/g;
@@ -68,7 +51,7 @@ export default class ImageHandler implements ImageHandlerType {
     return content;
   }
 
-  deleteImages(): void {
+  public deleteImages(): void {
     this.downloadedImages.forEach((imagePath) => {
       if (fs.existsSync(imagePath)) {
         fs.unlink(imagePath, (err) => {
@@ -83,7 +66,7 @@ export default class ImageHandler implements ImageHandlerType {
     });
   }
 
-  async downloadImages(images: string[]): Promise<string[]> {
+  private async downloadImages(images: string[]): Promise<string[]> {
     if (!images) return [];
     const findImagesWithNull: (string | null)[] = await Promise.all(
       images.map(async (image) => {
@@ -109,7 +92,7 @@ export default class ImageHandler implements ImageHandlerType {
     return findImages;
   }
 
-  saveImage(response: ArrayBuffer) {
+  private saveImage(response: ArrayBuffer) {
     try {
       const timestamp = new Date().getTime();
       const imageName = `${timestamp}.jpg`;
@@ -132,7 +115,7 @@ export default class ImageHandler implements ImageHandlerType {
     }
   }
 
-  getExtractedImagesUrls(content: string): string[] {
+  private getExtractedImagesUrls(content: string): string[] {
     const imageRegex =
       /(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$]?)/gim;
     const imagesUrls = content.match(imageRegex);

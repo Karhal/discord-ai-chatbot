@@ -5,8 +5,7 @@ const generateImage = async (imagePrompt: string) => {
     const prompt = JSON.parse(imagePrompt);
     const client = new AIClient();
     const response = await client.generateImage(prompt.imagePrompt);
-
-    return response;
+    return JSON.stringify({ image_url: response });
   }
   catch (error: unknow) {
     console.log(error);
