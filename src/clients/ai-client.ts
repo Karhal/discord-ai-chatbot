@@ -2,10 +2,7 @@ import OpenAI from 'openai';
 import config from '../config';
 import { AIClientType } from '../types/AIClientType';
 import { MessageInput, ToolsAI } from '../types/types';
-import {
-  ChatCompletionCreateParamsNonStreaming,
-  Completion
-} from 'openai/resources';
+import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources';
 type openAIImageSize =
   | '1024x1024'
   | '256x256'
@@ -84,7 +81,7 @@ export default class AIClient implements AIClientType {
   async getAiCompletion(
     conversation: MessageInput[],
     tools: ToolsAI[]
-  ): Promise<Completion> {
+  ): Promise<string> {
     const options = {
       model: AIClient.openAiModel,
       messages: conversation,
@@ -95,6 +92,6 @@ export default class AIClient implements AIClientType {
     const runner = this.client.beta.chat.completions.runTools(options);
     const response = await runner.finalContent();
     console.log('response', response);
-    return JSON.parse(response as string);
+    return JSON.parse(response as string).content;
   }
 }
