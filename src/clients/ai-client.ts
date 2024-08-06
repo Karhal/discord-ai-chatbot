@@ -1,7 +1,11 @@
 import OpenAI from 'openai';
 import config from '../config';
 import { AIClientType } from '../types/AIClientType';
-import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources';
+import { MessageInput, ToolsAI } from '../types/types';
+import {
+  ChatCompletionCreateParamsNonStreaming,
+  Completion
+} from 'openai/resources';
 type openAIImageSize =
   | '1024x1024'
   | '256x256'
@@ -15,6 +19,8 @@ export default class AIClient implements AIClientType {
   static openAiKey?: string =
     config?.openAI?.apiKey || process.env.OPENAI_API_KEY;
   static imageSize: openAIImageSize = '1024x1024';
+  static openAiModel = 'davinci';
+  static openAiSummaryModel: string;
   client: OpenAI;
 
   constructor() {
@@ -22,6 +28,18 @@ export default class AIClient implements AIClientType {
       AIClient.imageSize = (config?.openAI?.imageSize ||
         process.env.IMAGE_SIZE) as openAIImageSize;
     }
+    if (config?.openAI?.model || process.env.OPEN_AI_MODEL) {
+      AIClient.openAiModel = (config.openAI.model ||
+        process.env.OPEN_AI_MODEL) as string;
+    }
+    if (config?.openAI?.summaryModel || process.env.OPEN_AI_SUMMARY_MODEL) {
+      AIClient.openAiSummaryModel = (config.openAI.summaryModel ||
+        process.env.OPEN_AI_SUMMARY_MODEL) as string;
+    }
+    else {
+      AIClient.openAiSummaryModel = AIClient.openAiModel;
+    }
+
     if (!AIClient.openAiKey) {
       throw new Error('No Open AI key configured');
     }
@@ -51,5 +69,32 @@ export default class AIClient implements AIClientType {
       size: AIClient.imageSize
     });
     return response?.data[0]?.url || null;
+  }
+
+  async getSummary(messages: any[]): Promise<string | null> {
+    const option: ChatCompletionCreateParamsNonStreaming = {
+      messages: messages,
+      model: AIClient.openAiSummaryModel
+    };
+
+    const response = await this.message(option);
+    return response;
+  }
+
+  async getAiCompletion(
+    conversation: MessageInput[],
+    tools: ToolsAI[]
+  ): Promise<Completion> {
+    const options = {
+      model: AIClient.openAiModel,
+      messages: conversation,
+      tools: tools,
+      response_format: { type: 'json_object' }
+    };
+
+    const runner = this.client.beta.chat.completions.runTools(options);
+    const response = await runner.finalContent();
+    console.log('response', response);
+    return JSON.parse(response as string);
   }
 }
