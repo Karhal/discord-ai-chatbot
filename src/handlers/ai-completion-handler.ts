@@ -3,7 +3,7 @@ import config from '../config';
 import AIClient from './../clients/ai-client';
 import { AIClientType } from '../types/AIClientType';
 import { Collection, Message } from 'discord.js';
-import { ToolsAI, MessageInput, Completion } from '../types/types';
+import { ToolsAI, MessageInput } from '../types/types';
 
 const lang: string = config.discord.lang || process.env.LANG || 'en';
 const maxHistory: number =
@@ -46,10 +46,7 @@ class AiCompletionHandler {
     return response;
   }
 
-  async getAiCompletion(
-    summary: string,
-    channelId: string
-  ): Promise<Completion> {
+  async getAiCompletion(summary: string, channelId: string): Promise<string> {
     const memory: string = readMemory();
     const fullPrompt = `${this.prompt}.\n\n
     MEMORY:"""\n${memory}\n"""\n
@@ -66,17 +63,8 @@ class AiCompletionHandler {
       this.getLastMessagesOfAChannel(5, channelId) || []
     );
 
-    const options = {
-      model: AIClient.openAiModel,
-      messages: conversation,
-      tools: this.tools,
-      response_format: { type: 'json_object' }
-    };
-
-    const runner = this.aiClient.client.beta.chat.completions.runTools(options);
-    const response = await runner.finalContent();
-    console.log('response', response);
-    return JSON.parse(response as string);
+    const content = this.aiClient.getAiCompletion(conversation, this.tools);
+    return content;
   }
 
   addMessageToChannel(message: MessageInput, limit = maxHistory) {

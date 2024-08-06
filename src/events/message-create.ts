@@ -35,12 +35,11 @@ export default class MessageCreate extends EventDiscord {
 
     const summary = await aiCompletionHandler.getSummary(channelId);
     if (summary) {
-      const completion = await aiCompletionHandler.getAiCompletion(
+      let content = await aiCompletionHandler.getAiCompletion(
         summary,
         channelId
       );
-      let content = completion.content;
-      console.log('completion', completion);
+
       const imageHandler = new ImageHandler(content);
       content = await imageHandler.handleMessageImages();
       message.channel.sendTyping();
