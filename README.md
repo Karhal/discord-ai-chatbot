@@ -54,6 +54,16 @@ Open `config.ts` and adjust the settings as needed. You can set your Discord bot
   4. Copy the API key provided in the dashboard.
   5. Paste the API key into your `config.ts` file.
 
+- **CoinAPI Key**:
+  To use the CoinAPI features, you need to obtain an API key. Follow these steps:
+
+  1. Go to the [CoinAPI website](https://docs.coinapi.io/).
+  2. Click on the "Get a free API Key" button.
+  3. Sign up for an account if you don't have one, or log in if you already have an account.
+  4. Follow the instructions to generate your API key.
+  5. Once you have your API key, add it to your `config.ts` file.
+
+
 ## Running the Bot
 
 1. Ensure all necessary API keys and configurations are set in `config.ts`.
