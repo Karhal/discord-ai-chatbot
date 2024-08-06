@@ -2,6 +2,7 @@ import fs from 'fs';
 import writeMemoryTool from './tools/write-memory';
 import generateImageTool from './tools/generate-image';
 import getCryptoPriceTool from './tools/crypto-price-tracker';
+import getLastNewsTool from './tools/brave-search';
 import { ToolsAI } from './types/types';
 import fetchDuneDataTool from './tools/dune';
 
@@ -11,6 +12,7 @@ tools.push(writeMemoryTool);
 tools.push(generateImageTool);
 tools.push(getCryptoPriceTool);
 tools.push(fetchDuneDataTool);
+tools.push(getLastNewsTool);
 
 const readMemory = () => {
   const memoryFilePath = './memory.txt';
