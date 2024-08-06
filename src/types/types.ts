@@ -19,7 +19,7 @@ type Completion = {
 type MessageInput = {
   role: string;
   content: string;
-  channelId: string;
+  channelId?: string;
 };
 
 export { ToolsAI, Completion, MessageInput };

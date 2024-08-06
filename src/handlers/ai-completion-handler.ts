@@ -2,19 +2,13 @@ import { readMemory } from '../tools';
 import config from '../config';
 import AIClient from './../clients/ai-client';
 import { AIClientType } from '../types/AIClientType';
-import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources';
 import { Collection, Message } from 'discord.js';
-import { ToolsAI, Completion, MessageInput } from '../types/types';
+import { ToolsAI, MessageInput, Completion } from '../types/types';
 
-const openAiModel: string =
-  config.openAI.model || process.env.OPEN_AI_MODEL || 'davinci';
-const openAiSummaryModel: string =
-  config.openAI.summaryModel ||
-  process.env.OPEN_AI_SUMMARY_MODEL ||
-  openAiModel;
 const lang: string = config.discord.lang || process.env.LANG || 'en';
 const maxHistory: number =
   config.discord.maxHistory || Number(process.env.MAX_HISTORY) || 10;
+
 class AiCompletionHandler {
   aiClient: AIClientType;
   prompt: string;
@@ -28,30 +22,27 @@ class AiCompletionHandler {
     this.tools = tools;
   }
 
-  async getSummary(channelId: string) {
-    const option: ChatCompletionCreateParamsNonStreaming = {
-      messages: [
-        {
-          role: 'assistant',
-          content:
-            'Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. Rely strictly on the provided text. Format the summary in one paragraph form for easy understanding. The summary has to be the shortest possible (<100 words) and give a good idea of what the discussion is about. Use the following language: ' +
-            lang +
-            '\n\nText:"""'
-        },
-        {
-          role: 'user',
-          content: this.getFirstMessagesOfAChannel(5, channelId)
-            .map(function(msg) {
-              const contentParsed = JSON.parse(msg.content);
-              return contentParsed.author + ': ' + msg.content;
-            })
-            .join('\n\n')
-        }
-      ],
-      model: openAiSummaryModel
-    };
+  async getSummary(channelId: string): Promise<string | null> {
+    const messages = [
+      {
+        role: 'assistant',
+        content:
+          'Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. Rely strictly on the provided text. Format the summary in one paragraph form for easy understanding. The summary has to be the shortest possible (<100 words) and give a good idea of what the discussion is about. Use the following language: ' +
+          lang +
+          '\n\nText:"""'
+      },
+      {
+        role: 'user',
+        content: this.getFirstMessagesOfAChannel(5, channelId)
+          .map(function(msg) {
+            const contentParsed = JSON.parse(msg.content);
+            return contentParsed.author + ': ' + msg.content;
+          })
+          .join('\n\n')
+      }
+    ];
 
-    const response = await this.aiClient.message(option);
+    const response = await this.aiClient.getSummary(messages);
     return response;
   }
 
@@ -76,7 +67,7 @@ class AiCompletionHandler {
     );
 
     const options = {
-      model: openAiModel,
+      model: AIClient.openAiModel,
       messages: conversation,
       tools: this.tools,
       response_format: { type: 'json_object' }
