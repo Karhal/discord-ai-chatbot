@@ -57,7 +57,7 @@ test('should extract multiple image URLs from content', () => {
   expect(result).toEqual(expected);
 });
 
-test('should return null when no image URLs are present', () => {
+test('should return empty array when no image URLs are present', () => {
   const discordMessage = {
     channel: {
       sendTyping: function() {}
@@ -71,7 +71,8 @@ test('should return null when no image URLs are present', () => {
   const imgHandler = new ImageHandler(discordMessage);
   const content = 'There are no images here.';
   const result = imgHandler.getExtractedImagesUrls(content);
-  expect(result).toBeNull();
+  expect(result).toBeInstanceOf(Array);
+  expect(result).toHaveLength(0);
 });
 
 test('should delete invalid urls from the content', () => {
