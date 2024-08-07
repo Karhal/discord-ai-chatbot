@@ -40,7 +40,7 @@ export default class ImageHandler implements ImageHandlerType {
 
   cleanImagePathsFromResponse(content: string): string {
     const regex =
-      /(?:!?\[.*?\])?(?:\(?(?:https?|ftp|file):\/\/oaidalleapiprodscus\.[-A-Z0-9+&@#\/%=~_|$?!:,.]*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$]?)\)?)/gim;
+      /(?:!?\[.*?\])?(?:\(?(?:https?|ftp|file):\/\/[A-z]*\.[-A-Z0-9+&@#\/%=~_|$?!:,.]*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$]?)\)?)/gim;
     const matches = content.match(regex);
     if (matches) {
       matches.forEach((match) => {
