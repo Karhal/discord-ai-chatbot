@@ -40,11 +40,11 @@ export default class ImageHandler implements ImageHandlerType {
 
   cleanImagePathsFromResponse(content: string): string {
     const regex =
-      /!?\[.*?\]\(https:\/\/oaidalleapiprodscus\.blob\.core\.windows\.net.*?\)/g;
+      /(?:!?\[.*?\])?(?:\(?(?:https?|ftp|file):\/\/[A-z]*\.[-A-Z0-9+&@#\/%=~_|$?!:,.]*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$]?)\)?)/gim;
     const matches = content.match(regex);
     if (matches) {
       matches.forEach((match) => {
-        content = content.replace(match, '');
+        content = content.replace(match, '').trim();
       });
     }
     return content;

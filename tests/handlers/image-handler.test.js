@@ -75,7 +75,7 @@ test('should return empty array when no image URLs are present', () => {
   expect(result).toHaveLength(0);
 });
 
-test('should delete invalid urls from the content', () => {
+test('cleanImagePathsFromResponse should delete image urls from the content', () => {
   const discordMessage = {
     channel: {
       sendTyping: function() {}
@@ -86,6 +86,22 @@ test('should delete invalid urls from the content', () => {
   const completion =
     'Lorem Ipsum Woop woop' +
     '![Rockstar Sheep](https://oaidalleapiprodscus.blob.core.windows.net/private/org-WNrO9cD8TNufdV4A5ebLCcRL/user-EOZ4jMyp3NQ37vc9gXp0utFl/img-kkzx3kc7SQuaZNs4RDsm6GMA.png?st=2024-08-05T09%3A27%3A21Z&se=2024-08-05T11%3A27%3A21Z&sp=r&sv=2023-11-03&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2024-08-05T09%3A24%3A54Z&ske=2024-08-06T09%3A24%3A54Z&sks=b&skv=2023-11-03&sig=mG22afXBwhSO0Z6VuVYApi66HDRgve8u6ErH/sEf38o%3D)';
+  const imgHandler = new ImageHandler(discordMessage);
+  const cleanContent = imgHandler.cleanImagePathsFromResponse(completion);
+  expect(cleanContent).toBe('Lorem Ipsum Woop woop');
+});
+
+test('cleanImagePathsFromResponse should delete invalid urls from the content when url only', () => {
+  const discordMessage = {
+    channel: {
+      sendTyping: function() {}
+    },
+    content:
+      'Check out these images: https://example.com/image1.jpg and https://example.com/image2.png'
+  };
+  const completion =
+    'Lorem Ipsum Woop woop' +
+    ' https://oaidalleapiprodscus.blob.core.windows.net/private/org-WNrO9cD8TNufdV4A5ebLCcRL/user-EOZ4jMyp3NQ37vc9gXp0utFl/img-kkzx3kc7SQuaZNs4RDsm6GMA.png?st=2024-08-05T09%3A27%3A21Z&se=2024-08-05T11%3A27%3A21Z&sp=r&sv=2023-11-03&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2024-08-05T09%3A24%3A54Z&ske=2024-08-06T09%3A24%3A54Z&sks=b&skv=2023-11-03&sig=mG22afXBwhSO0Z6VuVYApi66HDRgve8u6ErH/sEf38o%3D';
   const imgHandler = new ImageHandler(discordMessage);
   const cleanContent = imgHandler.cleanImagePathsFromResponse(completion);
   expect(cleanContent).toBe('Lorem Ipsum Woop woop');
