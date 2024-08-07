@@ -91,6 +91,7 @@ export default class AIClient implements AIClientType {
 
     const runner = this.client.beta.chat.completions.runTools(options);
     const response = await runner.finalContent();
+    console.log(JSON.parse(response as string));
     console.log('response', response);
     return JSON.parse(response as string).content;
   }

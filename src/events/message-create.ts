@@ -64,7 +64,7 @@ export default class MessageCreate extends EventDiscord {
         channelId
       );
 
-      const imageHandler = new ImageHandler(content);
+      const imageHandler = new ImageHandler(content.content);
       content = await imageHandler.handleMessageImages();
       message.channel.sendTyping();
       await this.sendResponse(message, content, imageHandler.downloadedImages);

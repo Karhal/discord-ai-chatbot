@@ -46,7 +46,10 @@ class AiCompletionHandler {
     return response;
   }
 
-  async getAiCompletion(summary: string, channelId: string): Promise<string> {
+  async getAiCompletion(
+    summary: string,
+    channelId: string
+  ): Promise<Completion> {
     const memory: string = readMemory();
     const fullPrompt = `${this.prompt}.\n\n
     MEMORY:"""\n${memory}\n"""\n
@@ -56,15 +59,26 @@ class AiCompletionHandler {
     - If you have an image to add, use the key 'content' to store the image URL.
     - When you use a tool, use the property 'content' to store its results.
     - Interract only to the last message mentionning you. The rest is to give you context.
-    - Consider the DateTime given with the last message to avoid being out of context.\n"""
+    - Consider the DateTime given with the last message to avoid being out of context.
+    - if the message is not addressed to you, add a property 'addressing:false' to your json response
+    \n"""
     `;
     let conversation = [{ role: 'assistant', content: fullPrompt }];
     conversation = conversation.concat(
       this.getLastMessagesOfAChannel(5, channelId) || []
     );
 
-    const content = this.aiClient.getAiCompletion(conversation, this.tools);
-    return content;
+    const options = {
+      model: AIClient.openAiModel,
+      messages: conversation,
+      tools: this.tools,
+      response_format: { type: 'json_object' }
+    };
+
+    const runner = this.aiClient.client.beta.chat.completions.runTools(options);
+    const response = await runner.finalContent();
+    console.log('response', response);
+    return JSON.parse(response as string);
   }
 
   addMessageToChannel(message: MessageInput, limit = maxHistory) {
