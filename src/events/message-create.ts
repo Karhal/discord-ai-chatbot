@@ -7,6 +7,29 @@ import { Collection, Events, Message } from 'discord.js';
 
 export default class MessageCreate extends EventDiscord {
   eventName: Events = Events.MessageCreate;
+  intervalDate: NodeJS.Timeout | null = null;
+  message: Message | null = null;
+
+  sendTyping = (message: Message) => {
+    if (this.intervalDate) {
+      this.endTyping();
+    }
+    this.message = message;
+    this.message.channel.sendTyping();
+    this.intervalDate = setInterval(() => {
+      if (this.message) {
+        this.message.channel.sendTyping();
+      }
+    }, 4500);
+  };
+
+  endTyping = () => {
+    if (this.intervalDate) clearInterval(this.intervalDate);
+    if (this.message) {
+      this.message = null;
+    }
+  };
+
   handler = async (message: Message): Promise<void> => {
     const maxHistory: number = config.discord.maxHistory;
     if (
@@ -16,6 +39,8 @@ export default class MessageCreate extends EventDiscord {
       return;
     }
 
+    this.sendTyping(message);
+
     const channelId: string = message.channelId;
     const messagesChannelHistory: Collection<
       string,
@@ -23,7 +48,6 @@ export default class MessageCreate extends EventDiscord {
     > = await message.channel.messages.fetch({
       limit: maxHistory
     });
-    message.channel.sendTyping();
 
     const aiCompletionHandler = new AiCompletionHandler(
       this.aiClient,
@@ -47,6 +71,7 @@ export default class MessageCreate extends EventDiscord {
       imageHandler.deleteImages();
     }
 
+    this.endTyping();
     console.log('Done.');
   };
 
