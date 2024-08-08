@@ -23,7 +23,8 @@
     "libsodium-wrappers": "latest",
     "openai": "latest",
     "puppeteer": "latest",
-    "serpapi": "latest"
+    "serpapi": "latest",
+    "@mistralai/mistralai": "latest"
   },
   "type": "module",
   "devDependencies": {

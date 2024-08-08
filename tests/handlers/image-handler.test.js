@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import ImageHandler from './../../src/handlers/image-handler';
-jest.mock('./../../src/clients/ai-client');
+jest.mock('./../../src/clients/openai-client');
 jest.mock('./../../src/tools');
 
 it('should download images', async () => {

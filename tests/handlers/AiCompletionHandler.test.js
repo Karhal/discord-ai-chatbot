@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import AiCompletionHandler from './../../src/handlers/ai-completion-handler';
 
-jest.mock('./../../src/clients/ai-client');
+jest.mock('./../../src/clients/openai-client');
 jest.mock('./../../src/tools');
 
 describe('AiCompletionHandler', () => {

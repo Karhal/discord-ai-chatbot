@@ -31,6 +31,7 @@ const getLastNewsTool = {
   type: 'function',
   function: {
     function: getBraveSearch,
+    name: 'getBraveSearch',
     description:
       'Use this tool only when you need to make a search on the web. Then interpret the results and provide a summary.',
     parameters: {

@@ -32,6 +32,7 @@ const getGoogleNewsTool = {
   type: 'function',
   function: {
     function: getGoogleNews,
+    name: 'getGoogleNews',
     description:
       'Use this tool only when you need to get fresh news from Google. Then interpret the results and provide a summary.',
     parameters: {

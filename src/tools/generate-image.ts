@@ -1,4 +1,4 @@
-import AIClient from '../clients/ai-client';
+import AIClient from '../clients/openai-client';
 
 const generateImage = async (imagePrompt: string) => {
   try {
@@ -19,6 +19,7 @@ const generateImageTool = {
   type: 'function',
   function: {
     function: generateImage,
+    name: 'generateImage',
     description:
       'Use this tool when the user asks you to draw or to show a picture of something. \
       The tool will generate an image based on the prompt you provide. \

@@ -30,6 +30,7 @@ const fetchDuneDataTool = {
   type: 'function',
   function: {
     function: fetchDuneData,
+    name: 'fetchDuneData',
     description:
       'use this tool only when asked to get data from Dune API. Read the result and provide the data to the user in a human readable format.',
     parameters: {

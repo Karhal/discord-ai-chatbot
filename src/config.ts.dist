@@ -5,12 +5,20 @@ export default {
         maxHistory: 10,
         lang: "en"
     },
+    ai : {
+        aiForPrompt : "openAI", // openAI ou mistralAI
+        prompt : "You are a nice assistant in a discord server",
+    },
     openAI : {
         apiKey : "",
         model : "gpt-4o",
         summaryModel : "gpt-4o-mini",
-        prompt : "You are a nice assistant in a discord server",
         imageSize: "1024x1024",
+    },
+    mistralAI : {
+        apiKey : "",
+        model : "mistral-small-latest",
+        summaryModel : "mistral-small-latest"
     },
     dune : {
         apiKey : ""

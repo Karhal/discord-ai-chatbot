@@ -1,6 +1,6 @@
 import { readMemory } from '../tools';
 import config from '../config';
-import AIClient from './../clients/ai-client';
+import AIClient from '../clients/openai-client';
 import { AIClientType } from '../types/AIClientType';
 import { Collection, Message } from 'discord.js';
 import { ToolsAI, MessageInput } from '../types/types';

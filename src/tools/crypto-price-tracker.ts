@@ -30,6 +30,7 @@ const getCryptoPriceTool = {
   type: 'function',
   function: {
     function: getCryptoPrice,
+    name: 'getCryptoPrice',
     description:
       'use this tool only when you need to get the price of an asset. Use short ticker like BTC, ETH, etc.',
     parameters: {

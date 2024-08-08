@@ -13,11 +13,14 @@ type openAIImageSize =
   | undefined;
 
 export default class AIClient implements AIClientType {
-  static openAiKey?: string =
-    config?.openAI?.apiKey || process.env.OPENAI_API_KEY;
+  static apiKey?: string = config?.openAI?.apiKey || process.env.OPENAI_API_KEY;
   static imageSize: openAIImageSize = '1024x1024';
-  static openAiModel = 'davinci';
-  static openAiSummaryModel: string;
+  static model = 'davinci';
+  static summaryModel: string;
+  prompt: string =
+    config.ai.prompt ||
+    process.env.AI_PROMPT ||
+    'You are a nice assistant in a discord server';
   client: OpenAI;
 
   constructor() {
@@ -26,23 +29,23 @@ export default class AIClient implements AIClientType {
         process.env.IMAGE_SIZE) as openAIImageSize;
     }
     if (config?.openAI?.model || process.env.OPEN_AI_MODEL) {
-      AIClient.openAiModel = (config.openAI.model ||
+      AIClient.model = (config.openAI.model ||
         process.env.OPEN_AI_MODEL) as string;
     }
     if (config?.openAI?.summaryModel || process.env.OPEN_AI_SUMMARY_MODEL) {
-      AIClient.openAiSummaryModel = (config.openAI.summaryModel ||
+      AIClient.summaryModel = (config.openAI.summaryModel ||
         process.env.OPEN_AI_SUMMARY_MODEL) as string;
     }
     else {
-      AIClient.openAiSummaryModel = AIClient.openAiModel;
+      AIClient.summaryModel = AIClient.model;
     }
 
-    if (!AIClient.openAiKey) {
+    if (!AIClient.apiKey) {
       throw new Error('No Open AI key configured');
     }
     else {
       this.client = new OpenAI({
-        apiKey: AIClient.openAiKey
+        apiKey: AIClient.apiKey
       });
     }
   }
@@ -71,7 +74,7 @@ export default class AIClient implements AIClientType {
   async getSummary(messages: any[]): Promise<string | null> {
     const option: ChatCompletionCreateParamsNonStreaming = {
       messages: messages,
-      model: AIClient.openAiSummaryModel
+      model: AIClient.summaryModel
     };
 
     const response = await this.message(option);
@@ -83,7 +86,7 @@ export default class AIClient implements AIClientType {
     tools: ToolsAI[]
   ): Promise<string> {
     const options = {
-      model: AIClient.openAiModel,
+      model: AIClient.model,
       messages: conversation,
       tools: tools,
       response_format: { type: 'json_object' }
