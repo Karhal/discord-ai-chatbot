@@ -1,10 +1,8 @@
-import config from '../config';
-
-const braveSearchApiKey =
-  config.braveSearch.apiKey || process.env.BRAVE_SEARCH_API_KEY || '';
-const lang = config.discord.lang;
+import ConfigManager from "../configManager";
 
 const getBraveSearch = async (query: string) => {
+  const braveSearchApiKey = ConfigManager.getConfig().braveSearch.apiKey;
+  const lang = ConfigManager.getConfig().discord.lang;
   const queryParameters = JSON.parse(query);
   const myHeaders = new Headers();
   myHeaders.append('Accept', 'application/json');

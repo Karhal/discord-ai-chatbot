@@ -1,25 +1,17 @@
 import { readMemory } from '../tools';
-import config from '../config';
-import AIClient from './../clients/ai-client';
 import { AIClientType } from '../types/AIClientType';
 import { Collection, Message } from 'discord.js';
 import { ToolsAI, MessageInput } from '../types/types';
-
-const lang: string = config.discord.lang || process.env.LANG || 'en';
-const maxHistory: number =
-  config.discord.maxHistory || Number(process.env.MAX_HISTORY) || 10;
+import ConfigManager, { DiscordConfigType } from '../configManager';
 
 class AiCompletionHandler {
-  aiClient: AIClientType;
-  prompt: string;
-  messages: MessageInput[] = [];
-  summary: string | null = null;
-  tools: ToolsAI[];
 
-  constructor(aiClient: AIClient, prompt: string, tools: ToolsAI[]) {
-    this.aiClient = aiClient;
-    this.prompt = prompt;
-    this.tools = tools;
+  private messages: MessageInput[] = [];
+  public summary: string | null = null;
+  private discordConfig: DiscordConfigType;
+
+  constructor(private aiClient: AIClientType, private prompt: string, private tools: ToolsAI[]) {
+    this.discordConfig = ConfigManager.getConfig().discord;
   }
 
   async getSummary(channelId: string): Promise<string | null> {
@@ -28,13 +20,13 @@ class AiCompletionHandler {
         role: 'assistant',
         content:
           'Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. Rely strictly on the provided text. Format the summary in one paragraph form for easy understanding. The summary has to be the shortest possible (<100 words) and give a good idea of what the discussion is about. Use the following language: ' +
-          lang +
+          this.discordConfig.lang +
           '\n\nText:"""'
       },
       {
         role: 'user',
         content: this.getFirstMessagesOfAChannel(5, channelId)
-          .map(function(msg) {
+          .map((msg) => {
             const contentParsed = JSON.parse(msg.content);
             return contentParsed.author + ': ' + msg.content;
           })
@@ -67,7 +59,7 @@ class AiCompletionHandler {
     return content;
   }
 
-  addMessageToChannel(message: MessageInput, limit = maxHistory) {
+  addMessageToChannel(message: MessageInput, limit = this.discordConfig.maxHistory) {
     if (this.messages) {
       const channelMessages = this.messages.filter(
         (msg) => msg.channelId === message.channelId
@@ -87,7 +79,7 @@ class AiCompletionHandler {
     }
   }
 
-  addMessageArrayToChannel(messages: Array<MessageInput>, limit = maxHistory) {
+  addMessageArrayToChannel(messages: Array<MessageInput>, limit = this.discordConfig.maxHistory) {
     messages.forEach((message) => {
       this.addMessageToChannel(message, limit);
     });

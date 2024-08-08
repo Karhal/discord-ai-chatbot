@@ -5,14 +5,23 @@ import getCryptoPriceTool from './tools/crypto-price-tracker';
 import getLastNewsTool from './tools/brave-search';
 import { ToolsAI } from './types/types';
 import fetchDuneDataTool from './tools/dune';
+import ConfigManager from './configManager';
 
+const config = ConfigManager.getConfig();
 const tools: ToolsAI[] = [];
 
 tools.push(writeMemoryTool);
 tools.push(generateImageTool);
-tools.push(getCryptoPriceTool);
-tools.push(fetchDuneDataTool);
-tools.push(getLastNewsTool);
+
+if (config.coin.active) {
+  tools.push(getCryptoPriceTool);
+}
+if (config.dune.active) {
+  tools.push(fetchDuneDataTool);
+}
+if (config.braveSearch.active) {
+  tools.push(getLastNewsTool);
+}
 
 const readMemory = () => {
   const memoryFilePath = './memory.txt';

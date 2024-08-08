@@ -1,8 +1,9 @@
 import OpenAI from 'openai';
-import config from '../config';
 import { AIClientType } from '../types/AIClientType';
 import { MessageInput, ToolsAI } from '../types/types';
 import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources';
+import ConfigManager from '../configManager';
+
 type openAIImageSize =
   | '1024x1024'
   | '256x256'
@@ -13,38 +14,16 @@ type openAIImageSize =
   | undefined;
 
 export default class AIClient implements AIClientType {
-  static openAiKey?: string =
-    config?.openAI?.apiKey || process.env.OPENAI_API_KEY;
-  static imageSize: openAIImageSize = '1024x1024';
-  static openAiModel = 'davinci';
-  static openAiSummaryModel: string;
+  private imageSize: openAIImageSize;
+
   client: OpenAI;
+  openAIConfig = ConfigManager.getConfig().openAI;
 
   constructor() {
-    if (config?.openAI?.imageSize || process.env.IMAGE_SIZE) {
-      AIClient.imageSize = (config?.openAI?.imageSize ||
-        process.env.IMAGE_SIZE) as openAIImageSize;
-    }
-    if (config?.openAI?.model || process.env.OPEN_AI_MODEL) {
-      AIClient.openAiModel = (config.openAI.model ||
-        process.env.OPEN_AI_MODEL) as string;
-    }
-    if (config?.openAI?.summaryModel || process.env.OPEN_AI_SUMMARY_MODEL) {
-      AIClient.openAiSummaryModel = (config.openAI.summaryModel ||
-        process.env.OPEN_AI_SUMMARY_MODEL) as string;
-    }
-    else {
-      AIClient.openAiSummaryModel = AIClient.openAiModel;
-    }
-
-    if (!AIClient.openAiKey) {
-      throw new Error('No Open AI key configured');
-    }
-    else {
-      this.client = new OpenAI({
-        apiKey: AIClient.openAiKey
-      });
-    }
+    this.imageSize = this.openAIConfig.imageSize as openAIImageSize;
+    this.client = new OpenAI({
+      apiKey: this.openAIConfig.apiKey,
+    });
   }
 
   async message(
@@ -63,7 +42,7 @@ export default class AIClient implements AIClientType {
       model: 'dall-e-3',
       prompt: prompt,
       n: 1,
-      size: AIClient.imageSize
+      size: this.imageSize
     });
     return response?.data[0]?.url || null;
   }
@@ -71,7 +50,7 @@ export default class AIClient implements AIClientType {
   async getSummary(messages: any[]): Promise<string | null> {
     const option: ChatCompletionCreateParamsNonStreaming = {
       messages: messages,
-      model: AIClient.openAiSummaryModel
+      model: this.openAIConfig.summaryModel
     };
 
     const response = await this.message(option);
@@ -83,7 +62,7 @@ export default class AIClient implements AIClientType {
     tools: ToolsAI[]
   ): Promise<string> {
     const options = {
-      model: AIClient.openAiModel,
+      model: this.openAIConfig.model,
       messages: conversation,
       tools: tools,
       response_format: { type: 'json_object' }

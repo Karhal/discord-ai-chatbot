@@ -1,12 +1,12 @@
 
 export default {
     discord : {
-        token : "",
+        token : "XXXXX",
         maxHistory: 10,
         lang: "en"
     },
     openAI : {
-        apiKey : "",
+        apiKey : "XXXXX",
         model : "gpt-4o",
         summaryModel : "gpt-4o-mini",
         prompt : "You are a nice assistant in a discord server",

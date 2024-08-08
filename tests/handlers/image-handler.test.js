@@ -6,14 +6,14 @@ jest.mock('./../../src/tools');
 it('should download images', async () => {
   const msg = {
     channel: {
-      sendTyping: function() {}
+      sendTyping: () => {}
     }
   };
   const imgHandler = new ImageHandler(null, msg, '');
   const images = ['https://fr.wikipedia.org/static/images/icons/wikipedia.png'];
   const response = await imgHandler.downloadImages(images);
   expect(response).toHaveLength(1);
-  expect(response[0]).toMatch(/\/tmp\/\d+.jpg/);
+  expect(response[0]).toMatch(/(\\|\/)tmp(\\|\/)\d+.jpg/);
   const fs = require('fs');
   fs.unlinkSync(response[0]);
 });
@@ -21,7 +21,7 @@ it('should download images', async () => {
 it('should delete images', async () => {
   const discordMessage = {
     channel: {
-      sendTyping: function() {}
+      sendTyping: () => {}
     }
   };
   const imgHandler = new ImageHandler(null, discordMessage, '');
@@ -37,7 +37,7 @@ it('should delete images', async () => {
 test('should extract multiple image URLs from content', () => {
   const discordMessage = {
     channel: {
-      sendTyping: function() {}
+      sendTyping: () => {}
     },
     content:
       'Check out these images: https://example.com/image1.jpg and https://example.com/image2.png',
@@ -60,7 +60,7 @@ test('should extract multiple image URLs from content', () => {
 test('should return empty array when no image URLs are present', () => {
   const discordMessage = {
     channel: {
-      sendTyping: function() {}
+      sendTyping: () => {}
     },
     content: 'There is nothign here.',
     author: {
@@ -78,7 +78,7 @@ test('should return empty array when no image URLs are present', () => {
 test('cleanImagePathsFromResponse should delete image urls from the content', () => {
   const discordMessage = {
     channel: {
-      sendTyping: function() {}
+      sendTyping: () => {}
     },
     content:
       'Check out these images: https://example.com/image1.jpg and https://example.com/image2.png'
@@ -94,7 +94,7 @@ test('cleanImagePathsFromResponse should delete image urls from the content', ()
 test('cleanImagePathsFromResponse should delete invalid urls from the content when url only', () => {
   const discordMessage = {
     channel: {
-      sendTyping: function() {}
+      sendTyping: () => {}
     },
     content:
       'Check out these images: https://example.com/image1.jpg and https://example.com/image2.png'
