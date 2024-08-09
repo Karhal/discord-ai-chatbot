@@ -29,10 +29,14 @@ Open `config.ts` and adjust the settings as needed. You can set your Discord bot
 1. duplicate config.ts.dist to config.ts.local for local purpose
 2. duplicate config.ts.dist to config.ts.prod for production purpose
 
-## build for prod
+## build dans deploy for prod
 
 1. do to scripts folder
 2. run ./build-prod.sh (execute chmod +x build-prod.sh if file is not executable)
+3. copy dist/index.cjs and package.json on the same directory on you're host
+4. run npm install
+5. run pm2 start index.cjs -i 1 --name=yourbot --time
+6. optionnaly run pm2 save for start when your host restart
 
 ### Creating a Discord Bot Token
 
@@ -58,6 +62,7 @@ Open `config.ts` and adjust the settings as needed. You can set your Discord bot
   3. Copy the API key and paste it into your `config.ts` file.
 
 - **SerpAPI Token**:
+
   1. Sign up at [SerpAPI](https://serpapi.com/users/sign_up).
   2. Create an account or log in if you already have one.
   3. Navigate to the dashboard.
@@ -72,7 +77,6 @@ Open `config.ts` and adjust the settings as needed. You can set your Discord bot
   3. Sign up for an account if you don't have one, or log in if you already have an account.
   4. Follow the instructions to generate your API key.
   5. Once you have your API key, add it to your `config.ts` file.
-
 
 ## Running the Bot
 
