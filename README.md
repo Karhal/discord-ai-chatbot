@@ -29,10 +29,14 @@ Open `config.ts` and adjust the settings as needed. You can set your Discord bot
 1. duplicate config.ts.dist to config.ts.local for local purpose
 2. duplicate config.ts.dist to config.ts.prod for production purpose
 
-## build for prod
+## build dans deploy for prod
 
 1. do to scripts folder
 2. run ./build-prod.sh (execute chmod +x build-prod.sh if file is not executable)
+3. copy dist/index.cjs and package.json on the same directory on you're host
+4. run npm install
+5. run pm2 start index.cjs -i 1 --name=yourbot --time
+6. optionnaly run pm2 save for start when your host restart
 
 ### Creating a Discord Bot Token
 
