@@ -1,6 +1,7 @@
 import AIClient from '../clients/openai-client';
 
 const generateImage = async (imagePrompt: string) => {
+  console.log('call generateImage');
   try {
     const prompt = JSON.parse(imagePrompt);
     const client = new AIClient();
@@ -14,6 +15,8 @@ const generateImage = async (imagePrompt: string) => {
     }
   }
 };
+
+global.generateImage = generateImage;
 
 const generateImageTool = {
   type: 'function',
@@ -33,7 +36,8 @@ const generateImageTool = {
       type: 'object',
       properties: {
         imagePrompt: { type: 'string' }
-      }
+      },
+      required: ['imagePrompt']
     }
   }
 };
