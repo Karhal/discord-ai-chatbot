@@ -30,6 +30,9 @@ jest.mock('./../../src/config', () => {
     coin: {
       apiKey: '',
       defaulAsset: 'USD'
+    },
+    googleLighthouse: {
+      apiKey: ''
     }
   };
 });

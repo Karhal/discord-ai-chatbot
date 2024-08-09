@@ -48,6 +48,7 @@ Open `config.ts` and adjust the settings as needed. You can set your Discord bot
   3. Copy the API key and paste it into your `config.ts` file.
 
 - **SerpAPI Token**:
+
   1. Sign up at [SerpAPI](https://serpapi.com/users/sign_up).
   2. Create an account or log in if you already have one.
   3. Navigate to the dashboard.
@@ -63,6 +64,12 @@ Open `config.ts` and adjust the settings as needed. You can set your Discord bot
   4. Follow the instructions to generate your API key.
   5. Once you have your API key, add it to your `config.ts` file.
 
+- **Google Lighthouse API Key**:
+
+  1. Sign up at [Google console](https://console.cloud.google.com/).
+  2. Follow their instructions to obtain an API key.
+  3. Activate PageSpeed Insights API module (https://console.cloud.google.com/apis/api/pagespeedonline.googleapis.com)
+  4. Copy the API key and paste it into your `config.ts` file.
 
 ## Running the Bot
 
