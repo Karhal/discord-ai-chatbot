@@ -24,6 +24,16 @@ Before getting started, make sure you have Node.js installed on your system. You
 
 Open `config.ts` and adjust the settings as needed. You can set your Discord bot token, API keys for the various services, and other customization options.
 
+## Configuration for environnements prod/local
+
+1. duplicate config.ts.dist to config.ts.local for local purpose
+2. duplicate config.ts.dist to config.ts.prod for production purpose
+
+## build for prod
+
+1. do to scripts folder
+2. run ./build-prod.sh (execute chmod +x build-prod.sh if file is not executable)
+
 ### Creating a Discord Bot Token
 
 1. Go to the [Discord Developer Portal](https://discord.com/developers/applications).
