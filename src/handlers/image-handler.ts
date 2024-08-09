@@ -40,7 +40,7 @@ export default class ImageHandler implements ImageHandlerType {
 
   cleanImagePathsFromResponse(content: string): string {
     const regex =
-      /(?:!?\[.*?\])?(?:\(?(?:https?|ftp|file):\/\/[A-z]*\.[-A-Z0-9+&@#\/%=~_|$?!:,.]*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$]?)\)?)/gim;
+      /(?:\[(.*?)\]\((https?:\/\/(?:[^\/]*\.)?oaidalleapiprodscus[^)]*)\))|(?:!\[(.*?)\]\((https?:\/\/(?:[^\/]*\.)?oaidalleapiprodscus[^)]*)\))/g;
     const matches = content.match(regex);
     if (matches) {
       matches.forEach((match) => {
@@ -116,8 +116,10 @@ export default class ImageHandler implements ImageHandlerType {
 
   private getExtractedImagesUrls(content: string): string[] {
     const imageRegex =
-      /(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$]?)/gim;
-    const imagesUrls = content.match(imageRegex);
+      /(?:\[(.*?)\]\((https?:\/\/(?:[^\/]*\.)?oaidalleapiprodscus[^)]*)\))|(?:!\[(.*?)\]\((https?:\/\/(?:[^\/]*\.)?oaidalleapiprodscus[^)]*)\))/g;
+    const imagesUrls = [...content.matchAll(imageRegex)].map(
+      (match) => match[2] || match[4]
+    );
     return imagesUrls || [];
   }
 }

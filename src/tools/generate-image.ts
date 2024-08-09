@@ -25,9 +25,9 @@ const generateImageTool = {
       The more specific your prompt, the better the image quality. \
       Include details like the setting, objects, colors, mood, and any specific elements you want in the image. \
       Consider Perspective and Composition. Specify Lighting and Time of Day. \
-      Use Analogies or Comparisons. Specify Desired Styles or Themes. \
-      Please Include the response in the "content" property of the JSON object.\
-      Use a valid markdown link syntax to display the image in the response. ex: ![image](image_url)',
+      Specify Desired Styles or Themes. \
+      Include the response in the "content" property of the JSON object.\
+      Use a strictly valid markdown image syntax to display the image in the response. ex: ![Texte alternatif](/chemin/access/image.jpg "Titre de \'image") and [Link text Here](https://link-url-here.org)',
     parameters: {
       type: 'object',
       properties: {
