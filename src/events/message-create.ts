@@ -66,7 +66,6 @@ export default class MessageCreate extends EventDiscord {
 
       const imageHandler = new ImageHandler(content);
       content = await imageHandler.handleMessageImages();
-      message.channel.sendTyping();
       await this.sendResponse(message, content, imageHandler.downloadedImages);
       imageHandler.deleteImages();
     }
@@ -83,7 +82,6 @@ export default class MessageCreate extends EventDiscord {
     response = response.trim().replace(/\n\s*\n/g, '\n');
     message.channel.send(response);
     if (imagePaths.length > 0) {
-      message.channel.sendTyping();
       await message.channel.send({ files: imagePaths });
       console.log('Images sent');
     }
