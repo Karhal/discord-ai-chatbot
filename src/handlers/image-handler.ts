@@ -97,7 +97,7 @@ export default class ImageHandler implements ImageHandlerType {
       const imageName = `${timestamp}.jpg`;
       const imageData = Buffer.from(response);
 
-      const pathTmpFolder = './../tmp';
+      const pathTmpFolder = path.join('.', '..', 'tmp');
       if (!fs.existsSync(pathTmpFolder)) {
         fs.mkdirSync(pathTmpFolder);
       }
