@@ -4,6 +4,8 @@ on:
   pull_request:
     types: [opened, reopened, synchronize]
     branches: [main, go-ts, remove-any]
+  pull_request_target:
+    types: [labeled]
 
 permissions:
   contents: write
@@ -11,6 +13,7 @@ permissions:
 
 jobs:
   build-and-test:
+    if: ${{ github.event.label.name == 'ready' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
