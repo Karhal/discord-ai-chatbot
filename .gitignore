@@ -5,4 +5,6 @@ memory.txt
 .DS_Store
 coverage/*
 src/config.ts
+src/config.ts.prod
+src/config.ts.local
 dist

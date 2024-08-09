@@ -7,7 +7,7 @@ const generateImage = async (imagePrompt: string) => {
     const response = await client.generateImage(prompt.imagePrompt);
     return JSON.stringify({ image_url: response });
   }
-  catch (error: any) {
+  catch (error: unknow) {
     console.log(error);
     if (error && error.status === 400) {
       return error?.error?.message || null;

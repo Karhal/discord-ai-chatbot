@@ -1,4 +1,5 @@
 import pkg from '@discordjs/opus';
+import path from 'path';
 const { OpusEncoder } = pkg;
 
 import {
@@ -138,14 +139,18 @@ class VoiceTranscriptor {
 
       const [response] = await textToSpeech.synthesizeSpeech(request);
 
-      fs.writeFileSync('./tmp/output.mp3', response.audioContent, 'binary');
+      fs.writeFileSync(
+        path.join('.', 'tmp', 'output.mp3'),
+        response.audioContent,
+        'binary'
+      );
 
       //const __filename = fileURLToPath(import.meta.url);
       //const __filename = 'file://' + path.join(__dirname, path.basename(__filename));
       //const __dirname = dirname(__filename);
 
       const resource = createAudioResource(
-        join(__dirname, '../../../tmp/output.mp3')
+        join('..', '..', '..', 'tmp', 'output.mp3')
       );
 
       const player = createAudioPlayer();
@@ -179,7 +184,7 @@ class VoiceTranscriptor {
 
   getOutputPath(buffers) {
     const concatenatedBuffer = Buffer.concat(buffers);
-    const outputPath = './tmp/input.pcm';
+    const outputPath = path.join('.', 'tmp', 'input.pcm');
     fs.writeFileSync(outputPath, concatenatedBuffer);
     return outputPath;
   }
