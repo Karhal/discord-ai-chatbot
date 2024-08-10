@@ -68,28 +68,7 @@ export default class ImageHandler implements ImageHandlerType {
   private async downloadImages(images: string[]): Promise<string[]> {
     if (!images) return [];
     const findImagesWithNull: (string | null)[] = await Promise.all(
-      images.map(async (image) => {
-        try {
-          console.log('Downloading image:', image);
-          const response = await fetch(image);
-          if (response.status === 200) {
-            const responseBuffer = await response.arrayBuffer();
-            return this.saveImage(responseBuffer);
-          }
-          else {
-            console.error(
-              'Error downloading image:',
-              response.status,
-              response.statusText
-            );
-            return null;
-          }
-        }
-        catch (error) {
-          console.error('Error during image download:', error);
-          return null;
-        }
-      })
+      images.map(async (image) => this.downloadImage(image))
     );
 
     const findImages = findImagesWithNull.filter((img) => img !== null);
@@ -97,16 +76,41 @@ export default class ImageHandler implements ImageHandlerType {
     return findImages;
   }
 
-  private saveImage(response: ArrayBuffer) {
+  private async downloadImage(image: string): Promise<string | null> {
     try {
-      const timestamp = new Date().getTime();
-      const imageName = `${timestamp}.jpg`;
+      console.log('Downloading image:', image);
+      const response = await fetch(image);
+      return this.processImageResponse(response);
+    }
+    catch (error) {
+      console.error('Error during image download:', error);
+      return null;
+    }
+  }
+
+  private async processImageResponse(
+    response: Response
+  ): Promise<string | null> {
+    if (response.status === 200) {
+      const responseBuffer = await response.arrayBuffer();
+      return this.saveImage(responseBuffer);
+    }
+    else {
+      console.error(
+        'Error downloading image:',
+        response.status,
+        response.statusText
+      );
+      return null;
+    }
+  }
+
+  private saveImage(response: ArrayBuffer): string {
+    try {
+      const imageName = this.generateImageName();
       const imageData = Buffer.from(response);
 
-      const pathTmpFolder = path.join('.', '..', 'tmp');
-      if (!fs.existsSync(pathTmpFolder)) {
-        fs.mkdirSync(pathTmpFolder);
-      }
+      const pathTmpFolder = this.createTmpFolder();
       const imagePath = path.join(pathTmpFolder, imageName);
 
       console.log('Saving image to ' + imagePath);
@@ -118,6 +122,19 @@ export default class ImageHandler implements ImageHandlerType {
       console.error('Error saving image:', error);
       throw error;
     }
+  }
+
+  private createTmpFolder(): string {
+    const pathTmpFolder = path.join('.', '..', 'tmp');
+    if (!fs.existsSync(pathTmpFolder)) {
+      fs.mkdirSync(pathTmpFolder);
+    }
+    return pathTmpFolder;
+  }
+
+  private generateImageName(): string {
+    const timestamp = new Date().getTime();
+    return `${timestamp}.jpg`;
   }
 
   private getExtractedImagesUrls(content: string): string[] {
