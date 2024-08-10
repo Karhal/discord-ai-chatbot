@@ -41,6 +41,10 @@ jest.mock('./../../src/config', () => {
     },
     googleLighthouse: {
       apiKey: ''
+    },
+    googleSearch: {
+      apiKey: '',
+      cx: ''
     }
   };
 });
