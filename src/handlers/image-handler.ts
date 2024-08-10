@@ -12,6 +12,8 @@ export default class ImageHandler implements ImageHandlerType {
   imagesUrls: RegExpMatchArray | null = null;
   downloadedImages: string[] = [];
   message: string;
+  imageRegex =
+    /(?:\[(.*?)\]\((https?:\/\/(?:[^\/]*\.)?oaidalleapiprodscus[^)]*)\))|(?:!\[(.*?)\]\((https?:\/\/(?:[^\/]*\.)?oaidalleapiprodscus[^)]*)\))/g;
 
   constructor(message: string) {
     this.message = message;
@@ -39,9 +41,7 @@ export default class ImageHandler implements ImageHandlerType {
   }
 
   cleanImagePathsFromResponse(content: string): string {
-    const regex =
-      /(?:\[(.*?)\]\((https?:\/\/(?:[^\/]*\.)?oaidalleapiprodscus[^)]*)\))|(?:!\[(.*?)\]\((https?:\/\/(?:[^\/]*\.)?oaidalleapiprodscus[^)]*)\))/g;
-    const matches = content.match(regex);
+    const matches = content.match(this.imageRegex);
     if (matches) {
       matches.forEach((match) => {
         content = content.replace(match, '').trim();
@@ -115,9 +115,7 @@ export default class ImageHandler implements ImageHandlerType {
   }
 
   private getExtractedImagesUrls(content: string): string[] {
-    const imageRegex =
-      /(?:\[(.*?)\]\((https?:\/\/(?:[^\/]*\.)?oaidalleapiprodscus[^)]*)\))|(?:!\[(.*?)\]\((https?:\/\/(?:[^\/]*\.)?oaidalleapiprodscus[^)]*)\))/g;
-    const imagesUrls = [...content.matchAll(imageRegex)].map(
+    const imagesUrls = [...content.matchAll(this.imageRegex)].map(
       (match) => match[2] || match[4]
     );
     return imagesUrls || [];
