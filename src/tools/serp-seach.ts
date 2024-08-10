@@ -28,7 +28,7 @@ const getGoogleNews = async (query: string) => {
   }
 };
 
-const getGoogleNewsTool = {
+const getSerpNewsTool = {
   type: 'function',
   function: {
     function: getGoogleNews,
@@ -43,4 +43,4 @@ const getGoogleNewsTool = {
   }
 };
 
-export default getGoogleNewsTool;
+export default getSerpNewsTool;

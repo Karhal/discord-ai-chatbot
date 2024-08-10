@@ -17,15 +17,17 @@ export default {
     },
     serp : {
         apiKey : "",
-        lang : "",
         google_domain: ""
     },
     braveSearch : {
-        apiKey : "",
-        lang : ""
+        apiKey : ""
     },
     coin : {
         apiKey : "",
         defaultAsset : "USD"
+    },
+    googleSearch : {
+        apiKey: "",
+        cx: "",
     }
 };

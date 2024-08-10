@@ -30,6 +30,10 @@ jest.mock('./../../src/config', () => {
     coin: {
       apiKey: '',
       defaulAsset: 'USD'
+    },
+    googleSearch: {
+      apiKey: '',
+      cx: ''
     }
   };
 });
