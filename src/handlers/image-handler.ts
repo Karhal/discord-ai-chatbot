@@ -69,18 +69,24 @@ export default class ImageHandler implements ImageHandlerType {
     if (!images) return [];
     const findImagesWithNull: (string | null)[] = await Promise.all(
       images.map(async (image) => {
-        console.log('Downloading images ' + image);
-        const response = await fetch(image);
-        if (response.status === 200) {
-          const responseBuffer = await response.arrayBuffer();
-          return this.saveImage(responseBuffer);
+        try {
+          console.log('Downloading image:', image);
+          const response = await fetch(image);
+          if (response.status === 200) {
+            const responseBuffer = await response.arrayBuffer();
+            return this.saveImage(responseBuffer);
+          }
+          else {
+            console.error(
+              'Error downloading image:',
+              response.status,
+              response.statusText
+            );
+            return null;
+          }
         }
-        else {
-          console.log(
-            'error download image',
-            response.status,
-            response.statusText
-          );
+        catch (error) {
+          console.error('Error during image download:', error);
           return null;
         }
       })
