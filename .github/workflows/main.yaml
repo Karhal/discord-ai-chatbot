@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
 
       - name: Extract PR Diff
-        run: git diff ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} > pr_diff.txt
+        run: git diff ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }}  -- . ':!package-lock.json' > pr_diff.txt
         
       - name: Make script executable
         run: chmod +x ./scripts/gpt-pr.sh

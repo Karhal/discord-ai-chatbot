@@ -6,6 +6,7 @@ import getLastNewsTool from './tools/brave-search';
 import { ToolsAI } from './types/types';
 import fetchDuneDataTool from './tools/dune';
 import ConfigManager from './configManager';
+import createSong from './tools/suno';
 
 const config = ConfigManager.getConfig();
 const tools: ToolsAI[] = [];
@@ -21,6 +22,9 @@ if (config.dune.active) {
 }
 if (config.braveSearch.active) {
   tools.push(getLastNewsTool);
+}
+if (config.suno.active) {
+  tools.push(createSong);
 }
 
 const readMemory = () => {
