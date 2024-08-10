@@ -1,6 +1,6 @@
 import AiCompletionHandler from '../handlers/ai-completion-handler';
 import { tools } from '../tools';
-import config from '../config';
+import ConfigManager from '../configManager';
 import EventDiscord from '../clients/events-discord';
 import ImageHandler from '../handlers/image-handler';
 import { Collection, Events, Message } from 'discord.js';
@@ -31,7 +31,7 @@ export default class MessageCreate extends EventDiscord {
   };
 
   handler = async (message: Message): Promise<void> => {
-    const maxHistory: number = config.discord.maxHistory;
+    const maxHistory: number = ConfigManager.getConfig().discord.maxHistory;
     if (
       !this.theMessageContainsBotName(message) ||
       message.author.id === this.discordClient?.user?.id
@@ -51,7 +51,7 @@ export default class MessageCreate extends EventDiscord {
 
     const aiCompletionHandler = new AiCompletionHandler(
       this.aiClient,
-      config.openAI.prompt,
+      ConfigManager.getConfig().openAI.prompt,
       tools
     );
 

@@ -2,15 +2,15 @@ import { Client, GatewayIntentBits } from 'discord.js';
 import Ready from '../events/ready';
 import MessageCreate from '../events/message-create';
 import AIClient from './ai-client';
+import ConfigManager, { DiscordConfigType } from '../configManager';
 
 export default class DiscordClient {
-  ready: boolean;
   discordClient: Client;
-  login: string;
+  private discordConfig: DiscordConfigType;
   aiClient: AIClient = new AIClient();
-
-  constructor(login: string) {
-    this.ready = false;
+  private ready: boolean = false;
+  constructor() {
+    this.discordConfig = ConfigManager.getConfig().discord;
     this.discordClient = new Client({
       intents: [
         GatewayIntentBits.Guilds,
@@ -19,7 +19,6 @@ export default class DiscordClient {
         GatewayIntentBits.GuildVoiceStates
       ]
     });
-    this.login = login;
   }
 
   async init() {
@@ -44,6 +43,6 @@ export default class DiscordClient {
   }
 
   loginDiscord() {
-    this.discordClient.login(this.login);
+    this.discordClient.login(this.discordConfig.token);
   }
 }

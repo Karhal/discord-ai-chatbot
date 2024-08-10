@@ -11,5 +11,9 @@
       "url": "https://cdn.jsdelivr.net/npm/tsup/schema.json",
       "fileMatch": ["package.json", "tsup.config.json"]
     }
-  ]
+  ],
+  "prettier.jsxSingleQuote": true,
+  "prettier.singleQuote": true,
+  "eslint.codeActionsOnSave.rules": null,
+  "prettier.trailingComma": "none"
 }
