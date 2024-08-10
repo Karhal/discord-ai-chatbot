@@ -80,7 +80,9 @@ export default class MessageCreate extends EventDiscord {
     imagePaths: string[]
   ): Promise<boolean> {
     response = response.trim().replace(/\n\s*\n/g, '\n');
-    message.channel.send(response);
+    if (response) {
+      message.channel.send(response);
+    }
     if (imagePaths.length > 0) {
       await message.channel.send({ files: imagePaths });
       console.log('Images sent');

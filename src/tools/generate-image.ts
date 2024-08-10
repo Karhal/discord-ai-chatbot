@@ -20,7 +20,7 @@ const generateImageTool = {
   function: {
     function: generateImage,
     description:
-      'Use this tool when the user asks you to draw or to show a picture of something. \
+      'Use this tool only when the user asks you to draw or to show a picture of something in the last message. \
       The tool will generate an image based on the prompt you provide. \
       The more specific your prompt, the better the image quality. \
       Include details like the setting, objects, colors, mood, and any specific elements you want in the image. \
