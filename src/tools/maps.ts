@@ -1,9 +1,9 @@
 import ConfigManager from '../configManager';
 import { getJson } from 'serpapi';
 
-const serpApiKey = ConfigManager.getConfig().serp.apiKey;
-const serpHl = ConfigManager.getConfig().serp.hl;
-const serpGl = ConfigManager.getConfig().serp.gl;
+const serpApiKey = ConfigManager.config.serp.apiKey;
+const serpHl = ConfigManager.config.serp.hl;
+const serpGl = ConfigManager.config.serp.gl;
 
 interface SearchParams {
   engine: string;

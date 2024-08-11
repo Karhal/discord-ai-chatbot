@@ -12,7 +12,7 @@ import getGoogleSearchTool from './tools/google-search';
 import getSerpNewsTool from './tools/serp-search';
 import getMapsSearchTool from './tools/maps';
 
-const config = ConfigManager.getConfig();
+const config = ConfigManager.config;
 const tools: ToolsAI[] = [];
 
 tools.push(writeMemoryTool);

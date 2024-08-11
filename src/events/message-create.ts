@@ -32,7 +32,7 @@ export default class MessageCreate extends EventDiscord {
   };
 
   handler = async (message: Message): Promise<void> => {
-    const maxHistory: number = ConfigManager.getConfig().discord.maxHistory;
+    const maxHistory: number = ConfigManager.config.discord.maxHistory;
     if (
       !this.theMessageContainsBotName(message) ||
       message.author.id === this.discordClient?.user?.id
@@ -52,7 +52,7 @@ export default class MessageCreate extends EventDiscord {
 
     const aiCompletionHandler = new AiCompletionHandler(
       this.aiClient,
-      ConfigManager.getConfig().openAI.prompt,
+      ConfigManager.config.openAI.prompt,
       tools
     );
 
