@@ -17,19 +17,36 @@ jest.mock('./../../src/config', () => {
       imageSize: '1024x1024'
     },
     dune: {
+      active: false,
       apiKey: ''
     },
     serp: {
+      active: false,
       apiKey: '',
       lang: ''
     },
     braveSearch: {
+      active: false,
       apiKey: '',
       lang: ''
     },
     coin: {
+      active: false,
       apiKey: '',
       defaulAsset: 'USD'
+    },
+    suno: {
+      active: false,
+      cookieValue: ''
+    },
+    googleLighthouse: {
+      active: false,
+      apiKey: ''
+    },
+    googleSearch: {
+      active: false,
+      apiKey: '',
+      cx: ''
     }
   };
 });

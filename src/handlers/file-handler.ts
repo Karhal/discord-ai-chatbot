@@ -8,6 +8,32 @@ export default class FileHandler {
     this.baseDir = baseDir;
   }
 
+  private static createTmpFolder(): string {
+    const pathTmpFolder = path.join('.', '..', 'tmp');
+    if (!fs.existsSync(pathTmpFolder)) {
+      fs.mkdirSync(pathTmpFolder);
+    }
+    return pathTmpFolder;
+  }
+
+  private static getTmpPathByFilename(filename: string): string {
+    const tmpFolder = FileHandler.createTmpFolder();
+    const filePath = path.join(tmpFolder, filename);
+    return filePath;
+  }
+
+  static saveStringToFile(filename: string, content: string): string {
+    const pathToSave = FileHandler.getTmpPathByFilename(filename);
+    fs.writeFileSync(pathToSave, content);
+    return pathToSave;
+  }
+
+  static saveArrayBufferToFile(filename: string, content: Buffer): string {
+    const pathToSave = FileHandler.getTmpPathByFilename(filename);
+    fs.writeFileSync(pathToSave, content);
+    return pathToSave;
+  }
+
   readFile(filePath: string) {
     try {
       const fullPath = path.join(this.baseDir, filePath);

@@ -24,6 +24,20 @@ Before getting started, make sure you have Node.js installed on your system. You
 
 Open `config.ts` and adjust the settings as needed. You can set your Discord bot token, API keys for the various services, and other customization options.
 
+## Configuration for environnements prod/local
+
+1. duplicate config.ts.dist to config.ts.local for local purpose
+2. duplicate config.ts.dist to config.ts.prod for production purpose
+
+## build dans deploy for prod
+
+1. do to scripts folder
+2. run ./build-prod.sh (execute chmod +x build-prod.sh if file is not executable)
+3. copy dist/index.cjs and package.json on the same directory on you're host
+4. run npm install
+5. run pm2 start index.cjs -i 1 --name=yourbot --time
+6. optionnaly run pm2 save for start when your host restart
+
 ### Creating a Discord Bot Token
 
 1. Go to the [Discord Developer Portal](https://discord.com/developers/applications).
@@ -48,11 +62,14 @@ Open `config.ts` and adjust the settings as needed. You can set your Discord bot
   3. Copy the API key and paste it into your `config.ts` file.
 
 - **SerpAPI Token**:
+
   1. Sign up at [SerpAPI](https://serpapi.com/users/sign_up).
   2. Create an account or log in if you already have one.
   3. Navigate to the dashboard.
   4. Copy the API key provided in the dashboard.
   5. Paste the API key into your `config.ts` file.
+  6. Select Google domain at [SerpAPI Google domains](https://serpapi.com/google-domains)
+  7. Paste the google_domain into your `config.ts` file.
 
 - **CoinAPI Key**:
   To use the CoinAPI features, you need to obtain an API key. Follow these steps:
@@ -63,6 +80,29 @@ Open `config.ts` and adjust the settings as needed. You can set your Discord bot
   4. Follow the instructions to generate your API key.
   5. Once you have your API key, add it to your `config.ts` file.
 
+- **Suno**:
+  To use the Suno features, you need install chromium. Follow these steps:
+
+  1. apt install chromium on debian or ubuntu. See [Chromium website](https://www.chromium.org/) for other os
+  2. Connect to [Suno website](https://suno.com/)
+  3. Obtain the cookieKey by follow section "Obtain the cookie of your app.suno.ai account" on [Non official suno-api repository](https://github.com/gcui-art/suno-api)
+
+- **Google Lighthouse API Key**:
+
+  1. Sign up at [Google console](https://console.cloud.google.com/).
+  2. Follow their instructions to obtain an API key.
+  3. Activate PageSpeed Insights API module (https://console.cloud.google.com/apis/api/pagespeedonline.googleapis.com)
+  4. Copy the API key and paste it into your `config.ts` file.
+
+- **Google Search**:
+  To use Google Search API features, you need to create de Search engine and obtain a apikey
+  1. Go to the [Programmable search engine](https://programmablesearchengine.google.com/controlpanel/create)
+  2. Create your Search engine with your preferences
+  3. Go to you new search engine panel [Programmable search engine panel](https://programmablesearchengine.google.com/controlpanel/all)
+  4. copy ID of search engine it to parameter cs of your `config.ts` file
+  5. Get an API key, go to [Programmable search engine overview](https://developers.google.com/custom-search/v1/overview)
+  6. Click on "Obtain key"
+  7. Paste the API key into your `config.ts` file.
 
 ## Running the Bot
 

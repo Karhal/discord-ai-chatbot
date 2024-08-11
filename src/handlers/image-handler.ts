@@ -1,5 +1,5 @@
-import path from 'path';
 import fs from 'fs';
+import FileHandler from './file-handler';
 
 type ImageHandlerType = {
   message: string;
@@ -109,12 +109,7 @@ export default class ImageHandler implements ImageHandlerType {
     try {
       const imageName = this.generateImageName();
       const imageData = Buffer.from(response);
-
-      const pathTmpFolder = this.createTmpFolder();
-      const imagePath = path.join(pathTmpFolder, imageName);
-
-      console.log('Saving image to ' + imagePath);
-      fs.writeFileSync(imagePath, imageData);
+      const imagePath = FileHandler.saveArrayBufferToFile(imageName, imageData);
 
       return imagePath;
     }
@@ -122,14 +117,6 @@ export default class ImageHandler implements ImageHandlerType {
       console.error('Error saving image:', error);
       throw error;
     }
-  }
-
-  private createTmpFolder(): string {
-    const pathTmpFolder = path.join('.', '..', 'tmp');
-    if (!fs.existsSync(pathTmpFolder)) {
-      fs.mkdirSync(pathTmpFolder);
-    }
-    return pathTmpFolder;
   }
 
   private generateImageName(): string {

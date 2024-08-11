@@ -22,7 +22,9 @@
     "discord.js": "latest",
     "libsodium-wrappers": "latest",
     "openai": "latest",
-    "puppeteer": "latest",
+    "puppeteer": "23.0.2",
+    "puppeteer-extra": "latest",
+    "puppeteer-extra-plugin-stealth": "latest",
     "serpapi": "latest"
   },
   "type": "module",

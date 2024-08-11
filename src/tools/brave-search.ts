@@ -1,4 +1,4 @@
-import ConfigManager from "../configManager";
+import ConfigManager from '../configManager';
 
 const getBraveSearch = async (query: string) => {
   const braveSearchApiKey = ConfigManager.getConfig().braveSearch.apiKey;
@@ -25,7 +25,7 @@ const getBraveSearch = async (query: string) => {
   return { news: resultJSON.news, web_search: resultJSON.web };
 };
 
-const getLastNewsTool = {
+const getBraveSearchTool = {
   type: 'function',
   function: {
     function: getBraveSearch,
@@ -40,4 +40,4 @@ const getLastNewsTool = {
   }
 };
 
-export default getLastNewsTool;
+export default getBraveSearchTool;
