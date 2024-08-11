@@ -230,29 +230,19 @@ const openAndSaveSong = async function(resolve, page: Page) {
 };
 
 const saveSong = function(songData: Buffer): string {
-  const pathTmpFolder = FileHandler.createTmpFolder();
   const songName = new Date().getTime() + '.mp3';
-  const songPath = path.join(pathTmpFolder, songName);
+  const songPath = FileHandler.saveArrayBufferToFile(songName, songData);
 
-  console.log('Saving song to ' + songPath);
-  if (FileHandler.saveArrayBufferFile(songPath, songData)) {
-    return songPath;
-  }
-  else {
-    return '';
-  }
+  return songPath;
 };
 
 const saveErrorFile = function(errorName: string, page: Page) {
-  const pathTmpFolder = FileHandler.createTmpFolder();
-
-  const htmlErrorFile = path.join(
-    pathTmpFolder,
-    new Date().getTime() + '-' + errorName + '.html'
-  );
   (async function() {
     const content = await page.content();
-    fs.writeFileSync(htmlErrorFile, content);
+    const htmlErrorFile = FileHandler.saveStringToFile(
+      new Date().getTime() + '-' + errorName + '.html',
+      content
+    );
     console.log('error page on suno.com was saved to ' + htmlErrorFile);
   })();
 };

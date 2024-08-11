@@ -1,4 +1,3 @@
-import path from 'path';
 import fs from 'fs';
 import FileHandler from './file-handler';
 
@@ -110,12 +109,7 @@ export default class ImageHandler implements ImageHandlerType {
     try {
       const imageName = this.generateImageName();
       const imageData = Buffer.from(response);
-
-      const pathTmpFolder = FileHandler.createTmpFolder();
-      const imagePath = path.join(pathTmpFolder, imageName);
-
-      console.log('Saving image to ' + imagePath);
-      fs.writeFileSync(imagePath, imageData);
+      const imagePath = FileHandler.saveArrayBufferToFile(imageName, imageData);
 
       return imagePath;
     }
