@@ -36,5 +36,9 @@ export default {
         active: false,
         cookieKey : "",
         maxByDay: 8
+    },
+    googleLighthouse : {
+        active: false,
+        apiKey : ""
     }
 };

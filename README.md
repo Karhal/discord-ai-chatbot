@@ -71,6 +71,13 @@ Open `config.ts` and adjust the settings as needed. You can set your Discord bot
   2. Connect to [Suno website](https://suno.com/)
   3. Obtain the cookieKey by follow section "Obtain the cookie of your app.suno.ai account" on [Non official suno-api repository](https://github.com/gcui-art/suno-api)
 
+- **Google Lighthouse API Key**:
+
+  1. Sign up at [Google console](https://console.cloud.google.com/).
+  2. Follow their instructions to obtain an API key.
+  3. Activate PageSpeed Insights API module (https://console.cloud.google.com/apis/api/pagespeedonline.googleapis.com)
+  4. Copy the API key and paste it into your `config.ts` file.
+
 ## Running the Bot
 
 1. Ensure all necessary API keys and configurations are set in `config.ts`.
