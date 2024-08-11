@@ -17,7 +17,7 @@ export default class AIClient implements AIClientType {
   private imageSize: openAIImageSize;
 
   client: OpenAI;
-  openAIConfig = ConfigManager.getConfig().openAI;
+  openAIConfig = ConfigManager.config.openAI;
 
   constructor() {
     this.imageSize = this.openAIConfig.imageSize as openAIImageSize;

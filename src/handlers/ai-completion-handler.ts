@@ -5,13 +5,16 @@ import { ToolsAI, MessageInput } from '../types/types';
 import ConfigManager, { DiscordConfigType } from '../configManager';
 
 class AiCompletionHandler {
-
   private messages: MessageInput[] = [];
   public summary: string | null = null;
   private discordConfig: DiscordConfigType;
 
-  constructor(private aiClient: AIClientType, private prompt: string, private tools: ToolsAI[]) {
-    this.discordConfig = ConfigManager.getConfig().discord;
+  constructor(
+    private aiClient: AIClientType,
+    private prompt: string,
+    private tools: ToolsAI[]
+  ) {
+    this.discordConfig = ConfigManager.config.discord;
   }
 
   async getSummary(channelId: string): Promise<string | null> {
@@ -59,7 +62,10 @@ class AiCompletionHandler {
     return content;
   }
 
-  addMessageToChannel(message: MessageInput, limit = this.discordConfig.maxHistory) {
+  addMessageToChannel(
+    message: MessageInput,
+    limit = this.discordConfig.maxHistory
+  ) {
     if (this.messages) {
       const channelMessages = this.messages.filter(
         (msg) => msg.channelId === message.channelId
@@ -79,7 +85,10 @@ class AiCompletionHandler {
     }
   }
 
-  addMessageArrayToChannel(messages: Array<MessageInput>, limit = this.discordConfig.maxHistory) {
+  addMessageArrayToChannel(
+    messages: Array<MessageInput>,
+    limit = this.discordConfig.maxHistory
+  ) {
     messages.forEach((message) => {
       this.addMessageToChannel(message, limit);
     });

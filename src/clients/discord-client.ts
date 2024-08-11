@@ -10,7 +10,7 @@ export default class DiscordClient {
   aiClient: AIClient = new AIClient();
 
   constructor() {
-    this.discordConfig = ConfigManager.getConfig().discord;
+    this.discordConfig = ConfigManager.config.discord;
     this.discordClient = new Client({
       intents: [
         GatewayIntentBits.Guilds,
