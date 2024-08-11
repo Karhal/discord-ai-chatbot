@@ -40,9 +40,11 @@ jest.mock('./../../src/config', () => {
       cookieValue: ''
     },
     googleLighthouse: {
+      active: false,
       apiKey: ''
     },
     googleSearch: {
+      active: false,
       apiKey: '',
       cx: ''
     }

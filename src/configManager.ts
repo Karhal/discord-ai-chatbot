@@ -8,7 +8,7 @@ export interface ConfigType {
   braveSearch: BraveSearchConfigType;
   coin: CoinConfigType;
   suno: SunoConfigType;
-  lighthouse: LighthouseConfigType;
+  googleLighthouse: LighthouseConfigType;
   googleSearch: GoogleSearchConfigType;
 }
 
@@ -129,17 +129,6 @@ export default class ConfigManager {
     apiKey: config.googleLighthouse.apiKey || process.env.LIGHTHOUSE_API_KEY
   };
 
-  private config: ConfigType = {
-    discord: this.discordConfig,
-    openAI: this.openAIConfig,
-    dune: this.duneConfig,
-    serp: this.serpConfig,
-    braveSearch: this.braveSearchConfig,
-    coin: this.coinConfig,
-    suno: this.sunoConfig,
-    lighthouse: this.lighthouseConfig
-  };
-
   private googleSearchConfig: GoogleSearchConfigType = {
     active:
       config.googleSearch.active || process.env.GOOGLE_SEARCH_ACTIVE || false,
@@ -154,7 +143,9 @@ export default class ConfigManager {
     serp: this.serpConfig,
     braveSearch: this.braveSearchConfig,
     coin: this.coinConfig,
-    googleSearch: this.googleSearchConfig
+    suno: this.sunoConfig,
+    googleSearch: this.googleSearchConfig,
+    googleLighthouse: this.lighthouseConfig
   };
 
   private static getInstance() {
@@ -198,7 +189,10 @@ export default class ConfigManager {
     if (this.config.suno?.active && !this.config.suno?.cookieKey) {
       throw new Error('No Suno cookie key configured');
     }
-    if (this.config.lighthouse?.active && !this.config.lighthouse?.apiKey) {
+    if (
+      this.config.googleLighthouse?.active &&
+      !this.config.googleLighthouse?.apiKey
+    ) {
       throw new Error('No Lighthouse API key configured');
     }
     if (

@@ -1,6 +1,6 @@
 import ConfigManager from './../configManager';
 const config = ConfigManager.getConfig();
-const apiKey = config.lighthouse.apiKey;
+const apiKey = config.googleLighthouse.apiKey;
 
 const _addDetails = function(title: string, key: string, lh: any) {
   if (lh.audits['first-contentful-paint']) {

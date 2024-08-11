@@ -29,7 +29,7 @@ if (config.braveSearch.active) {
 if (config.suno.active) {
   tools.push(createSong);
 }
-if (config.lighthouse.active) {
+if (config.googleLighthouse.active) {
   tools.push(checkLighthHouse);
 }
 if (config.serp.active) {

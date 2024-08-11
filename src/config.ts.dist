@@ -40,6 +40,7 @@ export default {
         apiKey : ""
     },
     googleSearch : {
+        active: false,
         apiKey: "",
         cx: "",
     }
