@@ -4,6 +4,7 @@ import ConfigManager from '../configManager';
 import EventDiscord from '../clients/events-discord';
 import ImageHandler from '../handlers/image-handler';
 import { Collection, Events, Message } from 'discord.js';
+import SongHandler from '../handlers/song-handler';
 
 export default class MessageCreate extends EventDiscord {
   eventName: Events = Events.MessageCreate;
@@ -66,7 +67,16 @@ export default class MessageCreate extends EventDiscord {
 
       const imageHandler = new ImageHandler(content);
       content = await imageHandler.handleMessageImages();
-      await this.sendResponse(message, content, imageHandler.downloadedImages);
+
+      const songHandler = new SongHandler(content);
+      content = await songHandler.handleMessageSongs();
+
+      await this.sendResponse(
+        message,
+        content,
+        imageHandler.downloadedImages,
+        songHandler.songs
+      );
       imageHandler.deleteImages();
     }
 
@@ -77,14 +87,15 @@ export default class MessageCreate extends EventDiscord {
   async sendResponse(
     message: Message,
     response: string,
-    imagePaths: string[]
+    imagePaths: string[],
+    songPaths: string[]
   ): Promise<boolean> {
     response = response.trim().replace(/\n\s*\n/g, '\n');
     if (response) {
       message.channel.send(response);
     }
-    if (imagePaths.length > 0) {
-      await message.channel.send({ files: imagePaths });
+    if (imagePaths.length > 0 || songPaths.length > 0) {
+      await message.channel.send({ files: [...imagePaths, ...songPaths] });
       console.log('Images sent');
     }
     return true;

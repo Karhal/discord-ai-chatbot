@@ -13,19 +13,28 @@ export default {
         imageSize: "1024x1024",
     },
     dune : {
+        active: false,
         apiKey : ""
     },
     serp : {
+        active: false,
         apiKey : "",
         lang : "",
         google_domain: ""
     },
     braveSearch : {
+        active: false,
         apiKey : "",
         lang : ""
     },
     coin : {
+        active: false,
         apiKey : "",
         defaultAsset : "USD"
+    },
+    suno : {
+        active: false,
+        cookieKey : "",
+        maxByDay: 8
     }
 };

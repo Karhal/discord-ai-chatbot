@@ -48,6 +48,7 @@ Open `config.ts` and adjust the settings as needed. You can set your Discord bot
   3. Copy the API key and paste it into your `config.ts` file.
 
 - **SerpAPI Token**:
+
   1. Sign up at [SerpAPI](https://serpapi.com/users/sign_up).
   2. Create an account or log in if you already have one.
   3. Navigate to the dashboard.
@@ -63,6 +64,12 @@ Open `config.ts` and adjust the settings as needed. You can set your Discord bot
   4. Follow the instructions to generate your API key.
   5. Once you have your API key, add it to your `config.ts` file.
 
+- **Suno**:
+  To use the Suno features, you need install chromium. Follow these steps:
+
+  1. apt install chromium on debian or ubuntu. See [Chromium website](https://www.chromium.org/) for other os
+  2. Connect to [Suno website](https://suno.com/)
+  3. Obtain the cookieKey by follow section "Obtain the cookie of your app.suno.ai account" on [Non official suno-api repository](https://github.com/gcui-art/suno-api)
 
 ## Running the Bot
 
