@@ -22,7 +22,7 @@ export default class AIClient implements AIClientType {
   constructor() {
     this.imageSize = this.openAIConfig.imageSize as openAIImageSize;
     this.client = new OpenAI({
-      apiKey: this.openAIConfig.apiKey,
+      apiKey: this.openAIConfig.apiKey
     });
   }
 

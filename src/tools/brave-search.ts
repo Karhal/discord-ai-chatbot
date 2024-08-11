@@ -1,4 +1,4 @@
-import ConfigManager from "../configManager";
+import ConfigManager from '../configManager';
 
 const getBraveSearch = async (query: string) => {
   const braveSearchApiKey = ConfigManager.getConfig().braveSearch.apiKey;

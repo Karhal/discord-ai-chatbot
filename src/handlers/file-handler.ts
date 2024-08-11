@@ -8,7 +8,7 @@ export default class FileHandler {
     this.baseDir = baseDir;
   }
 
-  static createTmpFolder(): string {
+  private static createTmpFolder(): string {
     const pathTmpFolder = path.join('.', '..', 'tmp');
     if (!fs.existsSync(pathTmpFolder)) {
       fs.mkdirSync(pathTmpFolder);
@@ -16,15 +16,22 @@ export default class FileHandler {
     return pathTmpFolder;
   }
 
-  static saveArrayBufferFile(pathToSave: string, content: Buffer): boolean {
-    try {
-      fs.writeFileSync(pathToSave, content);
-      return true;
-    }
-    catch (e) {
-      console.log('err save file ' + pathToSave);
-      return false;
-    }
+  private static getTmpPathByFilename(filename: string): string {
+    const tmpFolder = FileHandler.createTmpFolder();
+    const filePath = path.join(tmpFolder, filename);
+    return filePath;
+  }
+
+  static saveStringToFile(filename: string, content: string): string {
+    const pathToSave = FileHandler.getTmpPathByFilename(filename);
+    fs.writeFileSync(pathToSave, content);
+    return pathToSave;
+  }
+
+  static saveArrayBufferToFile(filename: string, content: Buffer): string {
+    const pathToSave = FileHandler.getTmpPathByFilename(filename);
+    fs.writeFileSync(pathToSave, content);
+    return pathToSave;
   }
 
   readFile(filePath: string) {
