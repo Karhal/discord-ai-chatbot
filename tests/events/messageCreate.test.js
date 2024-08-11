@@ -38,6 +38,9 @@ jest.mock('./../../src/config', () => {
     suno: {
       active: false,
       cookieValue: ''
+    },
+    googleLighthouse: {
+      apiKey: ''
     }
   };
 });
