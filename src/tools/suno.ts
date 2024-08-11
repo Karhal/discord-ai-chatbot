@@ -173,7 +173,7 @@ const waitCreateSong = async function(resolve, page: Page) {
     console.log('Go to song page');
     saveErrorFile('beforegethref', page);
     const href = await page.$eval(
-      '.react-aria-GridList [data-key]:last-child a',
+      '.react-aria-GridList [data-key]:first-child a',
       (anchor) => anchor.getAttribute('href')
     );
 
