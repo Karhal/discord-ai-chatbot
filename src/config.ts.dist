@@ -20,7 +20,7 @@ export default {
     serp : {
         active: false,
         apiKey : "",
-        google_domain: ""
+        google_domain: "",
         lang : "",
         active: false,
         gl: "us",
