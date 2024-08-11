@@ -9,6 +9,7 @@ export interface ConfigType {
   coin: CoinConfigType;
   suno: SunoConfigType;
   lighthouse: LighthouseConfigType;
+  googleSearch: GoogleSearchConfigType;
 }
 
 export interface OpenAIConfigType {
@@ -58,6 +59,11 @@ export interface LighthouseConfigType extends ActivatorConfigType {
   apiKey: string;
 }
 
+export interface GoogleSearchConfigType extends ActivatorConfigType {
+  apiKey: string;
+  cx: string;
+}
+
 export default class ConfigManager {
   private static _instance: ConfigManager;
 
@@ -92,7 +98,6 @@ export default class ConfigManager {
   private serpConfig: SerpConfigType = {
     active: config.serp.active || process.env.SERP_ACTIVE || false,
     apiKey: config.serp.apiKey || process.env.SERP_API_KEY,
-    lang: config.serp.lang || process.env.SERP_LANG || 'en',
     google_domain:
       config.serp.google_domain || process.env.SERP_GOOGLE_DOMAIN || ''
   };
@@ -100,8 +105,7 @@ export default class ConfigManager {
   private braveSearchConfig: BraveSearchConfigType = {
     active:
       config.braveSearch.active || process.env.BRAVE_SEARCH_ACTIVE || false,
-    apiKey: config.braveSearch.apiKey || process.env.BRAVE_SEARCH_API_KEY,
-    lang: config.braveSearch.lang || process.env.BRAVE_SEARCH_LANG || 'en'
+    apiKey: config.braveSearch.apiKey || process.env.BRAVE_SEARCH_API_KEY
   };
 
   private coinConfig: CoinConfigType = {
@@ -136,6 +140,23 @@ export default class ConfigManager {
     lighthouse: this.lighthouseConfig
   };
 
+  private googleSearchConfig: GoogleSearchConfigType = {
+    active:
+      config.googleSearch.active || process.env.GOOGLE_SEARCH_ACTIVE || false,
+    apiKey: config.googleSearch.apiKey || process.env.GOOGLE_SEARCH_API_KEY,
+    cx: config.googleSearch.cx || process.env.GOOGLE_SEARCH_CX
+  };
+
+  private config: ConfigType = {
+    discord: this.discordConfig,
+    openAI: this.openAIConfig,
+    dune: this.duneConfig,
+    serp: this.serpConfig,
+    braveSearch: this.braveSearchConfig,
+    coin: this.coinConfig,
+    googleSearch: this.googleSearchConfig
+  };
+
   private static getInstance() {
     if (this._instance) {
       return this._instance;
@@ -162,8 +183,11 @@ export default class ConfigManager {
     if (this.config.dune?.active && !this.config.dune?.apiKey) {
       throw new Error('No Dune API key configured');
     }
-    if (this.config.serp?.active && !this.config.serp?.apiKey) {
-      throw new Error('No SERP API key configured');
+    if (
+      this.config.serp?.active &&
+      (!this.config.serp?.apiKey || !this.config.serp?.google_domain)
+    ) {
+      throw new Error('No SERP API key or Google domain configured');
     }
     if (this.config.braveSearch?.active && !this.config.braveSearch?.apiKey) {
       throw new Error('No Brave Search API key configured');
@@ -176,6 +200,12 @@ export default class ConfigManager {
     }
     if (this.config.lighthouse?.active && !this.config.lighthouse?.apiKey) {
       throw new Error('No Lighthouse API key configured');
+    }
+    if (
+      this.config.googleSearch?.active &&
+      (!this.config.googleSearch?.apiKey || !this.config.googleSearch?.cx)
+    ) {
+      throw new Error('No GoogleSearch API key or CX configured');
     }
   }
 }

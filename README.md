@@ -54,6 +54,8 @@ Open `config.ts` and adjust the settings as needed. You can set your Discord bot
   3. Navigate to the dashboard.
   4. Copy the API key provided in the dashboard.
   5. Paste the API key into your `config.ts` file.
+  6. Select Google domain at [SerpAPI Google domains](https://serpapi.com/google-domains)
+  7. Paste the google_domain into your `config.ts` file.
 
 - **CoinAPI Key**:
   To use the CoinAPI features, you need to obtain an API key. Follow these steps:
@@ -77,6 +79,16 @@ Open `config.ts` and adjust the settings as needed. You can set your Discord bot
   2. Follow their instructions to obtain an API key.
   3. Activate PageSpeed Insights API module (https://console.cloud.google.com/apis/api/pagespeedonline.googleapis.com)
   4. Copy the API key and paste it into your `config.ts` file.
+
+- **Google Search**:
+  To use Google Search API features, you need to create de Search engine and obtain a apikey
+  1. Go to the [Programmable search engine](https://programmablesearchengine.google.com/controlpanel/create)
+  2. Create your Search engine with your preferences
+  3. Go to you new search engine panel [Programmable search engine panel](https://programmablesearchengine.google.com/controlpanel/all)
+  4. copy ID of search engine it to parameter cs of your `config.ts` file
+  5. Get an API key, go to [Programmable search engine overview](https://developers.google.com/custom-search/v1/overview)
+  6. Click on "Obtain key"
+  7. Paste the API key into your `config.ts` file.
 
 ## Running the Bot
 

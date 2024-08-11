@@ -19,13 +19,11 @@ export default {
     serp : {
         active: false,
         apiKey : "",
-        lang : "",
         google_domain: ""
     },
     braveSearch : {
         active: false,
-        apiKey : "",
-        lang : ""
+        apiKey : ""
     },
     coin : {
         active: false,
@@ -40,5 +38,9 @@ export default {
     googleLighthouse : {
         active: false,
         apiKey : ""
+    },
+    googleSearch : {
+        apiKey: "",
+        cx: "",
     }
 };
