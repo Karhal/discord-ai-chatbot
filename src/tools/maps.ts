@@ -2,12 +2,16 @@ import ConfigManager from '../configManager';
 import { getJson } from 'serpapi';
 
 const serpApiKey = ConfigManager.getConfig().serp.apiKey;
+const serpHl = ConfigManager.getConfig().serp.hl;
+const serpGl = ConfigManager.getConfig().serp.gl;
 
 interface SearchParams {
   engine: string;
   q: string;
   location: string;
   api_key: string;
+  hl: string;
+  gl: string;
 }
 
 interface LocalResults {
@@ -22,7 +26,9 @@ const getMapsSearch = async (
     engine: 'google_local',
     q: query,
     location: city,
-    api_key: serpApiKey
+    api_key: serpApiKey,
+    hl: serpHl,
+    gl: serpGl
   };
 
   try {
@@ -46,8 +52,8 @@ const getMapsSearchTool = {
       Present the most exhaustive answer possible, including the information returned by the tool. \
       Beeware the size of the answer, it should not exceed 1500 characters. \
       Format your answer in one single content string, use the following format:\
-      1. ** ⭐⭐⭐⭐ Place Name 1** \n- [Address of Place 1]\n- [Description of Place 1] \
-      2. ** ⭐⭐⭐ Place Name 2** \n- [Address of Place 2]\n- [Description of Place 2], etc',
+      1. ** ⭐⭐⭐⭐ Place Name 1** - [Address of Place 1] - [Description of Place 1] \
+      2. ** ⭐⭐⭐ Place Name 2** - [Address of Place 2] - [Description of Place 2], etc',
     parameters: {
       type: 'object',
       properties: {
