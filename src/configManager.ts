@@ -38,6 +38,8 @@ export interface SerpConfigType extends ActivatorConfigType {
   apiKey: string;
   lang: string;
   google_domain: string;
+  hl: string;
+  gl: string;
 }
 
 export interface BraveSearchConfigType extends ActivatorConfigType {
@@ -98,14 +100,18 @@ export default class ConfigManager {
   private serpConfig: SerpConfigType = {
     active: config.serp.active || process.env.SERP_ACTIVE || false,
     apiKey: config.serp.apiKey || process.env.SERP_API_KEY,
+    lang: config.serp.lang || process.env.SERP_LANG || 'en',
     google_domain:
-      config.serp.google_domain || process.env.SERP_GOOGLE_DOMAIN || ''
+      config.serp.google_domain || process.env.SERP_GOOGLE_DOMAIN || '',
+    hl: config.serp.hl || process.env.SERP_HL || '',
+    gl: config.serp.gl || process.env.SERP_GL || ''
   };
 
   private braveSearchConfig: BraveSearchConfigType = {
     active:
       config.braveSearch.active || process.env.BRAVE_SEARCH_ACTIVE || false,
-    apiKey: config.braveSearch.apiKey || process.env.BRAVE_SEARCH_API_KEY
+    apiKey: config.braveSearch.apiKey || process.env.BRAVE_SEARCH_API_KEY,
+    lang: config.braveSearch.lang || process.env.BRAVE_SEARCH_LANG || 'en'
   };
 
   private coinConfig: CoinConfigType = {
@@ -186,6 +192,7 @@ export default class ConfigManager {
     if (this.config.coin?.active && !this.config.coin?.apiKey) {
       throw new Error('No Coin API key configured');
     }
+
     if (this.config.suno?.active && !this.config.suno?.cookieKey) {
       throw new Error('No Suno cookie key configured');
     }

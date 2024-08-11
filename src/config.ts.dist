@@ -14,21 +14,27 @@ export default {
     },
     dune : {
         active: false,
-        apiKey : ""
+        apiKey : "",
+        active: false
     },
     serp : {
         active: false,
         apiKey : "",
-        google_domain: ""
+        google_domain: "",
+        lang : "",
+        active: false,
+        gl: "us",
+        hl: "en"
     },
     braveSearch : {
-        active: false,
-        apiKey : ""
+        apiKey : "",
+        lang : "",
+        active: false
     },
     coin : {
         active: false,
         apiKey : "",
-        defaultAsset : "USD"
+        defaultAsset : "USD",
     },
     suno : {
         active: false,
