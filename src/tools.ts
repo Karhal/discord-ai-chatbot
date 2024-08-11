@@ -5,6 +5,7 @@ import getCryptoPriceTool from './tools/crypto-price-tracker';
 import getBraveSearchTool from './tools/brave-search';
 import { ToolsAI } from './types/types';
 import fetchDuneDataTool from './tools/dune';
+import getMapsSearchTool from './tools/maps';
 import ConfigManager from './configManager';
 import createSong from './tools/suno';
 import checkLighthHouse from './tools/google-lighthouse';
@@ -37,6 +38,9 @@ if (config.serp.active) {
 }
 if (config.googleSearch.active) {
   tools.push(getGoogleSearchTool);
+}
+if (config.serp.active) {
+  tools.push(getMapsSearchTool);
 }
 
 const readMemory = () => {

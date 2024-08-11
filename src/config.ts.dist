@@ -15,6 +15,7 @@ export default {
     dune : {
         active: false,
         apiKey : ""
+        active: false
     },
     serp : {
         active: false,
@@ -22,13 +23,14 @@ export default {
         google_domain: ""
     },
     braveSearch : {
-        active: false,
-        apiKey : ""
+        apiKey : "",
+        lang : "",
+        active: false
     },
     coin : {
         active: false,
         apiKey : "",
-        defaultAsset : "USD"
+        defaultAsset : "USD",
     },
     suno : {
         active: false,
