@@ -20,15 +20,11 @@ export default {
     serp : {
         active: false,
         apiKey : "",
-<<<<<<< HEAD
         google_domain: ""
-=======
         lang : "",
-        google_domain: "",
         active: false,
         gl: "us",
         hl: "en"
->>>>>>> 32d277d (Better lang conf for serpApi)
     },
     braveSearch : {
         apiKey : "",

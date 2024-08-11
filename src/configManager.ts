@@ -154,15 +154,6 @@ export default class ConfigManager {
     googleLighthouse: this.lighthouseConfig
   };
 
-  private config: ConfigType = {
-    discord: this.discordConfig,
-    openAI: this.openAIConfig,
-    dune: this.duneConfig,
-    serp: this.serpConfig,
-    braveSearch: this.braveSearchConfig,
-    coin: this.coinConfig
-  };
-
   private static getInstance() {
     if (this._instance) {
       return this._instance;
