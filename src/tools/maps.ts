@@ -45,7 +45,7 @@ const getMapsSearchTool = {
       Select the 3 firsts locations returned by the tool. It is important to give minimum 3 locations. \
       Present the most exhaustive answer possible, including the information returned by the tool. \
       Beeware the size of the answer, it should not exceed 1500 characters. \
-      Use the following format:\
+      Format your answer in one single content text, use the following format:\
       1. **Place Name 1** - Rating: ⭐⭐⭐⭐☆ - Address: [Address of Place 1] - Brief Description: [Description of Place 1] 2. **Place Name 2** - Rating: ⭐⭐⭐☆☆ - Address: [Address of Place 2] - Brief Description: [Description of Place 2], etc.',
     parameters: {
       type: 'object',
