@@ -51,8 +51,7 @@ class AiCompletionHandler {
     - If you have an image to add, use the key 'content' to store the image URL.
     - When you use a tool, use the property 'content' to store its results.
     - Interract only to the last message mentionning you. The rest is to give you context.
-    - Consider the DateTime given with the last message to avoid being out of context.
-    - You are concerned only when people use your name\n"""
+    - Consider the DateTime given with the last message to avoid being out of context.\n"""
     `;
     let conversation = [{ role: 'assistant', content: fullPrompt }];
     conversation = conversation.concat(
