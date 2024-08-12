@@ -154,15 +154,3 @@ When contributing, please follow the Conventional Commits specification for your
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for more details.
-
-```
-
-```
-
-```
-
-```
-
-```
-
-```
