@@ -64,5 +64,8 @@
     "splitting": false,
     "sourcemap": true,
     "clean": true
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-musl": "^4.20.0"
   }
 }
