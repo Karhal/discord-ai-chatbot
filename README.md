@@ -128,6 +128,29 @@ To ensure everything is working correctly, you can run the provided tests.
 
 We welcome contributions! Please fork the repository and submit a pull request with your changes.
 
+#### Commit Message Structure
+
+When contributing, please follow the Conventional Commits specification for your commit messages. The structure is as follows:
+
+```
+<type>[(scope)][!]: <description>
+[body]
+[footer]
+```
+
+- **Type**: The main types are `feat` (for new features) and `fix` (for bug fixes). Other types include `build`, `chore`, `docs`, etc.
+- **Scope (optional)**: Describes the part of the code or documentation affected by the changes, e.g., `api`, `parser`. Multiple scopes can be separated by `,`, `/`, or `\`.
+- **Exclamation mark (optional)**: Indicates an important commit. Should include a `BREAKING CHANGE` footer.
+- **Description**: A brief sentence describing the changes.
+- **Body (optional)**: Detailed description of the changes.
+- **Footer (optional)**: Typically includes `BREAKING CHANGE` to explain significant changes affecting the application's architecture.
+
+**Examples:**
+
+- Short commit message:
+
+`fix: /users api endpoint error fix`
+
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for more details.
