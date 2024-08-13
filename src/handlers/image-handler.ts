@@ -2,53 +2,13 @@ import fs from 'fs';
 import FileHandler from './file-handler';
 
 type ImageHandlerType = {
-  message: string;
-  handleMessageImages: () => Promise<string>;
-  cleanImagePathsFromResponse: (content: string) => string;
   deleteImages: () => void;
+  downloadImages: (images: string[]) => Promise<string[]>;
+  downloadImage: (image: string) => Promise<string | null>;
 };
 
 export default class ImageHandler implements ImageHandlerType {
-  imagesUrls: RegExpMatchArray | null = null;
   downloadedImages: string[] = [];
-  message: string;
-  imageRegex =
-    /(?:\[(.*?)\]\((https?:\/\/(?:[^\/]*\.)?oaidalleapiprodscus[^)]*)\))|(?:!\[(.*?)\]\((https?:\/\/(?:[^\/]*\.)?oaidalleapiprodscus[^)]*)\))/g;
-
-  constructor(message: string) {
-    this.message = message;
-  }
-
-  async handleMessageImages(): Promise<string> {
-    try {
-      const imagesUrls = this.getExtractedImagesUrls(this.message);
-      if (!imagesUrls.length) return this.message;
-
-      this.downloadedImages = await this.downloadImages(imagesUrls);
-      if (this.downloadedImages.length) {
-        this.message = this.cleanImagePathsFromResponse(this.message);
-      }
-
-      return this.message;
-    }
-    catch (error) {
-      console.error('Error handling message images:', {
-        message: this.message,
-        error
-      });
-      throw error;
-    }
-  }
-
-  cleanImagePathsFromResponse(content: string): string {
-    const matches = content.match(this.imageRegex);
-    if (matches) {
-      matches.forEach((match) => {
-        content = content.replace(match, '').trim();
-      });
-    }
-    return content;
-  }
 
   public deleteImages(): void {
     this.downloadedImages.forEach((imagePath) => {
@@ -65,7 +25,7 @@ export default class ImageHandler implements ImageHandlerType {
     });
   }
 
-  private async downloadImages(images: string[]): Promise<string[]> {
+  async downloadImages(images: string[]): Promise<string[]> {
     if (!images) return [];
     const findImagesWithNull: (string | null)[] = await Promise.all(
       images.map(async (image) => this.downloadImage(image))
@@ -76,7 +36,7 @@ export default class ImageHandler implements ImageHandlerType {
     return findImages;
   }
 
-  private async downloadImage(image: string): Promise<string | null> {
+  public async downloadImage(image: string): Promise<string | null> {
     try {
       console.log('Downloading image:', image);
       const response = await fetch(image);
@@ -109,7 +69,11 @@ export default class ImageHandler implements ImageHandlerType {
     try {
       const imageName = this.generateImageName();
       const imageData = Buffer.from(response);
-      const imagePath = FileHandler.saveArrayBufferToFile(imageName, imageData);
+      const imagePath = FileHandler.saveArrayBufferToFile(
+        'tmp',
+        imageName,
+        imageData
+      );
 
       return imagePath;
     }
@@ -122,12 +86,5 @@ export default class ImageHandler implements ImageHandlerType {
   private generateImageName(): string {
     const timestamp = new Date().getTime();
     return `${timestamp}.jpg`;
-  }
-
-  private getExtractedImagesUrls(content: string): string[] {
-    const imagesUrls = [...content.matchAll(this.imageRegex)].map(
-      (match) => match[2] || match[4]
-    );
-    return imagesUrls || [];
   }
 }

@@ -6,7 +6,6 @@ import getBraveSearchTool from './tools/brave-search';
 import { ToolsAI } from './types/types';
 import fetchDuneDataTool from './tools/dune';
 import ConfigManager from './configManager';
-import createSong from './tools/suno';
 import checkLighthHouse from './tools/google-lighthouse';
 import getGoogleSearchTool from './tools/google-search';
 import getSerpNewsTool from './tools/serp-search';
@@ -26,9 +25,6 @@ if (config.dune.active) {
 }
 if (config.braveSearch.active) {
   tools.push(getBraveSearchTool);
-}
-if (config.suno.active) {
-  tools.push(createSong);
 }
 if (config.googleLighthouse.active) {
   tools.push(checkLighthHouse);

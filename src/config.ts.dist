@@ -36,11 +36,6 @@ export default {
         apiKey : "",
         defaultAsset : "USD",
     },
-    suno : {
-        active: false,
-        cookieKey : "",
-        maxByDay: 8
-    },
     googleLighthouse : {
         active: false,
         apiKey : ""
@@ -49,5 +44,8 @@ export default {
         active: false,
         apiKey: "",
         cx: "",
-    }
+    },
+    tmpFolder: {
+        path: 'tmp'
+  }
 };

@@ -2,41 +2,61 @@ import fs from 'fs';
 import path from 'path';
 
 export default class FileHandler {
-  baseDir: string;
-
-  constructor(baseDir: string) {
-    this.baseDir = baseDir;
-  }
-
-  private static createTmpFolder(): string {
-    const pathTmpFolder = path.join('.', '..', 'tmp');
-    if (!fs.existsSync(pathTmpFolder)) {
-      fs.mkdirSync(pathTmpFolder);
+  static createFolder(folderName: string): string {
+    const folderPath = path.join('.', folderName);
+    if (!fs.existsSync(folderPath)) {
+      fs.mkdirSync(folderPath);
     }
-    return pathTmpFolder;
+    return folderPath;
   }
 
-  private static getTmpPathByFilename(filename: string): string {
-    const tmpFolder = FileHandler.createTmpFolder();
-    const filePath = path.join(tmpFolder, filename);
+  static emptyFolder(folderName: string): void {
+    const folderPath = path.join('.', folderName);
+    if (fs.existsSync(folderPath)) {
+      const files = fs.readdirSync(folderPath);
+      files.forEach((file) => {
+        const filePath = path.join(folderPath, file);
+        fs.unlinkSync(filePath);
+      });
+    }
+  }
+
+  static getFolderFilenameFullPaths(folderPath: string): string[] {
+    const filenames = fs.readdirSync(folderPath).map((filename) => {
+      return path.join('.', folderPath, filename);
+    });
+    return filenames;
+  }
+
+  private static getPathByFilename(folder: string, filename: string): string {
+    FileHandler.createFolder(folder);
+    const filePath = path.join(folder, filename);
     return filePath;
   }
 
-  static saveStringToFile(filename: string, content: string): string {
-    const pathToSave = FileHandler.getTmpPathByFilename(filename);
+  static saveStringToFile(
+    folder: string,
+    filename: string,
+    content: string
+  ): string {
+    const pathToSave = FileHandler.getPathByFilename(folder, filename);
     fs.writeFileSync(pathToSave, content);
     return pathToSave;
   }
 
-  static saveArrayBufferToFile(filename: string, content: Buffer): string {
-    const pathToSave = FileHandler.getTmpPathByFilename(filename);
+  static saveArrayBufferToFile(
+    folder: string,
+    filename: string,
+    content: Buffer
+  ): string {
+    const pathToSave = FileHandler.getPathByFilename(folder, filename);
     fs.writeFileSync(pathToSave, content);
     return pathToSave;
   }
 
-  readFile(filePath: string) {
+  readFile(baseDir: string, filePath: string) {
     try {
-      const fullPath = path.join(this.baseDir, filePath);
+      const fullPath = path.join(baseDir, filePath);
       if (!fs.existsSync(fullPath)) {
         return null;
       }
@@ -49,9 +69,9 @@ export default class FileHandler {
     }
   }
 
-  writeFile(filePath: string, content: string) {
+  writeFile(baseDir: string, filePath: string, content: string) {
     try {
-      const fullPath = path.join(this.baseDir, filePath);
+      const fullPath = path.join(baseDir, filePath);
       fs.writeFileSync(fullPath, content, 'utf8');
       return true;
     }
@@ -61,9 +81,9 @@ export default class FileHandler {
     }
   }
 
-  appendToFile(filePath: string, content: string) {
+  appendToFile(baseDir: string, filePath: string, content: string) {
     try {
-      const fullPath = path.join(this.baseDir, filePath);
+      const fullPath = path.join(baseDir, filePath);
       fs.appendFileSync(fullPath, content, 'utf8');
       return true;
     }
