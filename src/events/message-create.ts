@@ -2,9 +2,8 @@ import AiCompletionHandler from '../handlers/ai-completion-handler';
 import { tools } from '../tools';
 import ConfigManager from '../configManager';
 import EventDiscord from '../clients/events-discord';
-import ImageHandler from '../handlers/image-handler';
 import { Collection, Events, Message } from 'discord.js';
-import SongHandler from '../handlers/song-handler';
+import FileHandler from '../handlers/file-handler';
 
 export default class MessageCreate extends EventDiscord {
   eventName: Events = Events.MessageCreate;
@@ -60,43 +59,31 @@ export default class MessageCreate extends EventDiscord {
 
     const summary = await aiCompletionHandler.getSummary(channelId);
     if (summary) {
-      let content = await aiCompletionHandler.getAiCompletion(
+      const content = await aiCompletionHandler.getAiCompletion(
         summary,
         channelId
       );
 
-      const imageHandler = new ImageHandler(content);
-      content = await imageHandler.handleMessageImages();
-
-      const songHandler = new SongHandler(content);
-      content = await songHandler.handleMessageSongs();
-
-      await this.sendResponse(
-        message,
-        content,
-        imageHandler.downloadedImages,
-        songHandler.songs
-      );
-      imageHandler.deleteImages();
+      await this.sendResponse(message, content);
     }
 
     this.endTyping();
     console.log('Done.');
   };
 
-  async sendResponse(
-    message: Message,
-    response: string,
-    imagePaths: string[],
-    songPaths: string[]
-  ): Promise<boolean> {
+  async sendResponse(message: Message, response: string): Promise<boolean> {
     response = response.trim().replace(/\n\s*\n/g, '\n');
     if (response) {
       message.channel.send(response);
     }
-    if (imagePaths.length > 0 || songPaths.length > 0) {
-      await message.channel.send({ files: [...imagePaths, ...songPaths] });
-      console.log('Images sent');
+    const attachmentsPath = FileHandler.getFolderFilenameFullPaths(
+      ConfigManager.config.tmpFolder.path
+    );
+    console.log('Attachments:', attachmentsPath);
+    if (attachmentsPath.length > 0) {
+      await message.channel.send({ files: [...attachmentsPath] });
+      console.log('Attachments sent');
+      FileHandler.emptyFolder(ConfigManager.config.tmpFolder.path);
     }
     return true;
   }

@@ -7,9 +7,9 @@ export interface ConfigType {
   serp: SerpConfigType;
   braveSearch: BraveSearchConfigType;
   coin: CoinConfigType;
-  suno: SunoConfigType;
   googleLighthouse: LighthouseConfigType;
   googleSearch: GoogleSearchConfigType;
+  tmpFolder: TmpFolderConfigType;
 }
 
 export interface OpenAIConfigType {
@@ -52,11 +52,6 @@ export interface CoinConfigType extends ActivatorConfigType {
   defaultAsset: string;
 }
 
-export interface SunoConfigType extends ActivatorConfigType {
-  cookieKey: string;
-  maxByDay: number;
-}
-
 export interface LighthouseConfigType extends ActivatorConfigType {
   apiKey: string;
 }
@@ -64,6 +59,10 @@ export interface LighthouseConfigType extends ActivatorConfigType {
 export interface GoogleSearchConfigType extends ActivatorConfigType {
   apiKey: string;
   cx: string;
+}
+
+export interface TmpFolderConfigType extends ActivatorConfigType {
+  path: string;
 }
 
 export default class ConfigManager {
@@ -128,16 +127,9 @@ export default class ConfigManager {
       configValues.coin.defaultAsset || process.env.COIN_DEFAULT_ASSET || 'USD'
   };
 
-  private sunoConfig: SunoConfigType = {
-    active: configValues.suno.active || process.env.SUNO_ACTIVE || false,
-    cookieKey: configValues.suno.cookieKey || process.env.SUNO_COOKIE_KEY,
-    maxByDay: parseInt(
-      (
-        configValues?.suno?.maxByDay ||
-        process.env.SUNO_MAX_BY_DAY ||
-        8
-      ).toString()
-    )
+  private tmpFolderConfig: TmpFolderConfigType = {
+    active: true,
+    path: configValues.tmpFolder.path || process.env.TMP_FOLDER_PATH || 'tmp'
   };
 
   private lighthouseConfig: LighthouseConfigType = {
@@ -166,9 +158,9 @@ export default class ConfigManager {
     serp: this.serpConfig,
     braveSearch: this.braveSearchConfig,
     coin: this.coinConfig,
-    suno: this.sunoConfig,
     googleSearch: this.googleSearchConfig,
-    googleLighthouse: this.lighthouseConfig
+    googleLighthouse: this.lighthouseConfig,
+    tmpFolder: this.tmpFolderConfig
   };
 
   private static getInstance() {
@@ -210,9 +202,6 @@ export default class ConfigManager {
       throw new Error('No Coin API key configured');
     }
 
-    if (this._config.suno?.active && !this._config.suno?.cookieKey) {
-      throw new Error('No Suno cookie key configured');
-    }
     if (
       this._config.googleLighthouse?.active &&
       !this._config.googleLighthouse?.apiKey

@@ -35,10 +35,6 @@ jest.mock('./../../src/config', () => {
       apiKey: '',
       defaulAsset: 'USD'
     },
-    suno: {
-      active: false,
-      cookieValue: ''
-    },
     googleLighthouse: {
       active: false,
       apiKey: ''
@@ -47,6 +43,9 @@ jest.mock('./../../src/config', () => {
       active: false,
       apiKey: '',
       cx: ''
+    },
+    tmpFolder: {
+      path: 'tmp_test'
     }
   };
 });
