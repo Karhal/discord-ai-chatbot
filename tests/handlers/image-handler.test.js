@@ -60,7 +60,7 @@ it('should download images', async () => {
   const images = ['https://fr.wikipedia.org/static/images/icons/wikipedia.png'];
   const response = await imgHandler.downloadImages(images);
   expect(response).toHaveLength(1);
-  expect(response[0]).toMatch(/tmp(\\|\/)\d+.jpg/);
+  expect(response[0]).toMatch(/(\\|\.?\/?)tmp(\\|\/)\d+.jpg/);
   const fs = require('fs');
   fs.unlinkSync(response[0]);
 });
