@@ -49,5 +49,9 @@ export default {
         active: false,
         apiKey: "",
         cx: "",
+    },
+    backupFile : {
+        path: '',
+        active: false
     }
 };

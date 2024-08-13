@@ -10,6 +10,7 @@ export interface ConfigType {
   suno: SunoConfigType;
   googleLighthouse: LighthouseConfigType;
   googleSearch: GoogleSearchConfigType;
+  backupFile: BackupFileConfigType;
 }
 
 export interface OpenAIConfigType {
@@ -24,6 +25,11 @@ export interface DiscordConfigType {
   token: string;
   maxHistory: number;
   lang: string;
+}
+
+export interface BackupFileConfigType {
+  path: string;
+  active: boolean;
 }
 
 export interface ActivatorConfigType {
@@ -97,6 +103,11 @@ export default class ConfigManager {
     lang: configValues.discord.lang || process.env.DISCORD_LANG || 'en'
   };
 
+  private backupFileConfig: BackupFileConfigType = {
+    path: configValues.backupFile.path,
+    active: configValues.backupFile.active
+  };
+
   private duneConfig: DuneConfigType = {
     active: configValues.dune.active || process.env.DUNE_ACTIVE || false,
     apiKey: configValues.dune.apiKey || process.env.DUNE_API_KEY
@@ -168,7 +179,8 @@ export default class ConfigManager {
     coin: this.coinConfig,
     suno: this.sunoConfig,
     googleSearch: this.googleSearchConfig,
-    googleLighthouse: this.lighthouseConfig
+    googleLighthouse: this.lighthouseConfig,
+    backupFile: this.backupFileConfig
   };
 
   private static getInstance() {
@@ -224,6 +236,9 @@ export default class ConfigManager {
       (!this._config.googleSearch?.apiKey || !this._config.googleSearch?.cx)
     ) {
       throw new Error('No GoogleSearch API key or CX configured');
+    }
+    if (this._config.backupFile.active && !this._config.backupFile.path) {
+      throw new Error('No backup folder configured');
     }
   }
 }

@@ -4,8 +4,6 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import { Page } from 'puppeteer-extra-plugin/dist/puppeteer';
 import FileHandler from '../handlers/file-handler';
 import SongHandler from '../handlers/song-handler';
-import path from 'path';
-import fs from 'fs';
 
 puppeteer.use(StealthPlugin());
 

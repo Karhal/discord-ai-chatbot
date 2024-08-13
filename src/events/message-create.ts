@@ -77,7 +77,9 @@ export default class MessageCreate extends EventDiscord {
         imageHandler.downloadedImages,
         songHandler.songs
       );
+
       imageHandler.deleteImages();
+      songHandler.deleteSong();
     }
 
     this.endTyping();

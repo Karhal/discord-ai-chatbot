@@ -47,6 +47,9 @@ jest.mock('./../../src/config', () => {
       active: false,
       apiKey: '',
       cx: ''
+    },
+    backupFile: {
+      active: false
     }
   };
 });

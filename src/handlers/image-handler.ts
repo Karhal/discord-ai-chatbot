@@ -1,4 +1,3 @@
-import fs from 'fs';
 import FileHandler from './file-handler';
 
 type ImageHandlerType = {
@@ -52,16 +51,7 @@ export default class ImageHandler implements ImageHandlerType {
 
   public deleteImages(): void {
     this.downloadedImages.forEach((imagePath) => {
-      if (fs.existsSync(imagePath)) {
-        fs.unlink(imagePath, (err) => {
-          if (err) {
-            console.error(err);
-          }
-          else {
-            console.log('Image deleted:', imagePath);
-          }
-        });
-      }
+      FileHandler.deleteFile(imagePath);
     });
   }
 

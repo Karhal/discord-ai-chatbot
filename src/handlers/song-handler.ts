@@ -1,3 +1,5 @@
+import FileHandler from './file-handler';
+
 export default class SongHandler {
   static lastSong?: number;
   static songNumber = 0;
@@ -37,6 +39,12 @@ export default class SongHandler {
       });
     }
     return this.message;
+  }
+
+  public deleteSong(): void {
+    this.songs.forEach((songPath) => {
+      FileHandler.deleteFile(songPath);
+    });
   }
 
   extractSongUrls(): void {

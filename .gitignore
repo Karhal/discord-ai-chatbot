@@ -8,3 +8,4 @@ src/config.ts
 src/config.ts.prod
 src/config.ts.local
 dist
+tmp

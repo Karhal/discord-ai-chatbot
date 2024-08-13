@@ -24,6 +24,10 @@ Before getting started, make sure you have Node.js installed on your system. You
 
 Open `config.ts` and adjust the settings as needed. You can set your Discord bot token, API keys for the various services, and other customization options.
 
+## Configuration for backup generated files
+
+The `backupFile` section of the `config.ts` file allows you to define the path for backup the generated files (images and songs).
+
 ## Configuration for environnements prod/local
 
 1. duplicate config.ts.dist to config.ts.local for local purpose

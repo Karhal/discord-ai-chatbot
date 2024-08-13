@@ -1,4 +1,4 @@
-import { readMemory } from '../tools';
+import FileHandler from './file-handler';
 import { AIClientType } from '../types/AIClientType';
 import { Collection, Message } from 'discord.js';
 import { ToolsAI, MessageInput } from '../types/types';
@@ -42,7 +42,7 @@ class AiCompletionHandler {
   }
 
   async getAiCompletion(summary: string, channelId: string): Promise<string> {
-    const memory: string = readMemory();
+    const memory: string = FileHandler.readMemory();
     const fullPrompt = `${this.prompt}.\n\n
     MEMORY:"""\n${memory}\n"""\n
     PREVIOUSLY:"""\n${summary}\n"""
