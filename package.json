@@ -9,7 +9,8 @@
     "test:watch": "jest --watch",
     "start:dev": "tsx watch src/index.ts",
     "build": "tsup src/index.ts --minify",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "postinstall": "husky install"
   },
   "keywords": [],
   "author": "",
