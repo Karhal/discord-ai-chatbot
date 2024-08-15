@@ -21,7 +21,7 @@ export default class ClaudeClient implements AIClientType {
     systemPrompt: string,
     messages: MessageInput[]
   ): Promise<string | null> {
-    const option = {
+    const options = {
       model: this.claudeAIConfig.summaryModel,
       max_tokens: 2000,
       temperature: 0.5,
@@ -29,14 +29,14 @@ export default class ClaudeClient implements AIClientType {
       messages: messages
     };
 
-    const response = await this.message(option);
+    const response = await this.message(options);
     console.log(response);
     return response.content[0].text || null;
   }
 
   async getAiCompletion(
     systemPrompt: string,
-    conversation: MessageInput[],
+    messages: MessageInput[],
     tools: ToolsAI[]
   ): Promise<string> {
     const option = {
@@ -44,18 +44,7 @@ export default class ClaudeClient implements AIClientType {
       max_tokens: 1000,
       temperature: 0.5,
       system: systemPrompt,
-      messages: [
-        {
-          role: 'user',
-          content:
-            '###CONVERSATION: \n\n' +
-            conversation
-              .map((msg) => {
-                return msg.content;
-              })
-              .join('"""\n')
-        }
-      ]
+      messages: messages
       //tools: []
     };
 
