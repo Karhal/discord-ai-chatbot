@@ -5,12 +5,19 @@ export default {
         maxHistory: 10,
         lang: "en"
     },
+    aiClient: 'openAI',
     openAI : {
         apiKey : "XXXXX",
         model : "gpt-4o",
         summaryModel : "gpt-4o-mini",
         prompt : "You are a nice assistant in a discord server",
         imageSize: "1024x1024",
+    },
+    claude : {
+        apiKey : "XXXXX",
+        model : "claude-3-5-sonnet-20240620",
+        summaryModel : "claude-3-5-sonnet-20240620",
+        prompt : "You are a nice assistant in a discord server"
     },
     dune : {
         active: false,

@@ -48,11 +48,9 @@ export default class MessageCreate extends EventDiscord {
     > = await message.channel.messages.fetch({
       limit: maxHistory
     });
-
     const aiCompletionHandler = new AiCompletionHandler(
       this.aiClient,
-      ConfigManager.config.openAI.prompt,
-      tools
+      ConfigManager.config.AIPrompt
     );
 
     aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
