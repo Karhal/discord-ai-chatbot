@@ -23,7 +23,7 @@ export default class ClaudeClient implements AIClientType {
   ): Promise<string | null> {
     const option = {
       model: this.claudeAIConfig.summaryModel,
-      max_tokens: 100,
+      max_tokens: 2000,
       temperature: 0.5,
       system: systemPrompt,
       messages: messages
@@ -56,6 +56,7 @@ export default class ClaudeClient implements AIClientType {
               .join('"""\n')
         }
       ]
+      //tools: []
     };
 
     const response = await this.message(option);
