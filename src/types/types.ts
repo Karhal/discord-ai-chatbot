@@ -1,7 +1,7 @@
 type ToolsAI = {
   type: string;
   function: {
-    function: Function;
+    name: string;
     description: string;
     parameters: {
       type: string;

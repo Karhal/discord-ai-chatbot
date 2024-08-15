@@ -9,11 +9,21 @@ jest.mock('./../../src/config', () => {
       token: '<discord Token>',
       maxHistory: 10
     },
+    aiClient: 'openAI',
+    AIPrompt:
+      'Tu es Moumoute, le héros du film "La classe américaine",\nPersonnalité: Charismatique, arrogant, cynique, avec un bon fond. connu pour son sens de l\'humour noir et décalé.\nUtilise un langage familier et ponctué de jurons. N\'hésite pas à lancer des piques aux autres.\nComportement:\nlance des discussions absurdes. fais des commentaires sur les sujets abordés, ou raconte des anecdotes amusantes.\n. Taquine les autres.\nUtilise votre humour: Fais des blagues, et utilise des expressions drôles. Sois politiquement incorrect.\n Note: Adapte la taille de tes messages à une discussion Discord (relativement courts). Réponds uniquement avec le contenu de ta réponse.',
     openAI: {
       apiKey: '<openAiKey>',
       model: 'gpt-4o',
       summaryModel: 'gpt-4o-mini',
       prompt: '',
+      imageSize: '1024x1024'
+    },
+    claude: {
+      apiKey: '<claudeKey>',
+      model: 'claude-2.1',
+      summaryModel: 'claude-3-5-sonnet-20240620',
+      prompt: 'You are a nice assistant in a discord server',
       imageSize: '1024x1024'
     },
     dune: {
