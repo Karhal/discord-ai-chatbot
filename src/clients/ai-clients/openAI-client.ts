@@ -48,37 +48,25 @@ export default class OpenAIClient implements AIClientType {
 
   async getSummary(
     systemPrompt: string,
-    messages: any[]
+    messages: MessageInput[]
   ): Promise<string | null> {
-    const option: ChatCompletionCreateParamsNonStreaming = {
+    const options = {
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
       model: this.openAIConfig.summaryModel
     };
 
-    const response = await this.message(option);
+    const response = await this.message(options);
     return response;
   }
 
   async getAiCompletion(
     systemPrompt: string,
-    conversation: MessageInput[],
+    messages: MessageInput[],
     tools: ToolsAI[]
   ): Promise<string> {
     const options = {
+      messages: [{ role: 'system', content: systemPrompt }, ...messages],
       model: this.openAIConfig.model,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        {
-          role: 'user',
-          content:
-            '###CONVERSATION : \n\n' +
-            conversation
-              .map((msg) => {
-                return msg.content;
-              })
-              .join('"""\n')
-        }
-      ],
       //tools: [],
       response_format: { type: 'json_object' }
     };
@@ -86,6 +74,6 @@ export default class OpenAIClient implements AIClientType {
     const response = (await this.client.chat.completions.create(options))
       .choices[0].message.content;
     console.log(response);
-    return JSON.parse(response).content;
+    return response ? JSON.parse(response).content : null;
   }
 }

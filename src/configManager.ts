@@ -19,7 +19,7 @@ export interface AiClientConfigType {
   apiKey: string;
   model: string;
   prompt: string;
-  summaryModel?: string;
+  summaryModel: string;
   imageSize: string;
 }
 
