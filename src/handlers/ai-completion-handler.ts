@@ -48,14 +48,17 @@ class AiCompletionHandler {
     - Format your response in a JSON object only with the keys 'content' and the key 'author'.
     """
     `;
-    const messages: { role: string; content: string }[] = [];
-    this.getLastMessagesOfAChannel(5, channelId).forEach((msg) => {
-      const contentParsed = JSON.parse(msg.content);
-      messages.push({
-        role: contentParsed.role,
-        content: contentParsed.author + ': ' + contentParsed.content
-      });
-    });
+    const messages: { role: string; content: string }[] = [
+      {
+        role: 'user',
+        content: this.getLastMessagesOfAChannel(5, channelId)
+          .map((msg) => {
+            const contentParsed = JSON.parse(msg.content);
+            return contentParsed.author + ': ' + contentParsed.content;
+          })
+          .join('\n\n')
+      }
+    ];
 
     const content = this.aiClient.getAiCompletion(
       systemPrompt,
