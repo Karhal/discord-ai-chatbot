@@ -79,12 +79,13 @@ export default class OpenAIClient implements AIClientType {
               .join('"""\n')
         }
       ],
-      tools: tools,
+      //tools: [],
       response_format: { type: 'json_object' }
     };
     console.log(options);
-    const runner = this.client.beta.chat.completions.runTools(options);
-    const response = await runner.finalContent();
-    return JSON.parse(response as string).content;
+    const response = (await this.client.chat.completions.create(options))
+      .choices[0].message.content;
+    console.log(response);
+    return JSON.parse(response).content;
   }
 }
