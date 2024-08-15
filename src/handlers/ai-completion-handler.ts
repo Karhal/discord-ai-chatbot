@@ -19,18 +19,21 @@ class AiCompletionHandler {
 
   async getSummary(channelId: string): Promise<string | null> {
     const systemPrompt =
-      'Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. Rely strictly on the provided text. Format the summary in one paragraph form for easy understanding. The summary has to be the shortest possible (<100 words) and give a good idea of what the discussion is about. Use the following language: ' +
+      'Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. \
+      Rely strictly on the provided text. Format the summary in one paragraph form for easy understanding. \
+      The summary has to be the shortest possible (<100 words) and give a good idea of what the discussion is about. \
+      Use the following language: ' +
       this.discordConfig.lang +
       '\n\nText:"""';
 
     const messages = [
       {
         role: 'user',
-        content: this.getLastMessagesOfAChannel(10, channelId)
+        content: this.getLastMessagesOfAChannel(15, channelId)
           .map((msg) => {
             return msg.content;
           })
-          .join('\n\n')
+          .join('\n')
       }
     ];
     const response = await this.aiClient.getSummary(systemPrompt, messages);
@@ -41,9 +44,9 @@ class AiCompletionHandler {
   async getAiCompletion(summary: string, channelId: string): Promise<string> {
     const memory: string = readMemory();
     const systemPrompt = `${this.prompt}.\n\n
-    MEMORY:"""\n${memory}\n"""\n
-    PREVIOUSLY:"""\n${summary}\n"""
-    NOTE:"""\n
+    MEMORY:"""${memory}"""\n
+    PREVIOUSLY:"""${summary}"""\n
+    NOTE:"""
     - You have to respond to the user in the context of the conversation.
     - Format your response in a JSON object only with the keys 'content' and the key 'author'.
     """
@@ -56,7 +59,7 @@ class AiCompletionHandler {
             const contentParsed = JSON.parse(msg.content);
             return contentParsed.author + ': ' + contentParsed.content;
           })
-          .join('\n\n')
+          .join('\n')
       }
     ];
 
