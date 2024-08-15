@@ -28,6 +28,7 @@ const generateImageTool = {
   type: 'function',
   function: {
     name: 'generate_image',
+    function: generateImage,
     description:
       'Use this tool only when the user asks you to draw or to show a picture of something in the last message. \
       The tool will generate an image based on the prompt you provide and add it as an attachment on discord. \
@@ -41,8 +42,7 @@ const generateImageTool = {
         imagePrompt: { type: 'string' }
       }
     }
-  },
-  embedFunction: generateImage
+  }
 };
 
 export default generateImageTool;
