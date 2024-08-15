@@ -1,4 +1,4 @@
-import { readMemory } from '../tools';
+import { readMemory } from '../tools-manager';
 import { AIClientType } from '../types/AIClientType';
 import { Collection, Message } from 'discord.js';
 import { ToolsAI, MessageInput } from '../types/types';

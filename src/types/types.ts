@@ -16,4 +16,16 @@ type MessageInput = {
   channelId?: string;
 };
 
-export { ToolsAI, MessageInput };
+interface ToolType {
+  toolName: string;
+  buildTool: () => ToolsAI;
+  execute: (...args: string[]) => Promise<any>;
+  description: string;
+  isActivated: boolean;
+  parameters: {
+    type: string;
+    properties: object;
+  };
+}
+
+export { ToolsAI, MessageInput, ToolType };
