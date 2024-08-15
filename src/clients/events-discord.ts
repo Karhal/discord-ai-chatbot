@@ -1,9 +1,9 @@
 import { Client } from 'discord.js';
-import AIClient from './ai-client';
+import { AIClientType } from '../types/AIClientType';
 
 interface EventDiscordType {
   eventName: string;
-  aiClient: AIClient;
+  aiClient: AIClientType;
   once: boolean;
   handler: Function;
   discordClient: Client;
@@ -15,7 +15,7 @@ interface EventDiscordType {
 export default abstract class EventDiscord implements EventDiscordType {
   constructor(
     public discordClient: Client,
-    public aiClient: AIClient,
+    public aiClient: AIClientType,
     public once: boolean = false,
     public eventName: string = 'eventName',
     public handler: Function = function() {}

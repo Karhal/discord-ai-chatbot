@@ -1,8 +1,11 @@
 import configValues from './config';
 
 export interface ConfigType {
+  aiClient: string;
   discord: DiscordConfigType;
-  openAI: OpenAIConfigType;
+  openAI: AiClientConfigType;
+  AIPrompt: string;
+  claude: AiClientConfigType;
   dune: DuneConfigType;
   serp: SerpConfigType;
   braveSearch: BraveSearchConfigType;
@@ -12,7 +15,7 @@ export interface ConfigType {
   tmpFolder: TmpFolderConfigType;
 }
 
-export interface OpenAIConfigType {
+export interface AiClientConfigType {
   apiKey: string;
   model: string;
   prompt: string;
@@ -72,7 +75,12 @@ export default class ConfigManager {
 
   private static _instance: ConfigManager;
 
-  private openAIConfig: OpenAIConfigType = {
+  private AIPrompt: string =
+    configValues.AIPrompt ||
+    process.env.AI_PROMPT ||
+    'You are a nice assistant in a discord server';
+
+  private openAIConfig: AiClientConfigType = {
     apiKey: configValues.openAI.apiKey || process.env.OPENAI_API_KEY,
     model: configValues.openAI.model || process.env.OPENAI_MODEL || 'gpt-4o',
     summaryModel:
@@ -85,6 +93,21 @@ export default class ConfigManager {
       'You are a nice assistant in a discord server',
     imageSize:
       configValues.openAI.imageSize || process.env.IMAGE_SIZE || '1024x1024'
+  };
+
+  private claudeConfig: AiClientConfigType = {
+    apiKey: configValues.claude.apiKey || process.env.OPENAI_API_KEY,
+    model: configValues.claude.model || process.env.OPENAI_MODEL || 'gpt-4o',
+    summaryModel:
+      configValues.claude.summaryModel ||
+      process.env.CLAUDE_SUMMARY_MODEL ||
+      'gpt-4o-mini',
+    prompt:
+      configValues.claude.prompt ||
+      process.env.CLAUDE_PROMPT ||
+      'You are a nice assistant in a discord server',
+    imageSize:
+      configValues.claude.imageSize || process.env.IMAGE_SIZE || '1024x1024'
   };
 
   private discordConfig: DiscordConfigType = {
@@ -152,8 +175,11 @@ export default class ConfigManager {
   };
 
   private _config: ConfigType = {
+    aiClient: configValues.aiClient || process.env.AI_CLIENT || 'openAI',
     discord: this.discordConfig,
     openAI: this.openAIConfig,
+    claude: this.claudeConfig,
+    AIPrompt: this.AIPrompt,
     dune: this.duneConfig,
     serp: this.serpConfig,
     braveSearch: this.braveSearchConfig,
@@ -180,6 +206,12 @@ export default class ConfigManager {
   }
 
   private validateConfigIntegrity(): void {
+    if (!this._config.AIPrompt) {
+      throw new Error('No Ai Prompt configured');
+    }
+    if (!this._config.aiClient) {
+      throw new Error('No Ai Client configured');
+    }
     if (!this._config.discord.token) {
       throw new Error('No Discord token configured');
     }

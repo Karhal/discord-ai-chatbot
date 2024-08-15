@@ -1,7 +1,8 @@
 import { readMemory } from '../tools-manager';
 import { AIClientType } from '../types/AIClientType';
 import { Collection, Message } from 'discord.js';
-import { ToolsAI, MessageInput } from '../types/types';
+import { MessageInput } from '../types/types';
+import { tools } from '../tools';
 import ConfigManager, { DiscordConfigType } from '../configManager';
 
 class AiCompletionHandler {
@@ -11,54 +12,56 @@ class AiCompletionHandler {
 
   constructor(
     private aiClient: AIClientType,
-    private prompt: string,
-    private tools: ToolsAI[]
+    private prompt: string
   ) {
     this.discordConfig = ConfigManager.config.discord;
   }
 
   async getSummary(channelId: string): Promise<string | null> {
+    const systemPrompt =
+      'Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. Rely strictly on the provided text. Format the summary in one paragraph form for easy understanding. The summary has to be the shortest possible (<100 words) and give a good idea of what the discussion is about. Use the following language: ' +
+      this.discordConfig.lang +
+      '\n\nText:"""';
+
     const messages = [
       {
-        role: 'assistant',
-        content:
-          'Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. Rely strictly on the provided text. Format the summary in one paragraph form for easy understanding. The summary has to be the shortest possible (<100 words) and give a good idea of what the discussion is about. Use the following language: ' +
-          this.discordConfig.lang +
-          '\n\nText:"""'
-      },
-      {
         role: 'user',
-        content: this.getFirstMessagesOfAChannel(5, channelId)
+        content: this.getLastMessagesOfAChannel(10, channelId)
           .map((msg) => {
-            const contentParsed = JSON.parse(msg.content);
-            return contentParsed.author + ': ' + msg.content;
+            return msg.content;
           })
           .join('\n\n')
       }
     ];
-
-    const response = await this.aiClient.getSummary(messages);
+    const response = await this.aiClient.getSummary(systemPrompt, messages);
+    console.log(response);
     return response;
   }
 
   async getAiCompletion(summary: string, channelId: string): Promise<string> {
     const memory: string = readMemory();
-    const fullPrompt = `${this.prompt}.\n\n
+    const systemPrompt = `${this.prompt}.\n\n
     MEMORY:"""\n${memory}\n"""\n
     PREVIOUSLY:"""\n${summary}\n"""
     NOTE:"""\n
+    - You have to respond to the user in the context of the conversation.
     - Format your response in a JSON object only with the keys 'content' and the key 'author'.
-    - If you have an image to add, use the key 'content' to store the image URL.
-    - When you use a tool, use the property 'content' to store its results.
-    - Interract only to the last message mentionning you. The rest is to give you context.
-    - Consider the DateTime given with the last message to avoid being out of context.\n"""
+    """
     `;
-    let conversation = [{ role: 'assistant', content: fullPrompt }];
-    conversation = conversation.concat(
-      this.getLastMessagesOfAChannel(5, channelId) || []
-    );
+    const messages: { role: string; content: string }[] = [];
+    this.getLastMessagesOfAChannel(5, channelId).forEach((msg) => {
+      const contentParsed = JSON.parse(msg.content);
+      messages.push({
+        role: contentParsed.role,
+        content: contentParsed.author + ': ' + contentParsed.content
+      });
+    });
 
-    const content = this.aiClient.getAiCompletion(conversation, this.tools);
+    const content = this.aiClient.getAiCompletion(
+      systemPrompt,
+      messages,
+      tools
+    );
     return content;
   }
 
