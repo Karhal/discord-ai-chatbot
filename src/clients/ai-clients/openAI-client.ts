@@ -67,13 +67,21 @@ export default class OpenAIClient implements AIClientType {
     const options = {
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
       model: this.openAIConfig.model,
-      //tools: [],
+      tools: tools.filter((tool) => tool.function.name === 'generate_image'),
       response_format: { type: 'json_object' }
     };
     console.log(options);
-    const response = (await this.client.chat.completions.create(options))
-      .choices[0].message.content;
-    console.log(response);
-    return response ? JSON.parse(response).content : null;
+    const runner = this.client.beta.chat.completions.runTools(options);
+    const response = await runner.finalContent();
+    console.log('response', response);
+    return JSON.parse(response as string).content;
+  }
+
+  transformTools(tools: ToolsAI[]): string {
+    return tools
+      .map((tool) => {
+        return `TOOL:"""${tool}"""\n`;
+      })
+      .join('');
   }
 }
