@@ -16,6 +16,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.26.0",
     "@discordjs/opus": "latest",
     "@discordjs/voice": "latest",
     "@google-cloud/speech": "latest",
