@@ -2,7 +2,7 @@
 export default {
     discord : {
         token : "XXXXX",
-        maxHistory: 10,
+        maxHistory: 20,
         lang: "en"
     },
     aiClient: 'openAI',
