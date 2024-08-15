@@ -1,5 +1,5 @@
 import AiCompletionHandler from '../handlers/ai-completion-handler';
-import { tools } from '../tools';
+import { tools } from '../tools-manager';
 import ConfigManager from '../configManager';
 import EventDiscord from '../clients/events-discord';
 import { Collection, Events, Message } from 'discord.js';
