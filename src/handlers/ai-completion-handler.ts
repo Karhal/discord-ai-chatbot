@@ -56,8 +56,7 @@ class AiCompletionHandler {
         role: 'user',
         content: this.getLastMessagesOfAChannel(5, channelId)
           .map((msg) => {
-            const contentParsed = JSON.parse(msg.content);
-            return contentParsed.author + ': ' + contentParsed.content;
+            return msg.content;
           })
           .join('\n')
       }

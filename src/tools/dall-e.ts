@@ -24,7 +24,7 @@ const generateImageWithDallE = async (imagePrompt: string) => {
 const dallETool = {
   type: 'function',
   function: {
-    name: 'generate_image_with_dall_e',
+    name: 'generateImageWithDallE',
     function: generateImageWithDallE,
     description:
       'Use this tool only when the user asks you to draw or to show a picture of something in the last message. \
