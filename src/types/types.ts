@@ -1,13 +1,25 @@
-type ToolsAI = {
+type AIToolParameter = {
   type: string;
-  function: {
-    name: string;
-    description: string;
-    parameters: {
-      type: string;
-      properties: object;
-    };
+  description?: string;
+};
+
+type AIToolParameters = {
+  type: string;
+  properties: {
+    [key: string]: AIToolParameter;
   };
+  required?: string[];
+};
+
+type AIToolFunction = {
+  name: string;
+  description: string;
+  parameters: AIToolParameters;
+};
+
+type AITool = {
+  type: string;
+  function: AIToolFunction;
 };
 
 type MessageInput = {
@@ -16,4 +28,10 @@ type MessageInput = {
   channelId?: string;
 };
 
-export { ToolsAI, MessageInput };
+export {
+  AIToolFunction,
+  AIToolParameters,
+  AIToolParameter,
+  AITool,
+  MessageInput
+};
