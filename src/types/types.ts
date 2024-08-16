@@ -1,13 +1,25 @@
-type ToolsAI = {
+type AIToolParameter = {
   type: string;
-  function: {
-    name: string;
-    description: string;
-    parameters: {
-      type: string;
-      properties: object;
-    };
+  description?: string;
+};
+
+type AIToolParameters = {
+  type: string;
+  properties: {
+    [key: string]: AIToolParameter;
   };
+  required?: string[];
+};
+
+type AIToolFunction = {
+  name: string;
+  description: string;
+  parameters: AIToolParameters;
+};
+
+type AITool = {
+  type: string;
+  function: AIToolFunction;
 };
 
 type MessageInput = {
@@ -18,7 +30,7 @@ type MessageInput = {
 
 interface ToolType {
   toolName: string;
-  buildTool: () => ToolsAI;
+  buildTool: () => AITool;
   execute: (...args: string[]) => Promise<any>;
   description: string;
   isActivated: boolean;
@@ -28,4 +40,11 @@ interface ToolType {
   };
 }
 
-export { ToolsAI, MessageInput, ToolType };
+export {
+  AIToolFunction,
+  AIToolParameters,
+  AIToolParameter,
+  AITool,
+  MessageInput,
+  ToolType
+};
