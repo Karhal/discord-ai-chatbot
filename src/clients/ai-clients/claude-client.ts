@@ -3,7 +3,7 @@ import { AIClientType } from '../../types/AIClientType';
 import ConfigManager from '../../configManager';
 import { MessageInput } from '../../types/types';
 import transformOpenAIToolToClaudeTool from '../../handlers/tools-handler';
-import { tools } from '../../tools';
+import { tools } from './../../tools-manager';
 
 export default class ClaudeClient implements AIClientType {
   client: Anthropic;
@@ -47,7 +47,7 @@ export default class ClaudeClient implements AIClientType {
       system: systemPrompt,
       messages: messages,
       tools: tools
-        .filter((tool) => tool.function.name === 'generateImageWithDallE')
+        .filter((tool) => tool.function.name === '_ImageGeneratorTool')
         .map((tool) => {
           return transformOpenAIToolToClaudeTool(tool);
         })

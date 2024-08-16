@@ -3,7 +3,7 @@ import { AIClientType } from '../../types/AIClientType';
 import { MessageInput, AITool } from '../../types/types';
 import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources';
 import ConfigManager from '../../configManager';
-import { tools } from '../../tools';
+import { tools } from './../../tools-manager';
 
 type openAIImageSize =
   | '1024x1024'
@@ -64,11 +64,14 @@ export default class OpenAIClient implements AIClientType {
     systemPrompt: string,
     messages: MessageInput[]
   ): Promise<string> {
+    tools.forEach((tool) => {
+      console.log(tool);
+    });
     const options = {
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
       model: this.openAIConfig.model,
       tools: tools.filter(
-        (tool) => tool.function.name === 'generateImageWithDallE'
+        (tool) => tool.function.name === '_ImageGeneratorTool'
       ),
       response_format: { type: 'json_object' }
     };
