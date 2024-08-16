@@ -32,6 +32,10 @@ export default class ClaudeClient implements AIClientType {
     return response?.content[0]?.text || null;
   }
 
+  generateImageWithDallE(imagePrompt: string): Promise<string | null> {
+    console.log('!!!!!!!!!! Method not implemented.');
+  }
+
   async getAiCompletion(
     systemPrompt: string,
     messages: MessageInput[]
@@ -43,12 +47,13 @@ export default class ClaudeClient implements AIClientType {
       system: systemPrompt,
       messages: messages,
       tools: tools
-        .filter((tool) => tool.function.name === 'generate_image_with_dall_e')
+        .filter((tool) => tool.function.name === 'generateImageWithDallE')
         .map((tool) => {
           return transformOpenAIToolToClaudeTool(tool);
         })
     };
     const response = await this.message(option);
+    console.log(response);
     return JSON.parse(response.content[0].text).content;
   }
 

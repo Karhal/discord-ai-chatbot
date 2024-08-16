@@ -68,7 +68,7 @@ export default class OpenAIClient implements AIClientType {
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
       model: this.openAIConfig.model,
       tools: tools.filter(
-        (tool) => tool.function.name === 'generate_image_with_dall_e'
+        (tool) => tool.function.name === 'generateImageWithDallE'
       ),
       response_format: { type: 'json_object' }
     };
