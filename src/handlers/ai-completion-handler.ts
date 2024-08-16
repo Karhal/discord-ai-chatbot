@@ -2,7 +2,7 @@ import { readMemory } from '../tools-manager';
 import { AIClientType } from '../types/AIClientType';
 import { Collection, Message } from 'discord.js';
 import { MessageInput } from '../types/types';
-import { tools } from '../tools';
+import { tools } from './../tools-manager';
 import ConfigManager, { DiscordConfigType } from '../configManager';
 
 class AiCompletionHandler {

@@ -1,9 +1,9 @@
 import fs from 'fs';
-import { ToolsAI } from './types/types';
-import toolList from './tools';
+import { AITool } from './types/types';
+import toolList from './tools/index';
 import WriteMemoryTool from './tools/write-memory-tool';
 
-const tools: ToolsAI[] = [];
+const tools: AITool[] = [];
 
 toolList.forEach((toolClass) => {
   const instance = new toolClass();
