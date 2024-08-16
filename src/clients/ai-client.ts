@@ -1,5 +1,5 @@
 import { AIClientType } from '../types/AIClientType';
-import { MessageInput, ToolsAI } from '../types/types';
+import { MessageInput, AITool } from '../types/types';
 import OpenAiClient from './ai-clients/openAI-client';
 import ConfigManager from '../configManager';
 import ClaudeClient from './ai-clients/claude-client';
@@ -20,15 +20,9 @@ export default class AIClient implements AIClientType {
     }
   }
 
-  async generateImage(prompt: string): Promise<string | null> {
-    if (!this.client) return null;
-
-    return this.client.generateImage(prompt);
-  }
-
   async getSummary(
     systemPrompt: string,
-    messages: any[]
+    messages: MessageInput[]
   ): Promise<string | null> {
     if (!this.client) return null;
     return await this.client.getSummary(systemPrompt, messages);
@@ -37,7 +31,7 @@ export default class AIClient implements AIClientType {
   async getAiCompletion(
     systemPrompt: string,
     conversation: MessageInput[],
-    tools: ToolsAI[]
+    tools: AITool[]
   ): Promise<string> {
     if (!this.client) return '';
     return await this.client.getAiCompletion(systemPrompt, conversation, tools);

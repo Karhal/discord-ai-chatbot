@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import { AIClientType } from '../../types/AIClientType';
-import { MessageInput, ToolsAI } from '../../types/types';
+import { MessageInput, AITool } from '../../types/types';
 import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources';
 import ConfigManager from '../../configManager';
 
@@ -62,12 +62,14 @@ export default class OpenAIClient implements AIClientType {
   async getAiCompletion(
     systemPrompt: string,
     messages: MessageInput[],
-    tools: ToolsAI[]
+    tools: AITool[]
   ): Promise<string> {
     const options = {
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
       model: this.openAIConfig.model,
-      tools: tools.filter((tool) => tool.function.name === 'generate_image'),
+      tools: tools.filter(
+        (tool) => tool.function.name === 'generate_image_with_dall_e'
+      ),
       response_format: { type: 'json_object' }
     };
     console.log(options);
@@ -77,7 +79,7 @@ export default class OpenAIClient implements AIClientType {
     return JSON.parse(response as string).content;
   }
 
-  transformTools(tools: ToolsAI[]): string {
+  transformTools(tools: AITool[]): string {
     return tools
       .map((tool) => {
         return `TOOL:"""${tool}"""\n`;

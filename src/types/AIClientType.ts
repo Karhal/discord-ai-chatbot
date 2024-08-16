@@ -1,7 +1,6 @@
-import { MessageInput, ToolsAI } from './types';
+import { MessageInput, AITool } from './types';
 
 export type AIClientType = {
-  generateImage: (prompt: string) => Promise<string | null>;
   getSummary: (
     systemPrompt: string,
     messages: MessageInput[]
@@ -9,6 +8,6 @@ export type AIClientType = {
   getAiCompletion: (
     systemPrompt: string,
     conversation: MessageInput[],
-    tools: ToolsAI[]
+    tools: AITool[]
   ) => Promise<string>;
 };

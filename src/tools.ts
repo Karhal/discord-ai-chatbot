@@ -1,23 +1,23 @@
 import fs from 'fs';
-import writeMemoryTool from './tools/write-memory';
-import generateImageTool from './tools/generate-image';
+import ConfigManager from './configManager';
+import { AITool } from './types/types';
+import dallETool from './tools/dall-e';
+/*import writeMemoryTool from './tools/write-memory';
 import getCryptoPriceTool from './tools/crypto-price-tracker';
 import getBraveSearchTool from './tools/brave-search';
-import { ToolsAI } from './types/types';
 import fetchDuneDataTool from './tools/dune';
-import ConfigManager from './configManager';
 import checkLighthHouse from './tools/google-lighthouse';
 import getGoogleSearchTool from './tools/google-search';
 import getSerpNewsTool from './tools/serp-search';
 import getMapsSearchTool from './tools/maps';
-
+*/
 const config = ConfigManager.config;
-const tools: ToolsAI[] = [];
+const tools: AITool[] = [];
 
-tools.push(writeMemoryTool);
-tools.push(generateImageTool);
+//tools.push(writeMemoryTool);
+tools.push(dallETool);
 
-if (config.coin.active) {
+/*if (config.coin.active) {
   tools.push(getCryptoPriceTool);
 }
 if (config.dune.active) {
@@ -36,6 +36,7 @@ if (config.serp.active) {
 if (config.googleSearch.active) {
   tools.push(getGoogleSearchTool);
 }
+  */
 
 const readMemory = () => {
   const memoryFilePath = './memory.txt';
