@@ -20,6 +20,7 @@ type AIToolFunction = {
 
 type AITool = {
   type: string;
+  name: string;
   function: AIToolFunction;
 };
 

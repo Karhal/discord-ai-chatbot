@@ -11,6 +11,7 @@ export default abstract class AbstractTool implements ToolType {
     console.log(this.execute);
     return {
       type: 'function',
+      name: this.toolName,
       function: {
         name: this.toolName,
         function: this.execute,
