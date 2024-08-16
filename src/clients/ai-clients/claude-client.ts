@@ -1,8 +1,9 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { AIClientType } from '../../types/AIClientType';
 import ConfigManager from '../../configManager';
-import { MessageInput, AITool } from '../../types/types';
+import { MessageInput } from '../../types/types';
 import transformOpenAIToolToClaudeTool from '../../handlers/tools-handler';
+import { tools } from '../../tools';
 
 export default class ClaudeClient implements AIClientType {
   client: Anthropic;
@@ -33,8 +34,7 @@ export default class ClaudeClient implements AIClientType {
 
   async getAiCompletion(
     systemPrompt: string,
-    messages: MessageInput[],
-    tools: AITool[]
+    messages: MessageInput[]
   ): Promise<string> {
     const option = {
       model: this.claudeAIConfig.model,
