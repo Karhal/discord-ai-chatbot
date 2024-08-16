@@ -42,7 +42,7 @@ export default class ClaudeClient implements AIClientType {
       temperature: 0.5,
       system: systemPrompt,
       messages: messages,
-      tools: tools
+      tools: tools.filter((tool) => tool.name === '_ImageGeneratorTool')
     };
     const response = await this.message(options);
     console.log(response);
