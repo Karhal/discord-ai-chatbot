@@ -3,6 +3,7 @@ import { AIClientType } from '../../types/AIClientType';
 import { MessageInput, AITool } from '../../types/types';
 import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources';
 import ConfigManager from '../../configManager';
+import { tools } from '../../tools';
 
 type openAIImageSize =
   | '1024x1024'
@@ -61,8 +62,7 @@ export default class OpenAIClient implements AIClientType {
 
   async getAiCompletion(
     systemPrompt: string,
-    messages: MessageInput[],
-    tools: AITool[]
+    messages: MessageInput[]
   ): Promise<string> {
     const options = {
       messages: [{ role: 'system', content: systemPrompt }, ...messages],

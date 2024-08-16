@@ -15,6 +15,7 @@ type AIToolFunction = {
   name: string;
   description: string;
   parameters: AIToolParameters;
+  function: Function;
 };
 
 type AITool = {
