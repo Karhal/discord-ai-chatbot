@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { AIClientType } from '../../types/AIClientType';
 import ConfigManager from '../../configManager';
-import { MessageInput, AIToolFunction } from '../../types/types';
+import { MessageInput, AITool } from '../../types/types';
 import transformOpenAIToolToClaudeTool from '../../handlers/tools-handler';
 
 export default class ClaudeClient implements AIClientType {
@@ -12,10 +12,6 @@ export default class ClaudeClient implements AIClientType {
     this.client = new Anthropic({
       apiKey: this.claudeAIConfig.apiKey
     });
-  }
-
-  async generateImage(prompt: string): Promise<string | null> {
-    return '';
   }
 
   async getSummary(
@@ -32,13 +28,13 @@ export default class ClaudeClient implements AIClientType {
 
     const response = await this.message(options);
     console.log(response);
-    return response.content[0].text || null;
+    return response?.content[0]?.text || null;
   }
 
   async getAiCompletion(
     systemPrompt: string,
     messages: MessageInput[],
-    tools: AIToolFunction[]
+    tools: AITool[]
   ): Promise<string> {
     const option = {
       model: this.claudeAIConfig.model,
@@ -47,7 +43,7 @@ export default class ClaudeClient implements AIClientType {
       system: systemPrompt,
       messages: messages,
       tools: tools
-        .filter((tool) => tool.function.name === 'generate_image')
+        .filter((tool) => tool.function.name === 'generate_image_with_dall_e')
         .map((tool) => {
           return transformOpenAIToolToClaudeTool(tool);
         })
