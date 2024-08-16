@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import { AIClientType } from '../../types/AIClientType';
-import { MessageInput, AITool } from '../../types/types';
+import { MessageInput } from '../../types/types';
 import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources';
 import ConfigManager from '../../configManager';
 import { tools } from './../../tools-manager';
@@ -27,11 +27,11 @@ export default class OpenAIClient implements AIClientType {
   }
 
   private async message(
-    option: ChatCompletionCreateParamsNonStreaming
+    options: ChatCompletionCreateParamsNonStreaming
   ): Promise<string | null> {
     if (!this.client) return null;
 
-    const response = await this.client.chat.completions.create(option);
+    const response = await this.client.chat.completions.create(options);
     return response?.choices[0]?.message?.content || null;
   }
 
@@ -80,13 +80,5 @@ export default class OpenAIClient implements AIClientType {
     const response = await runner.finalContent();
     console.log('response', response);
     return JSON.parse(response as string).content;
-  }
-
-  transformTools(tools: AITool[]): string {
-    return tools
-      .map((tool) => {
-        return `TOOL:"""${tool}"""\n`;
-      })
-      .join('');
   }
 }
