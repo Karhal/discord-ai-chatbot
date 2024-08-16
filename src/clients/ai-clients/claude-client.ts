@@ -2,7 +2,6 @@ import Anthropic from '@anthropic-ai/sdk';
 import { AIClientType } from '../../types/AIClientType';
 import ConfigManager from '../../configManager';
 import { MessageInput } from '../../types/types';
-import transformOpenAIToolToClaudeTool from '../../handlers/tools-handler';
 import { tools } from './../../tools-manager';
 
 export default class ClaudeClient implements AIClientType {
@@ -32,32 +31,25 @@ export default class ClaudeClient implements AIClientType {
     return response?.content[0]?.text || null;
   }
 
-  generateImageWithDallE(imagePrompt: string): Promise<string | null> {
-    console.log('!!!!!!!!!! Method not implemented.');
-  }
-
   async getAiCompletion(
     systemPrompt: string,
     messages: MessageInput[]
   ): Promise<string> {
-    const option = {
+    console.log(tools);
+    const options = {
       model: this.claudeAIConfig.model,
       max_tokens: 2000,
       temperature: 0.5,
       system: systemPrompt,
       messages: messages,
       tools: tools
-        .filter((tool) => tool.function.name === '_ImageGeneratorTool')
-        .map((tool) => {
-          return transformOpenAIToolToClaudeTool(tool);
-        })
     };
-    const response = await this.message(option);
+    const response = await this.message(options);
     console.log(response);
     return JSON.parse(response.content[0].text).content;
   }
 
-  private async message(option: {
+  private async message(options: {
     model: string;
     max_tokens: number;
     temperature: number;
@@ -65,8 +57,8 @@ export default class ClaudeClient implements AIClientType {
     messages: MessageInput;
   }): Promise<string | null> {
     if (!this.client) return null;
-    console.log(option);
-    const response = await this.client.messages.create(option);
+    console.log(options);
+    const response = await this.client.messages.create(options);
 
     return response || null;
   }
