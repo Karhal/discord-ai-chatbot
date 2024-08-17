@@ -12,7 +12,10 @@ export default class SerpSearchTool extends AbstractTool {
   public readonly parameters = {
     type: 'object',
     properties: {
-      query: { type: 'string' }
+      query: {
+        type: 'string',
+        description: 'The search you want to get the results for.'
+      }
     }
   };
 
@@ -32,7 +35,8 @@ export default class SerpSearchTool extends AbstractTool {
 
       console.log(response);
       return response;
-    } catch (error) {
+    }
+    catch (error) {
       console.error(error);
     }
   };

@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { AIClientType } from '../../types/AIClientType';
 import ConfigManager from '../../configManager';
-import { MessageInput } from '../../types/types';
+import { AITool, MessageInput } from '../../types/types';
 import { tools } from './../../tools-manager';
 
 export default class ClaudeClient implements AIClientType {
@@ -27,7 +27,6 @@ export default class ClaudeClient implements AIClientType {
     };
 
     const response = await this.message(options);
-    console.log(response);
     return response?.content[0]?.text || null;
   }
 
@@ -35,18 +34,22 @@ export default class ClaudeClient implements AIClientType {
     systemPrompt: string,
     messages: MessageInput[]
   ): Promise<string> {
-    console.log(tools);
     const options = {
       model: this.claudeAIConfig.model,
       max_tokens: 2000,
       temperature: 0.5,
       system: systemPrompt,
       messages: messages,
-      tools: tools.filter((tool) => tool.name === '_ImageGeneratorTool')
+      tools: tools.map((tool) => {
+        return {
+          name: tool.name,
+          description: tool.description,
+          input_schema: tool.input_schema
+        };
+      })
     };
     const response = await this.message(options);
-    console.log(response);
-    return JSON.parse(response.content[0].text).content;
+    return await this.handleResponse(response);
   }
 
   private async message(options: {
@@ -62,4 +65,30 @@ export default class ClaudeClient implements AIClientType {
 
     return response || null;
   }
+
+  handleResponse = async (response: any) => {
+    const content = response?.content || [];
+    const toolUseItem = content.find(
+      ({ type }: { type: string }) => type === 'tool_use'
+    );
+    const textItem = content.find(
+      ({ type }: { type: string }) => type === 'text'
+    );
+
+    const textResponse = JSON.parse(textItem?.text).content || '';
+
+    if (toolUseItem) {
+      const toolName = toolUseItem.name;
+      const toolToUse = tools.find((tool) => tool.name === toolName);
+
+      if (toolToUse) {
+        await toolToUse.function.function(JSON.stringify(toolUseItem.input));
+      }
+
+      return textResponse;
+    }
+    else {
+      return JSON.parse(content[0]?.text) || '';
+    }
+  };
 }

@@ -12,7 +12,11 @@ export default class DuneTool extends AbstractTool {
   readonly parameters = {
     type: 'object',
     properties: {
-      queryId: { type: 'string' }
+      queryId: {
+        type: 'string',
+        description:
+          'The queryId you want to get the results for. Use the queryId from the dune search results.'
+      }
     }
   };
 
@@ -34,7 +38,8 @@ export default class DuneTool extends AbstractTool {
       const result = await response.json();
       console.log(result);
       return result;
-    } catch (error) {
+    }
+    catch (error) {
       console.error(error);
     }
   };

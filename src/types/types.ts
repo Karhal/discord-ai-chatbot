@@ -18,9 +18,21 @@ type AIToolFunction = {
   function: Function;
 };
 
+type InputSchema = {
+  type: 'object';
+  properties: {
+    location: {
+      type: 'string';
+      description: string;
+    };
+  };
+};
+
 type AITool = {
   type: string;
   name: string;
+  description: string;
+  input_schema: InputSchema;
   function: AIToolFunction;
 };
 
@@ -34,7 +46,6 @@ interface ToolType {
   toolName: string;
   buildTool: () => AITool;
   execute: (...args: string[]) => Promise<any>;
-  description: string;
   isActivated: boolean;
   parameters: {
     type: string;

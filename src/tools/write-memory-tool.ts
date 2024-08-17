@@ -7,12 +7,15 @@ export default class WriteMemoryTool extends AbstractTool {
   public isActivated = true;
 
   readonly description =
-    "Use this tool when the user asks you to remember something. Remember only what the user says from the last message and nothing else, one information at time. Use the same language used by the user. Example : Hey <bot>, remember that I like to eat pizza. Send to the function '<user> like to eat pizza'";
+    'Use this tool when the user asks you to remember something. Remember only what the user says from the last message and nothing else, one information at time. Use the same language used by the user. Example : Hey <bot>, remember that I like to eat pizza. Send to the function \'<user> like to eat pizza\'';
 
   readonly parameters = {
     type: 'object',
     properties: {
-      memoryString: { type: 'string' }
+      memoryString: {
+        type: 'string',
+        description: 'The memory string to remember.'
+      }
     }
   };
 
@@ -41,7 +44,8 @@ export default class WriteMemoryTool extends AbstractTool {
           lastTenLines.join('\n')
         );
       }
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Error reading file:', error);
     }
   };

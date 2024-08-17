@@ -14,7 +14,10 @@ export default class GoogleSearchTool extends AbstractTool {
   public readonly parameters = {
     type: 'object',
     properties: {
-      search: { type: 'string' }
+      search: {
+        type: 'string',
+        description: 'The search you want to get the results for.'
+      }
     }
   };
 
@@ -40,7 +43,8 @@ export default class GoogleSearchTool extends AbstractTool {
       const resultJSON = await response.json();
       console.log(resultJSON);
       return resultJSON;
-    } catch (e) {
+    }
+    catch (e) {
       console.log('err getGoogleSearch', e);
     }
   };

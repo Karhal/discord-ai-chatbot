@@ -11,7 +11,11 @@ export default class CryptoPriceTool extends AbstractTool {
   readonly parameters = {
     type: 'object',
     properties: {
-      asset: { type: 'string' }
+      asset: {
+        type: 'string',
+        description:
+          'The asset you want to get the price for. Use short ticker like BTC, ETH, etc.'
+      }
     }
   };
 
