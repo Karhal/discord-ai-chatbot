@@ -70,9 +70,7 @@ export default class OpenAIClient implements AIClientType {
     const options = {
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
       model: this.openAIConfig.model,
-      tools: tools.filter(
-        (tool) => tool.function.name === '_ImageGeneratorTool'
-      ),
+      tools: tools,
       response_format: { type: 'json_object' }
     };
     console.log(options);
