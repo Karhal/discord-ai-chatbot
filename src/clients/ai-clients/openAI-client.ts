@@ -44,6 +44,7 @@ export default class OpenAIClient implements AIClientType {
       n: 1,
       size: this.imageSize
     });
+    console.log(response);
     return response?.data[0]?.url || null;
   }
 

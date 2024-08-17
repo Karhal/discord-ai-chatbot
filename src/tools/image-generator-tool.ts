@@ -25,8 +25,6 @@ export default class ImageGeneratorTool extends AbstractTool {
   };
 
   readonly execute = async (promptAsString: string) => {
-    console.log(ImageGeneratorTool.name + ' usage');
-
     try {
       const prompt = JSON.parse(promptAsString);
       const client = new OpenAIClient();

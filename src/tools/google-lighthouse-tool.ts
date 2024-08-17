@@ -11,7 +11,7 @@ export default class GoogleLighthouseTool extends AbstractTool {
   readonly parameters = {
     type: 'object',
     properties: {
-      url: { type: 'string' }
+      url: { type: 'string', description: 'The url you want to get the performance for.' }
     },
     required: ['url']
   };

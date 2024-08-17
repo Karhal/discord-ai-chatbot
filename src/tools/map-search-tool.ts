@@ -31,8 +31,14 @@ export default class MapSearchTool extends AbstractTool {
   public readonly parameters = {
     type: 'object',
     properties: {
-      query: { type: 'string' },
-      city: { type: 'string' }
+      query: {
+        type: 'string',
+        description: 'The search you want to get the results for.'
+      },
+      city: {
+        type: 'string',
+        description: 'The city you want to get the results for.'
+      }
     }
   };
 
@@ -53,7 +59,8 @@ export default class MapSearchTool extends AbstractTool {
       const json = await getJson(searchParams);
       console.log('Maps search results:', json);
       return json['local_results'];
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Error fetching maps search results:', error);
       throw new Error('Failed to fetch maps search results');
     }
