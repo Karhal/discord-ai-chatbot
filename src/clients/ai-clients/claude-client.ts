@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { AIClientType } from '../../types/AIClientType';
 import ConfigManager from '../../configManager';
-import { AITool, MessageInput } from '../../types/types';
+import { MessageInput } from '../../types/types';
 import { tools } from './../../tools-manager';
 
 export default class ClaudeClient implements AIClientType {
@@ -60,7 +60,6 @@ export default class ClaudeClient implements AIClientType {
     messages: MessageInput;
   }): Promise<string | null> {
     if (!this.client) return null;
-    console.log(options);
     const response = await this.client.messages.create(options);
 
     return response || null;
@@ -68,6 +67,7 @@ export default class ClaudeClient implements AIClientType {
 
   handleResponse = async (response: any) => {
     const content = response?.content || [];
+    console.log('Content:', content);
     const toolUseItem = content.find(
       ({ type }: { type: string }) => type === 'tool_use'
     );
@@ -75,8 +75,8 @@ export default class ClaudeClient implements AIClientType {
       ({ type }: { type: string }) => type === 'text'
     );
 
-    const textResponse = JSON.parse(textItem?.text).content || '';
-
+    const textResponse = textItem?.text || '';
+    console.log('Is toolUseItem:', toolUseItem);
     if (toolUseItem) {
       const toolName = toolUseItem.name;
       const toolToUse = tools.find((tool) => tool.name === toolName);
@@ -88,7 +88,8 @@ export default class ClaudeClient implements AIClientType {
       return textResponse;
     }
     else {
-      return JSON.parse(content[0]?.text) || '';
+      console.log('simple text response', JSON.parse(content[0]?.text).content);
+      return JSON.parse(content[0]?.text).content || '';
     }
   };
 }
