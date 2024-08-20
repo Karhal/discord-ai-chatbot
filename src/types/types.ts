@@ -38,7 +38,7 @@ type AITool = {
 
 type MessageInput = {
   role: string;
-  content: string;
+  content: string | object;
   channelId?: string;
 };
 
