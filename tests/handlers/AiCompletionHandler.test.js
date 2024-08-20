@@ -2,7 +2,6 @@
 import AiCompletionHandler from './../../src/handlers/ai-completion-handler';
 
 jest.mock('./../../src/clients/ai-client');
-jest.mock('./../../src/tools');
 
 describe('AiCompletionHandler', () => {
   const mockPrompt = 'Test prompt';

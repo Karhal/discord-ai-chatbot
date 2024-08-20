@@ -49,7 +49,7 @@ export default class ClaudeClient implements AIClientType {
       })
     };
     const response = await this.message(options);
-    return await this.handleResponse(response);
+    return await this.handleResponse(response, systemPrompt, messages);
   }
 
   private async message(options: {
@@ -65,27 +65,56 @@ export default class ClaudeClient implements AIClientType {
     return response || null;
   }
 
-  handleResponse = async (response: any) => {
+  handleResponse = async (
+    response: any,
+    systemPrompt: string,
+    messages: MessageInput[]
+  ) => {
     const content = response?.content || [];
     console.log('Content:', content);
     const toolUseItem = content.find(
       ({ type }: { type: string }) => type === 'tool_use'
     );
-    const textItem = content.find(
-      ({ type }: { type: string }) => type === 'text'
-    );
 
-    const textResponse = textItem?.text || '';
     console.log('Is toolUseItem:', toolUseItem);
     if (toolUseItem) {
       const toolName = toolUseItem.name;
+      const toolUseId = toolUseItem.id;
+      const toolArgs = toolUseItem.input;
       const toolToUse = tools.find((tool) => tool.name === toolName);
 
       if (toolToUse) {
-        await toolToUse.function.function(JSON.stringify(toolUseItem.input));
+        const toolResult = await toolToUse.function.function(
+          JSON.stringify(toolArgs)
+        );
+        const assistantMessage: MessageInput = {
+          role: 'assistant',
+          content: [
+            {
+              type: 'tool_use',
+              id: toolUseId,
+              name: toolName,
+              input: toolArgs
+            }
+          ]
+        };
+        messages.push(assistantMessage);
+        const userMessage: MessageInput = {
+          role: 'user',
+          content: [
+            {
+              type: 'tool_result',
+              tool_use_id: toolUseId,
+              content: [{ type: 'text', text: JSON.stringify(toolResult) }]
+            }
+          ]
+        };
+        messages.push(userMessage);
+        console.log('second call message:', userMessage);
+        const result = await this.getAiCompletion(systemPrompt, messages);
+        console.log('second call response:', result);
+        return result;
       }
-
-      return textResponse;
     }
     else {
       console.log('simple text response', JSON.parse(content[0]?.text).content);
