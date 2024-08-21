@@ -18,56 +18,54 @@ class AiCompletionHandler {
   }
 
   async getSummary(channelId: string): Promise<string | null> {
-    const systemPrompt =
-      'Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. \
-      Rely strictly on the provided text. Format the summary in one paragraph form for easy understanding. \
-      The summary has to be the shortest possible (<100 words) and give a good idea of what the discussion is about. \
-      Use the following language: ' +
-      this.discordConfig.lang +
-      '\n\nText:"""';
-
-    const messages = [
-      {
-        role: 'user',
-        content: this.getLastMessagesOfAChannel(15, channelId)
-          .map((msg) => {
-            return msg.content;
-          })
-          .join('\n')
-      }
-    ];
-    const response = await this.aiClient.getSummary(systemPrompt, messages);
-    console.log(response);
-    return response;
+    try {
+      const systemPrompt = this.createSummaryPrompt();
+      const messages = this.getFormattedMessages(5, channelId);
+      return await this.aiClient.getSummary(systemPrompt, messages);
+    }
+    catch (error) {
+      console.error('Error getting AI completion:', error);
+      return 'An error occurred while processing your request.';
+    }
   }
 
-  async getAiCompletion(summary: string, channelId: string): Promise<string> {
+  private getFormattedMessages(count: number, channelId: string): { role: string; content: string }[] {
+    return [{
+      role: 'user',
+      content: this.getLastMessagesOfAChannel(count, channelId)
+        .map(msg => msg.content)
+        .join('\n')
+    }];
+  }
+
+  private createSummaryPrompt(): string {
+    return `Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. 
+      Rely strictly on the provided text. Format the summary in one paragraph form for easy understanding. 
+      The summary has to be the shortest possible (<100 words) and give a good idea of what the discussion is about. 
+      Use the following language: ${this.discordConfig.lang}\n\nText:"""`;
+  }
+
+  private createCompletionPrompt(summary: string): string {
     const memory: string = readMemory();
-    const systemPrompt = `${this.prompt}.\n\n
+    return `${this.prompt}.\n\n
     MEMORY:"""${memory}"""\n
     PREVIOUSLY:"""${summary}"""\n
     NOTE:"""
     - You have to respond to the user in the context of the conversation.
-    - Format your response in a JSON object only with the keys 'content' and the key 'author'.
-    """
-    `;
-    const messages: { role: string; content: string }[] = [
-      {
-        role: 'user',
-        content: this.getLastMessagesOfAChannel(5, channelId)
-          .map((msg) => {
-            return msg.content;
-          })
-          .join('\n')
-      }
-    ];
+    - Format your response in a strictly valid one lined JSON object with the properties 'content' and 'author' only.
+    """`;
+  }
 
-    const content = this.aiClient.getAiCompletion(
-      systemPrompt,
-      messages,
-      tools
-    );
-    return content;
+  async getAiCompletion(summary: string, channelId: string): Promise<string> {
+    try {
+      const systemPrompt = this.createCompletionPrompt(summary);
+      const messages = this.getFormattedMessages(5, channelId);
+      return await this.aiClient.getAiCompletion(systemPrompt, messages, tools);
+    }
+    catch (error) {
+      console.error('Error getting AI completion:', error);
+      return 'An error occurred while processing your request.';
+    }
   }
 
   addMessageToChannel(

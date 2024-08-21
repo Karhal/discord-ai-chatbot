@@ -69,56 +69,35 @@ export default class ClaudeClient implements AIClientType {
     response: any,
     systemPrompt: string,
     messages: MessageInput[]
-  ) => {
+  ): Promise<string> => {
     const content = response?.content || [];
     console.log('Content:', content);
-    const toolUseItem = content.find(
-      ({ type }: { type: string }) => type === 'tool_use'
-    );
 
+    const toolUseItem = content.find((item: { type: string }) => item.type === 'tool_use');
     console.log('Is toolUseItem:', toolUseItem);
-    if (toolUseItem) {
-      const toolName = toolUseItem.name;
-      const toolUseId = toolUseItem.id;
-      const toolArgs = toolUseItem.input;
-      const toolToUse = tools.find((tool) => tool.name === toolName);
 
-      if (toolToUse) {
-        const toolResult = await toolToUse.function.function(
-          JSON.stringify(toolArgs)
-        );
-        const assistantMessage: MessageInput = {
-          role: 'assistant',
-          content: [
-            {
-              type: 'tool_use',
-              id: toolUseId,
-              name: toolName,
-              input: toolArgs
-            }
-          ]
-        };
-        messages.push(assistantMessage);
-        const userMessage: MessageInput = {
-          role: 'user',
-          content: [
-            {
-              type: 'tool_result',
-              tool_use_id: toolUseId,
-              content: [{ type: 'text', text: JSON.stringify(toolResult) }]
-            }
-          ]
-        };
-        messages.push(userMessage);
-        console.log('second call message:', userMessage);
-        const result = await this.getAiCompletion(systemPrompt, messages);
-        console.log('second call response:', result);
-        return result;
-      }
-    }
-    else {
-      console.log('simple text response', JSON.parse(content[0]?.text).content);
+    if (!toolUseItem) {
+      console.log('simple text response', content[0]?.text);
       return JSON.parse(content[0]?.text).content || '';
     }
+
+    const { name: toolName, id: toolUseId, input: toolArgs } = toolUseItem;
+    const toolToUse = tools.find((tool) => tool.name === toolName);
+
+    if (!toolToUse) {
+      return '';
+    }
+
+    const toolResult = await toolToUse.function.function(JSON.stringify(toolArgs));
+
+    messages.push(
+      { role: 'assistant', content: [{ type: 'tool_use', id: toolUseId, name: toolName, input: toolArgs }] },
+      { role: 'user', content: [{ type: 'tool_result', tool_use_id: toolUseId, content: [{ type: 'text', text: JSON.stringify(toolResult) }] }] }
+    );
+
+    console.log('second call message:', messages[messages.length - 1]);
+    const result = await this.getAiCompletion(systemPrompt, messages);
+    console.log('second call response:', result);
+    return result;
   };
 }
