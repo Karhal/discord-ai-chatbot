@@ -51,8 +51,8 @@ class AiCompletionHandler {
     MEMORY:"""${memory}"""\n
     PREVIOUSLY:"""${summary}"""\n
     NOTE:"""
-    - You have to respond to the user in the context of the conversation.
-    - Format your response in a strictly valid one lined JSON object with the properties 'content' and 'author' only.
+    - You have to respond to the user in the context of the conversation. Respond only to the last user message.
+    - Output in JSON format with keys: "content" (your response in a short and clean text, keep the size of an average discord conversation message), "author" (you).
     """`;
   }
 

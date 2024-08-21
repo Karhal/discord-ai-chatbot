@@ -65,39 +65,69 @@ export default class ClaudeClient implements AIClientType {
     return response || null;
   }
 
-  handleResponse = async (
+  private async handleResponse(
     response: any,
     systemPrompt: string,
     messages: MessageInput[]
-  ): Promise<string> => {
+  ): Promise<string> {
     const content = response?.content || [];
     console.log('Content:', content);
 
-    const toolUseItem = content.find((item: { type: string }) => item.type === 'tool_use');
-    console.log('Is toolUseItem:', toolUseItem);
-
+    const toolUseItem = this.findToolUseItem(content);
     if (!toolUseItem) {
-      console.log('simple text response', content[0]?.text);
-      return JSON.parse(content[0]?.text).content || '';
+      return this.handleSimpleTextResponse(content);
     }
 
+    return this.handleToolUseResponse(toolUseItem, systemPrompt, messages);
+  }
+
+  private findToolUseItem(content: any[]): any {
+    return content.find((item: { type: string }) => item.type === 'tool_use');
+  }
+
+  private handleSimpleTextResponse(content: any[]): string {
+    console.log('Simple text response', content[0]?.text);
+    return JSON.parse(content[0]?.text)?.content || '';
+  }
+
+  private async handleToolUseResponse(
+    toolUseItem: any,
+    systemPrompt: string,
+    messages: MessageInput[]
+  ): Promise<string> {
     const { name: toolName, id: toolUseId, input: toolArgs } = toolUseItem;
-    const toolToUse = tools.find((tool) => tool.name === toolName);
+    const toolToUse = this.findTool(toolName);
 
     if (!toolToUse) {
+      console.log(`Tool not found: ${toolName}`);
       return '';
     }
 
-    const toolResult = await toolToUse.function.function(JSON.stringify(toolArgs));
+    const toolResult = await this.executeToolFunction(toolToUse, toolArgs);
+    this.updateMessages(messages, toolUseItem, toolResult);
 
+    return this.getSecondCallResponse(systemPrompt, messages);
+  }
+
+  private findTool(toolName: string): any {
+    return tools.find((tool) => tool.name === toolName);
+  }
+
+  private async executeToolFunction(tool: any, args: any): Promise<any> {
+    return await tool.function.function(JSON.stringify(args));
+  }
+
+  private updateMessages(messages: MessageInput[], toolUseItem: any, toolResult: any): void {
     messages.push(
-      { role: 'assistant', content: [{ type: 'tool_use', id: toolUseId, name: toolName, input: toolArgs }] },
-      { role: 'user', content: [{ type: 'tool_result', tool_use_id: toolUseId, content: [{ type: 'text', text: JSON.stringify(toolResult) }] }] }
+      { role: 'assistant', content: [{ type: 'tool_use', id: toolUseItem.id, name: toolUseItem.name, input: toolUseItem.input }] },
+      { role: 'user', content: [{ type: 'tool_result', tool_use_id: toolUseItem.id, content: [{ type: 'text', text: JSON.stringify(toolResult) }] }] }
     );
+  }
 
-    console.log('second call message:', messages[messages.length - 1]);
+  private async getSecondCallResponse(systemPrompt: string, messages: MessageInput[]): Promise<string> {
+    console.log('Second call message:', messages[messages.length - 1]);
     const result = await this.getAiCompletion(systemPrompt, messages);
-    console.log('second call response:', result);
+    console.log('Second call response:', result);
     return result;
-  };
+  }
 }
