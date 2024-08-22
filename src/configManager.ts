@@ -6,6 +6,7 @@ export interface ConfigType {
   openAI: AiClientConfigType;
   AIPrompt: string;
   claude: AiClientConfigType;
+  mistral: AiClientConfigType;
   dune: DuneConfigType;
   serp: SerpConfigType;
   braveSearch: BraveSearchConfigType;
@@ -18,7 +19,6 @@ export interface ConfigType {
 export interface AiClientConfigType {
   apiKey: string;
   model: string;
-  prompt: string;
   summaryModel: string;
   imageSize: string;
 }
@@ -87,27 +87,26 @@ export default class ConfigManager {
       configValues.openAI.summaryModel ||
       process.env.OPENAI_SUMMARY_MODEL ||
       'gpt-4o-mini',
-    prompt:
-      configValues.openAI.prompt ||
-      process.env.OPENAI_PROMPT ||
-      'You are a nice assistant in a discord server',
     imageSize:
       configValues.openAI.imageSize || process.env.IMAGE_SIZE || '1024x1024'
   };
 
   private claudeConfig: AiClientConfigType = {
     apiKey: configValues.claude.apiKey || process.env.OPENAI_API_KEY,
-    model: configValues.claude.model || process.env.OPENAI_MODEL || 'gpt-4o',
+    model: configValues.claude.model || process.env.OPENAI_MODEL || 'claude-3-5-sonnet-20240620',
     summaryModel:
       configValues.claude.summaryModel ||
       process.env.CLAUDE_SUMMARY_MODEL ||
-      'gpt-4o-mini',
-    prompt:
-      configValues.claude.prompt ||
-      process.env.CLAUDE_PROMPT ||
-      'You are a nice assistant in a discord server',
-    imageSize:
-      configValues.claude.imageSize || process.env.IMAGE_SIZE || '1024x1024'
+      'claude-3-5-sonnet-20240620'
+  };
+
+  private mistralConfig: AiClientConfigType = {
+    apiKey: configValues.mistral.apiKey || process.env.OPENAI_API_KEY,
+    model: configValues.mistral.model || process.env.OPENAI_MODEL || 'mistral-large-latest',
+    summaryModel:
+      configValues.mistral.summaryModel ||
+      process.env.MISTRAL_SUMMARY_MODEL ||
+      'mistral-small-latest'
   };
 
   private discordConfig: DiscordConfigType = {
@@ -179,6 +178,7 @@ export default class ConfigManager {
     discord: this.discordConfig,
     openAI: this.openAIConfig,
     claude: this.claudeConfig,
+    mistral: this.mistralConfig,
     AIPrompt: this.AIPrompt,
     dune: this.duneConfig,
     serp: this.serpConfig,
@@ -215,8 +215,8 @@ export default class ConfigManager {
     if (!this._config.discord.token) {
       throw new Error('No Discord token configured');
     }
-    if (!this._config.openAI.apiKey) {
-      throw new Error('No Open AI key configured');
+    if (!this._config.openAI.apiKey && !this._config.claude.apiKey && !this._config.mistral.apiKey) {
+      throw new Error('No ai client key configured');
     }
     if (this._config.dune?.active && !this._config.dune?.apiKey) {
       throw new Error('No Dune API key configured');

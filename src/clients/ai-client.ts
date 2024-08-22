@@ -3,6 +3,7 @@ import { MessageInput, AITool } from '../types/types';
 import OpenAiClient from './ai-clients/openAI-client';
 import ConfigManager from '../configManager';
 import ClaudeClient from './ai-clients/claude-client';
+import MistralClient from './ai-clients/mistral-client';
 
 export default class AIClient implements AIClientType {
   client: AIClientType | undefined;
@@ -14,6 +15,9 @@ export default class AIClient implements AIClientType {
     }
     else if (ConfigManager.config.aiClient === 'claude') {
       this.client = new ClaudeClient();
+    }
+    else if (ConfigManager.config.aiClient === 'mistral') {
+      this.client = new MistralClient();
     }
     else {
       console.log('AI Client not initialized');

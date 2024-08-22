@@ -21,6 +21,7 @@
     "@discordjs/voice": "latest",
     "@google-cloud/speech": "latest",
     "@google-cloud/text-to-speech": "latest",
+    "@mistralai/mistralai": "^1.0.2",
     "discord.js": "latest",
     "openai": "latest",
     "serpapi": "latest"
