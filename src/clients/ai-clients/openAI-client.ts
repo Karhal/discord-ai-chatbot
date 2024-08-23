@@ -44,7 +44,6 @@ export default class OpenAIClient implements AIClientType {
       n: 1,
       size: this.imageSize
     });
-    console.log(response);
     return response?.data[0]?.url || null;
   }
 
@@ -65,19 +64,14 @@ export default class OpenAIClient implements AIClientType {
     systemPrompt: string,
     messages: MessageInput[]
   ): Promise<string> {
-    tools.forEach((tool) => {
-      console.log(tool);
-    });
     const options = {
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
       model: this.openAIConfig.model,
       tools: tools,
       response_format: { type: 'json_object' }
     };
-    console.log(options);
     const runner = this.client.beta.chat.completions.runTools(options);
     const response = await runner.finalContent();
-    console.log('response', response);
     return JSON.parse(response as string).content;
   }
 }

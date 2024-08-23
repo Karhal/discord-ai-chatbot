@@ -38,7 +38,8 @@ export default class GoogleLighthouseTool extends AbstractTool {
     if (result.status === 200) {
       const resultJSON = await result.json();
       report = this.buildReport(resultJSON);
-    } else {
+    }
+    else {
       console.log('Error tools checkLighthouse', JSON.stringify(result));
     }
 

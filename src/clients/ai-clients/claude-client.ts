@@ -67,8 +67,6 @@ export default class ClaudeClient implements AIClientType {
     systemPrompt: string,
     messages: MessageInput[]
   ): Promise<string> {
-    console.log('Response:', response);
-
     const toolUseItem = this.findToolUseItem(response);
     if (!toolUseItem) {
       return this.handleSimpleTextResponse(response);
@@ -84,7 +82,6 @@ export default class ClaudeClient implements AIClientType {
 
   private handleSimpleTextResponse(message: Anthropic.Message): string {
     const content = message.content[0].text;
-    console.log('Simple text response', content);
     return JSON.parse(content)?.content || '';
   }
 
@@ -97,7 +94,6 @@ export default class ClaudeClient implements AIClientType {
     const toolToUse = this.findTool(toolName);
 
     if (!toolToUse) {
-      console.log(`Tool not found: ${toolName}`);
       return '';
     }
 
@@ -123,9 +119,7 @@ export default class ClaudeClient implements AIClientType {
   }
 
   private async getSecondCallResponse(systemPrompt: string, messages: MessageInput[]): Promise<string> {
-    console.log('Second call message:', messages[messages.length - 1]);
     const result = await this.getAiCompletion(systemPrompt, messages);
-    console.log('Second call response:', result);
     return result;
   }
 }
