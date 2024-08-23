@@ -4,6 +4,7 @@ import AbstractTool from './absract-tool';
 export default class CryptoPriceTool extends AbstractTool {
   readonly toolName = CryptoPriceTool.name;
   private defaultAsset = ConfigManager.config.coin.defaultAsset;
+  readonly isActivated = ConfigManager.config.coin.active;
 
   readonly description =
     'use this tool only when you need to get the price of an asset. Use short ticker like BTC, ETH, etc.';
@@ -21,7 +22,6 @@ export default class CryptoPriceTool extends AbstractTool {
 
   readonly execute = async (query: string) => {
     const queryParameters = JSON.parse(query);
-    console.log(queryParameters);
     const myHeaders = new Headers();
     myHeaders.append('Accept', 'text/plain');
     myHeaders.append('X-CoinAPI-Key', ConfigManager.config.coin.apiKey);

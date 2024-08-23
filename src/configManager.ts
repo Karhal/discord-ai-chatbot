@@ -197,7 +197,6 @@ export default class ConfigManager {
     }
 
     this._instance = new ConfigManager();
-    console.log('Init config manager');
     this._instance.validateConfigIntegrity();
 
     return this._instance;

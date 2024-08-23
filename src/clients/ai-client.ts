@@ -10,10 +10,11 @@ export default class AIClient implements AIClientType {
   constructor() {
     if (ConfigManager.config.aiClient === 'openAI') {
       this.client = new OpenAiClient();
-      console.log('AI Client initialized');
+      console.log('OpenAI Client initialized');
     }
     else if (ConfigManager.config.aiClient === 'claude') {
       this.client = new ClaudeClient();
+      console.log('Claude Client initialized');
     }
     else {
       console.log('AI Client not initialized');

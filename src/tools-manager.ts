@@ -14,13 +14,11 @@ toolList.forEach((toolClass) => {
 });
 
 const readMemory = () => {
-  console.log('READ MEMORY in ' + WriteMemoryTool.MEMORY_FILE);
   const memoryFilePath = `./${WriteMemoryTool.MEMORY_FILE}`;
   if (!fs.existsSync(memoryFilePath)) {
     fs.writeFileSync(memoryFilePath, '', 'utf8');
   }
   const memoryData = fs.readFileSync(memoryFilePath, 'utf8');
-  console.log('memory :' + memoryData);
   return memoryData;
 };
 

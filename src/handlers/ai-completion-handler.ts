@@ -21,6 +21,7 @@ class AiCompletionHandler {
     try {
       const systemPrompt = this.createSummaryPrompt();
       const messages = this.getFormattedMessages(5, channelId);
+      console.log('Fetch summary args:', systemPrompt, messages);
       return await this.aiClient.getSummary(systemPrompt, messages);
     }
     catch (error) {
@@ -42,15 +43,15 @@ class AiCompletionHandler {
     return `Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. 
       Rely strictly on the provided text. Format the summary in one paragraph form for easy understanding. 
       The summary has to be the shortest possible (<100 words) and give a good idea of what the discussion is about. 
-      Use the following language: ${this.discordConfig.lang}\n\nText:"""`;
+      Use the following language: ${this.discordConfig.lang}\n\n"""Text:`;
   }
 
   private createCompletionPrompt(summary: string): string {
     const memory: string = readMemory();
     return `${this.prompt}.\n\n
-    MEMORY:"""${memory}"""\n
-    PREVIOUSLY:"""${summary}"""\n
-    NOTE:"""
+    """MEMORY:${memory}"""\n
+    """PREVIOUSLY:${summary}"""\n
+    """NOTE:
     - You have to respond to the user in the context of the conversation. Respond only to the last user message.
     - Output in JSON format with keys: "content" (your response in a short and clean text, keep the size of an average discord conversation message), "author" (you).
     """`;
@@ -60,6 +61,8 @@ class AiCompletionHandler {
     try {
       const systemPrompt = this.createCompletionPrompt(summary);
       const messages = this.getFormattedMessages(5, channelId);
+      console.log('Fetch completion args:', systemPrompt, messages);
+
       return await this.aiClient.getAiCompletion(systemPrompt, messages, tools);
     }
     catch (error) {
