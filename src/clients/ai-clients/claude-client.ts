@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { AIClientType } from '../../types/AIClientType';
 import ConfigManager from '../../configManager';
-import { MessageInput } from '../../types/types';
+import { AITool, MessageInput } from '../../types/types';
 import { tools } from './../../tools-manager';
 
 export default class ClaudeClient implements AIClientType {
@@ -26,7 +26,7 @@ export default class ClaudeClient implements AIClientType {
       messages: messages
     };
 
-    const response = await this.message(options);
+    const response: Anthropic.Message = await this.message(options);
     return response?.content[0]?.text || null;
   }
 
@@ -48,17 +48,11 @@ export default class ClaudeClient implements AIClientType {
         };
       })
     };
-    const response = await this.message(options);
+    const response: Anthropic.Message = await this.message(options);
     return await this.handleResponse(response, systemPrompt, messages);
   }
 
-  private async message(options: {
-    model: string;
-    max_tokens: number;
-    temperature: number;
-    system: string;
-    messages: MessageInput;
-  }): Promise<string | null> {
+  private async message(options: Anthropic.MessageCreateParams ): Promise<string | null> {
     if (!this.client) return null;
     const response = await this.client.messages.create(options);
 
@@ -92,7 +86,7 @@ export default class ClaudeClient implements AIClientType {
   }
 
   private async handleToolUseResponse(
-    toolUseItem: any,
+    toolUseItem: Anthropic.ToolUseBlock,
     systemPrompt: string,
     messages: MessageInput[]
   ): Promise<string> {
@@ -110,15 +104,15 @@ export default class ClaudeClient implements AIClientType {
     return this.getSecondCallResponse(systemPrompt, messages);
   }
 
-  private findTool(toolName: string): any {
+  private findTool(toolName: string): AITool {
     return tools.find((tool) => tool.name === toolName);
   }
 
-  private async executeToolFunction(tool: any, args: any): Promise<any> {
+  private async executeToolFunction(tool: AITool, args: object): Promise<any> {
     return await tool.function.function(JSON.stringify(args));
   }
 
-  private updateMessages(messages: MessageInput[], toolUseItem: any, toolResult: any): void {
+  private updateMessages(messages: MessageInput[], toolUseItem: Anthropic.ToolUseBlock, toolResult: object): void {
     messages.push(
       { role: 'assistant', content: [{ type: 'tool_use', id: toolUseItem.id, name: toolUseItem.name, input: toolUseItem.input }] },
       { role: 'user', content: [{ type: 'tool_result', tool_use_id: toolUseItem.id, content: [{ type: 'text', text: JSON.stringify(toolResult) }] }] }
