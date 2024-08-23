@@ -66,28 +66,29 @@ export default class ClaudeClient implements AIClientType {
   }
 
   private async handleResponse(
-    response: any,
+    response: Anthropic.Message,
     systemPrompt: string,
     messages: MessageInput[]
   ): Promise<string> {
-    const content = response?.content || [];
-    console.log('Content:', content);
+    console.log('Response:', response);
 
-    const toolUseItem = this.findToolUseItem(content);
+    const toolUseItem = this.findToolUseItem(response);
     if (!toolUseItem) {
-      return this.handleSimpleTextResponse(content);
+      return this.handleSimpleTextResponse(response);
     }
 
     return this.handleToolUseResponse(toolUseItem, systemPrompt, messages);
   }
 
-  private findToolUseItem(content: any[]): any {
+  private findToolUseItem(message: Anthropic.Message): any {
+    const content = message.content;
     return content.find((item: { type: string }) => item.type === 'tool_use');
   }
 
-  private handleSimpleTextResponse(content: any[]): string {
-    console.log('Simple text response', content[0]?.text);
-    return JSON.parse(content[0]?.text)?.content || '';
+  private handleSimpleTextResponse(message: Anthropic.Message): string {
+    const content = message.content[0].text;
+    console.log('Simple text response', content);
+    return JSON.parse(content)?.content || '';
   }
 
   private async handleToolUseResponse(
