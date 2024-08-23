@@ -18,15 +18,16 @@ export default class ClaudeClient implements AIClientType {
     systemPrompt: string,
     messages: MessageInput[]
   ): Promise<string | null> {
-    const options = {
+    const options: Anthropic.MessageCreateParams = {
       model: this.claudeAIConfig.summaryModel,
-      max_tokens: 2000,
-      temperature: 0.5,
+      max_tokens: this.claudeAIConfig.maxTokens,
+      temperature: this.claudeAIConfig.temperature,
       system: systemPrompt,
-      messages: messages
+      messages: messages,
+      stream: false
     };
 
-    const response: Anthropic.Message = await this.message(options);
+    const response = await this.message(options);
     return response?.content[0]?.text || null;
   }
 
@@ -34,12 +35,13 @@ export default class ClaudeClient implements AIClientType {
     systemPrompt: string,
     messages: MessageInput[]
   ): Promise<string> {
-    const options = {
+    const options: Anthropic.MessageCreateParams = {
       model: this.claudeAIConfig.model,
-      max_tokens: 2000,
-      temperature: 0.5,
+      max_tokens: this.claudeAIConfig.maxTokens,
+      temperature: this.claudeAIConfig.temperature,
       system: systemPrompt,
       messages: messages,
+      stream: false,
       tools: tools.map((tool) => {
         return {
           name: tool.name,
@@ -48,11 +50,12 @@ export default class ClaudeClient implements AIClientType {
         };
       })
     };
+
     const response: Anthropic.Message = await this.message(options);
     return await this.handleResponse(response, systemPrompt, messages);
   }
 
-  private async message(options: Anthropic.MessageCreateParams ): Promise<string | null> {
+  private async message(options: Anthropic.MessageCreateParams ): Promise<Anthropic.Message | null> {
     if (!this.client) return null;
     const response = await this.client.messages.create(options);
 
@@ -104,7 +107,7 @@ export default class ClaudeClient implements AIClientType {
     return this.getSecondCallResponse(systemPrompt, messages);
   }
 
-  private findTool(toolName: string): AITool {
+  private findTool(toolName: string): AITool | undefined {
     return tools.find((tool) => tool.name === toolName);
   }
 

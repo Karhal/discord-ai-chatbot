@@ -3,9 +3,9 @@ import configValues from './config';
 export interface ConfigType {
   aiClient: string;
   discord: DiscordConfigType;
-  openAI: AiClientConfigType;
+  openAI: OpenAIClientConfigType;
   AIPrompt: string;
-  claude: AiClientConfigType;
+  claude: ClaudeClientConfigType;
   dune: DuneConfigType;
   serp: SerpConfigType;
   braveSearch: BraveSearchConfigType;
@@ -15,12 +15,21 @@ export interface ConfigType {
   tmpFolder: TmpFolderConfigType;
 }
 
-export interface AiClientConfigType {
+export interface OpenAIClientConfigType {
   apiKey: string;
   model: string;
-  prompt: string;
   summaryModel: string;
+  temperature: number;
+  maxTokens: number;
   imageSize: string;
+}
+
+export interface ClaudeClientConfigType {
+  apiKey: string;
+  model: string;
+  summaryModel: string;
+  temperature: number;
+  maxTokens: number;
 }
 
 export interface DiscordConfigType {
@@ -80,34 +89,28 @@ export default class ConfigManager {
     process.env.AI_PROMPT ||
     'You are a nice assistant in a discord server';
 
-  private openAIConfig: AiClientConfigType = {
-    apiKey: configValues.openAI.apiKey || process.env.OPENAI_API_KEY,
+  private openAIConfig: OpenAIClientConfigType = {
+    apiKey: configValues.openAI.apiKey || process.env.OPENAI_API_KEY || '',
     model: configValues.openAI.model || process.env.OPENAI_MODEL || 'gpt-4o',
     summaryModel:
       configValues.openAI.summaryModel ||
       process.env.OPENAI_SUMMARY_MODEL ||
       'gpt-4o-mini',
-    prompt:
-      configValues.openAI.prompt ||
-      process.env.OPENAI_PROMPT ||
-      'You are a nice assistant in a discord server',
     imageSize:
-      configValues.openAI.imageSize || process.env.IMAGE_SIZE || '1024x1024'
+      configValues.openAI.imageSize || process.env.IMAGE_SIZE || '1024x1024',
+    maxTokens: configValues.openAI.maxTokens || (process.env.OPENAI_MAX_TOKENS ? parseInt(process.env.OPENAI_MAX_TOKENS) : 2000),
+    temperature: configValues.openAI.temperature || (process.env.OPENAI_TEMPERATURE ? parseFloat(process.env.OPENAI_TEMPERATURE) : 0.5)
   };
 
-  private claudeConfig: AiClientConfigType = {
-    apiKey: configValues.claude.apiKey || process.env.OPENAI_API_KEY,
-    model: configValues.claude.model || process.env.OPENAI_MODEL || 'gpt-4o',
+  private claudeConfig: ClaudeClientConfigType = {
+    apiKey: configValues.claude.apiKey || process.env.CLAUDE_API_KEY || '',
+    model: configValues.claude.model || process.env.CLAUDE_MODEL || 'claude-3-5-sonnet-20240620',
     summaryModel:
       configValues.claude.summaryModel ||
       process.env.CLAUDE_SUMMARY_MODEL ||
-      'gpt-4o-mini',
-    prompt:
-      configValues.claude.prompt ||
-      process.env.CLAUDE_PROMPT ||
-      'You are a nice assistant in a discord server',
-    imageSize:
-      configValues.claude.imageSize || process.env.IMAGE_SIZE || '1024x1024'
+      'claude-3-haiku-20240307',
+    maxTokens: configValues.claude.maxTokens || (process.env.CLAUDE_MAX_TOKENS ? parseInt(process.env.CLAUDE_MAX_TOKENS) : 2000),
+    temperature: configValues.claude.temperature || (process.env.CLAUDE_TEMPERATURE ? parseFloat(process.env.CLAUDE_TEMPERATURE) : 0.5)
   };
 
   private discordConfig: DiscordConfigType = {
@@ -120,13 +123,13 @@ export default class ConfigManager {
   };
 
   private duneConfig: DuneConfigType = {
-    active: configValues.dune.active || process.env.DUNE_ACTIVE || false,
-    apiKey: configValues.dune.apiKey || process.env.DUNE_API_KEY
+    active: configValues.dune.active || process.env.DUNE_ACTIVE === 'true' || false,
+    apiKey: configValues.dune.apiKey || process.env.DUNE_API_KEY || ''
   };
 
   private serpConfig: SerpConfigType = {
-    active: configValues.serp.active || process.env.SERP_ACTIVE || false,
-    apiKey: configValues.serp.apiKey || process.env.SERP_API_KEY,
+    active: configValues.serp.active || process.env.SERP_ACTIVE === 'true' || false,
+    apiKey: configValues.serp.apiKey ?? process.env.SERP_API_KEY ?? '',
     lang: configValues.serp.lang || process.env.SERP_LANG || 'en',
     google_domain:
       configValues.serp.google_domain || process.env.SERP_GOOGLE_DOMAIN || '',
@@ -137,15 +140,15 @@ export default class ConfigManager {
   private braveSearchConfig: BraveSearchConfigType = {
     active:
       configValues.braveSearch.active ||
-      process.env.BRAVE_SEARCH_ACTIVE ||
+      process.env.BRAVE_SEARCH_ACTIVE === 'true' ||
       false,
-    apiKey: configValues.braveSearch.apiKey || process.env.BRAVE_SEARCH_API_KEY,
+    apiKey: configValues.braveSearch.apiKey ?? process.env.BRAVE_SEARCH_API_KEY ?? '',
     lang: configValues.braveSearch.lang || process.env.BRAVE_SEARCH_LANG || 'en'
   };
 
   private coinConfig: CoinConfigType = {
-    active: configValues.coin.active || process.env.COIN_ACTIVE || false,
-    apiKey: configValues.coin.apiKey || process.env.COIN_API_KEY,
+    active: configValues.coin.active || process.env.COIN_ACTIVE === 'true' || false,
+    apiKey: configValues.coin.apiKey ?? process.env.COIN_API_KEY ?? '',
     defaultAsset:
       configValues.coin.defaultAsset || process.env.COIN_DEFAULT_ASSET || 'USD'
   };
@@ -158,20 +161,19 @@ export default class ConfigManager {
   private lighthouseConfig: LighthouseConfigType = {
     active:
       configValues.googleLighthouse.active ||
-      process.env.LIGHTHOUSE_ACTIVE ||
+      process.env.LIGHTHOUSE_ACTIVE === 'true' ||
       false,
     apiKey:
-      configValues.googleLighthouse.apiKey || process.env.LIGHTHOUSE_API_KEY
+      configValues.googleLighthouse.apiKey ?? process.env.LIGHTHOUSE_API_KEY ?? ''
   };
 
   private googleSearchConfig: GoogleSearchConfigType = {
     active:
       configValues.googleSearch.active ||
-      process.env.GOOGLE_SEARCH_ACTIVE ||
+      process.env.GOOGLE_SEARCH_ACTIVE === 'true' ||
       false,
-    apiKey:
-      configValues.googleSearch.apiKey || process.env.GOOGLE_SEARCH_API_KEY,
-    cx: configValues.googleSearch.cx || process.env.GOOGLE_SEARCH_CX
+    apiKey: configValues.googleSearch.apiKey ?? process.env.GOOGLE_SEARCH_API_KEY ?? '',
+    cx: configValues.googleSearch.cx ?? process.env.GOOGLE_SEARCH_CX ?? ''
   };
 
   private _config: ConfigType = {
