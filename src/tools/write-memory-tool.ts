@@ -44,6 +44,7 @@ export default class WriteMemoryTool extends AbstractTool {
           lastTenLines.join('\n')
         );
       }
+      return JSON.stringify({ memory_tool_success: true });
     }
     catch (error) {
       console.error('Error reading file:', error);
