@@ -2,6 +2,7 @@ import AbstractTool from './absract-tool';
 import BraveSearchTool from './brave-search-tool';
 import CryptoPriceTool from './crypto-price-tool';
 import DuneTool from './dune-tool';
+import FluxGeneratorTool from './flux-generator-tool';
 import GoogleLighthouseTool from './google-lighthouse-tool';
 import GoogleSearchTool from './google-search-tool';
 import ImageGeneratorTool from './image-generator-tool';
@@ -18,7 +19,8 @@ const toolList: (typeof AbstractTool)[] = [
   MapSearchTool,
   CryptoPriceTool,
   SerpSearchTool,
-  GoogleLighthouseTool
+  GoogleLighthouseTool,
+  FluxGeneratorTool
 ];
 
 export default toolList;

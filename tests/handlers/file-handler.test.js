@@ -41,6 +41,10 @@ jest.mock('./../../src/config', () => {
       active: false,
       apiKey: ''
     },
+    fluxApi: {
+      active: false,
+      apiKey: ''
+    },
     googleSearch: {
       active: false,
       apiKey: '',

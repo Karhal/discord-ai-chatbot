@@ -12,6 +12,7 @@ export interface ConfigType {
   coin: CoinConfigType;
   googleLighthouse: LighthouseConfigType;
   googleSearch: GoogleSearchConfigType;
+  fluxApi: FluxApiConfigType;
   tmpFolder: TmpFolderConfigType;
 }
 
@@ -68,6 +69,10 @@ export interface LighthouseConfigType extends ActivatorConfigType {
   apiKey: string;
 }
 
+export interface FluxApiConfigType extends ActivatorConfigType {
+  apiKey: string;
+}
+
 export interface GoogleSearchConfigType extends ActivatorConfigType {
   apiKey: string;
   cx: string;
@@ -98,19 +103,38 @@ export default class ConfigManager {
       'gpt-4o-mini',
     imageSize:
       configValues.openAI.imageSize || process.env.IMAGE_SIZE || '1024x1024',
-    maxTokens: configValues.openAI.maxTokens || (process.env.OPENAI_MAX_TOKENS ? parseInt(process.env.OPENAI_MAX_TOKENS) : 2000),
-    temperature: configValues.openAI.temperature || (process.env.OPENAI_TEMPERATURE ? parseFloat(process.env.OPENAI_TEMPERATURE) : 0.5)
+    maxTokens:
+      configValues.openAI.maxTokens ||
+      (process.env.OPENAI_MAX_TOKENS
+        ? parseInt(process.env.OPENAI_MAX_TOKENS)
+        : 2000),
+    temperature:
+      configValues.openAI.temperature ||
+      (process.env.OPENAI_TEMPERATURE
+        ? parseFloat(process.env.OPENAI_TEMPERATURE)
+        : 0.5)
   };
 
   private claudeConfig: ClaudeClientConfigType = {
     apiKey: configValues.claude.apiKey || process.env.CLAUDE_API_KEY || '',
-    model: configValues.claude.model || process.env.CLAUDE_MODEL || 'claude-3-5-sonnet-20240620',
+    model:
+      configValues.claude.model ||
+      process.env.CLAUDE_MODEL ||
+      'claude-3-5-sonnet-20240620',
     summaryModel:
       configValues.claude.summaryModel ||
       process.env.CLAUDE_SUMMARY_MODEL ||
       'claude-3-haiku-20240307',
-    maxTokens: configValues.claude.maxTokens || (process.env.CLAUDE_MAX_TOKENS ? parseInt(process.env.CLAUDE_MAX_TOKENS) : 2000),
-    temperature: configValues.claude.temperature || (process.env.CLAUDE_TEMPERATURE ? parseFloat(process.env.CLAUDE_TEMPERATURE) : 0.5)
+    maxTokens:
+      configValues.claude.maxTokens ||
+      (process.env.CLAUDE_MAX_TOKENS
+        ? parseInt(process.env.CLAUDE_MAX_TOKENS)
+        : 2000),
+    temperature:
+      configValues.claude.temperature ||
+      (process.env.CLAUDE_TEMPERATURE
+        ? parseFloat(process.env.CLAUDE_TEMPERATURE)
+        : 0.5)
   };
 
   private discordConfig: DiscordConfigType = {
@@ -123,12 +147,14 @@ export default class ConfigManager {
   };
 
   private duneConfig: DuneConfigType = {
-    active: configValues.dune.active || process.env.DUNE_ACTIVE === 'true' || false,
+    active:
+      configValues.dune.active || process.env.DUNE_ACTIVE === 'true' || false,
     apiKey: configValues.dune.apiKey || process.env.DUNE_API_KEY || ''
   };
 
   private serpConfig: SerpConfigType = {
-    active: configValues.serp.active || process.env.SERP_ACTIVE === 'true' || false,
+    active:
+      configValues.serp.active || process.env.SERP_ACTIVE === 'true' || false,
     apiKey: configValues.serp.apiKey ?? process.env.SERP_API_KEY ?? '',
     lang: configValues.serp.lang || process.env.SERP_LANG || 'en',
     google_domain:
@@ -142,12 +168,14 @@ export default class ConfigManager {
       configValues.braveSearch.active ||
       process.env.BRAVE_SEARCH_ACTIVE === 'true' ||
       false,
-    apiKey: configValues.braveSearch.apiKey ?? process.env.BRAVE_SEARCH_API_KEY ?? '',
+    apiKey:
+      configValues.braveSearch.apiKey ?? process.env.BRAVE_SEARCH_API_KEY ?? '',
     lang: configValues.braveSearch.lang || process.env.BRAVE_SEARCH_LANG || 'en'
   };
 
   private coinConfig: CoinConfigType = {
-    active: configValues.coin.active || process.env.COIN_ACTIVE === 'true' || false,
+    active:
+      configValues.coin.active || process.env.COIN_ACTIVE === 'true' || false,
     apiKey: configValues.coin.apiKey ?? process.env.COIN_API_KEY ?? '',
     defaultAsset:
       configValues.coin.defaultAsset || process.env.COIN_DEFAULT_ASSET || 'USD'
@@ -164,7 +192,9 @@ export default class ConfigManager {
       process.env.LIGHTHOUSE_ACTIVE === 'true' ||
       false,
     apiKey:
-      configValues.googleLighthouse.apiKey ?? process.env.LIGHTHOUSE_API_KEY ?? ''
+      configValues.googleLighthouse.apiKey ??
+      process.env.LIGHTHOUSE_API_KEY ??
+      ''
   };
 
   private googleSearchConfig: GoogleSearchConfigType = {
@@ -172,8 +202,19 @@ export default class ConfigManager {
       configValues.googleSearch.active ||
       process.env.GOOGLE_SEARCH_ACTIVE === 'true' ||
       false,
-    apiKey: configValues.googleSearch.apiKey ?? process.env.GOOGLE_SEARCH_API_KEY ?? '',
+    apiKey:
+      configValues.googleSearch.apiKey ??
+      process.env.GOOGLE_SEARCH_API_KEY ??
+      '',
     cx: configValues.googleSearch.cx ?? process.env.GOOGLE_SEARCH_CX ?? ''
+  };
+
+  private fluxApiConfig: FluxApiConfigType = {
+    active:
+      configValues.fluxApi.active ||
+      process.env.FLUX_API_ACTIVE === 'true' ||
+      false,
+    apiKey: configValues.fluxApi.apiKey ?? process.env.FLUX_API_KEY ?? ''
   };
 
   private _config: ConfigType = {
@@ -188,6 +229,7 @@ export default class ConfigManager {
     coin: this.coinConfig,
     googleSearch: this.googleSearchConfig,
     googleLighthouse: this.lighthouseConfig,
+    fluxApi: this.fluxApiConfig,
     tmpFolder: this.tmpFolderConfig
   };
 

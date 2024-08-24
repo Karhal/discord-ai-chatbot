@@ -1,11 +1,14 @@
-import OpenAIClient from '../clients/ai-clients/openAI-client';
 import ImageHandler from '../handlers/image-handler';
 import AbstractTool from './absract-tool';
 import ConfigManager from '../configManager';
-
-export default class ImageGeneratorTool extends AbstractTool {
-  readonly toolName = ImageGeneratorTool.name;
-  public isActivated = !ConfigManager.config.fluxApi.active;
+import * as fal from '@fal-ai/serverless-client';
+console.log(ConfigManager.config);
+fal.config({
+  credentials: ConfigManager.config.fluxApi.apiKey
+});
+export default class FluxGeneratorTool extends AbstractTool {
+  readonly toolName = FluxGeneratorTool.name;
+  public isActivated = ConfigManager.config.fluxApi.active;
 
   readonly description =
     'Use this tool only when the user asks you to draw or to show a picture of something in the last message. \
@@ -28,13 +31,30 @@ export default class ImageGeneratorTool extends AbstractTool {
   readonly execute = async (promptAsString: string) => {
     try {
       const prompt = JSON.parse(promptAsString);
-      const client = new OpenAIClient();
+
       const imageHandler = new ImageHandler();
 
-      const imgUrl = await client.generateImage(prompt.imagePrompt);
-      if (imgUrl) {
-        await imageHandler.downloadImages([imgUrl]);
-      }
+      const result = await fal.subscribe('fal-ai/flux/dev', {
+        input: {
+          prompt: prompt.imagePrompt,
+          enable_safety_checker: false
+        },
+        logs: true,
+        onQueueUpdate: (update) => {
+          if (update.status === 'IN_PROGRESS') {
+            update.logs.map((log) => log.message).forEach(console.log);
+          }
+        }
+      });
+
+      console.log(result);
+
+      const imgUrls = result.images.map((element) => {
+        return element.url;
+      });
+
+      await imageHandler.downloadImages(imgUrls);
+
       return JSON.stringify({ image_ready: true });
     } catch (error: unknow) {
       console.log(error);
