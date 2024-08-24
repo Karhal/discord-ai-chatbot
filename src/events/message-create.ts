@@ -10,26 +10,6 @@ export default class MessageCreate extends EventDiscord {
   intervalDate: NodeJS.Timeout | null = null;
   message: Message | null = null;
 
-  sendTyping = (message: Message) => {
-    if (this.intervalDate) {
-      this.endTyping();
-    }
-    this.message = message;
-    this.message.channel.sendTyping();
-    this.intervalDate = setInterval(() => {
-      if (this.message) {
-        this.message.channel.sendTyping();
-      }
-    }, 4500);
-  };
-
-  endTyping = () => {
-    if (this.intervalDate) clearInterval(this.intervalDate);
-    if (this.message) {
-      this.message = null;
-    }
-  };
-
   handler = async (message: Message): Promise<void> => {
     const maxHistory: number = ConfigManager.config.discord.maxHistory;
     if (
@@ -38,8 +18,6 @@ export default class MessageCreate extends EventDiscord {
     ) {
       return;
     }
-
-    this.sendTyping(message);
 
     const channelId: string = message.channelId;
     const messagesChannelHistory: Collection<
@@ -56,9 +34,10 @@ export default class MessageCreate extends EventDiscord {
     );
 
     aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
-
+    message.channel.sendTyping();
     const summary = await aiCompletionHandler.getSummary(channelId);
     if (summary) {
+      message.channel.sendTyping();
       const content = await aiCompletionHandler.getAiCompletion(
         summary,
         channelId
@@ -66,8 +45,6 @@ export default class MessageCreate extends EventDiscord {
 
       await this.sendResponse(message, content);
     }
-
-    this.endTyping();
     console.log('Done.');
   };
 
