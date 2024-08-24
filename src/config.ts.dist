@@ -50,6 +50,10 @@ export default {
         active: false,
         apiKey : ""
     },
+    fluxApi : {
+        active: false,
+        apiKey : ""
+    },
     googleSearch : {
         active: false,
         apiKey: "",
