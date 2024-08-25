@@ -5,14 +5,14 @@ import DuneTool from './dune-tool';
 import FluxGeneratorTool from './flux-generator-tool';
 import GoogleLighthouseTool from './google-lighthouse-tool';
 import GoogleSearchTool from './google-search-tool';
-import ImageGeneratorTool from './image-generator-tool';
+import DallETool from './dalle-tool';
 import MapSearchTool from './map-search-tool';
 import SerpSearchTool from './serp-search-tool';
 import WriteMemoryTool from './write-memory-tool';
 
 const toolList: (typeof AbstractTool)[] = [
   WriteMemoryTool,
-  ImageGeneratorTool,
+  DallETool,
   BraveSearchTool,
   DuneTool,
   GoogleSearchTool,
