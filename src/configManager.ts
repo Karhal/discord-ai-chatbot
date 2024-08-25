@@ -4,6 +4,7 @@ export interface ConfigType {
   aiClient: string;
   discord: DiscordConfigType;
   openAI: OpenAIClientConfigType;
+  dallE: DallEConfigType;
   AIPrompt: string;
   claude: ClaudeClientConfigType;
   dune: DuneConfigType;
@@ -22,9 +23,7 @@ export interface OpenAIClientConfigType {
   summaryModel: string;
   temperature: number;
   maxTokens: number;
-  imageSize: string;
 }
-
 export interface ClaudeClientConfigType {
   apiKey: string;
   model: string;
@@ -72,7 +71,10 @@ export interface LighthouseConfigType extends ActivatorConfigType {
 export interface FluxApiConfigType extends ActivatorConfigType {
   apiKey: string;
 }
-
+export interface DallEConfigType extends ActivatorConfigType {
+  apiKey: string;
+  imageSize: string;
+}
 export interface GoogleSearchConfigType extends ActivatorConfigType {
   apiKey: string;
   cx: string;
@@ -94,6 +96,12 @@ export default class ConfigManager {
     process.env.AI_PROMPT ||
     'You are a nice assistant in a discord server';
 
+  private dallEConfig: DallEConfigType = {
+    active: configValues.dallE.active || process.env.DALLE_ACTIVE === 'true' || false,
+    apiKey: configValues.dallE.apiKey || process.env.DALLE_API_KEY || '',
+    imageSize: configValues.dallE.imageSize || process.env.IMAGE_SIZE || '1024x1024'
+  };
+
   private openAIConfig: OpenAIClientConfigType = {
     apiKey: configValues.openAI.apiKey || process.env.OPENAI_API_KEY || '',
     model: configValues.openAI.model || process.env.OPENAI_MODEL || 'gpt-4o',
@@ -101,8 +109,6 @@ export default class ConfigManager {
       configValues.openAI.summaryModel ||
       process.env.OPENAI_SUMMARY_MODEL ||
       'gpt-4o-mini',
-    imageSize:
-      configValues.openAI.imageSize || process.env.IMAGE_SIZE || '1024x1024',
     maxTokens:
       configValues.openAI.maxTokens ||
       (process.env.OPENAI_MAX_TOKENS
@@ -230,6 +236,7 @@ export default class ConfigManager {
     googleSearch: this.googleSearchConfig,
     googleLighthouse: this.lighthouseConfig,
     fluxApi: this.fluxApiConfig,
+    dallE: this.dallEConfig,
     tmpFolder: this.tmpFolderConfig
   };
 
@@ -288,6 +295,12 @@ export default class ConfigManager {
       (!this._config.googleSearch?.apiKey || !this._config.googleSearch?.cx)
     ) {
       throw new Error('No GoogleSearch API key or CX configured');
+    }
+    if (this._config.fluxApi?.active && !this._config.fluxApi?.apiKey) {
+      throw new Error('No Flux API key configured');
+    }
+    if (this._config.dallE?.active && !this._config.dallE?.apiKey) {
+      throw new Error('No DallE API key configured');
     }
   }
 }

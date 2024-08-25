@@ -54,6 +54,11 @@ export default {
         active: false,
         apiKey : ""
     },
+    dallE: {
+        apiKey: '',
+        imageSize: '1024x1024',
+        active: false
+    },
     googleSearch : {
         active: false,
         apiKey: "",
