@@ -83,18 +83,18 @@ export default class ClaudeClient implements AIClientType {
   private handleSimpleTextResponse(message: Anthropic.Message): string {
     const content = message.content[0].text;
     console.log(content);
-    if (content.trim().startsWith('{') && content.trim().endsWith('}')) {
-      try {
-        return JSON.parse(content)?.content || '';
-      }
-      catch (error) {
-        console.error('Error parsing JSON response:', error);
-        return content;
+
+    try {
+      const parsedContent = JSON.parse(content);
+      if (typeof parsedContent === 'object' && parsedContent !== null) {
+        return parsedContent.content || '';
       }
     }
-    else {
-      return content;
+    catch (error) {
+      // Not valid JSON, fall through to return original content
     }
+
+    return content;
   }
 
   private async handleToolUseResponse(
