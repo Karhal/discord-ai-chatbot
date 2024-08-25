@@ -14,14 +14,12 @@ jest.mock('./../../src/config', () => {
     openAI: {
       apiKey: '<openAiKey>',
       model: 'gpt-4o',
-      summaryModel: 'gpt-4o-mini',
-      imageSize: '1024x1024'
+      summaryModel: 'gpt-4o-mini'
     },
     claude: {
       apiKey: '<claudeKey>',
       model: 'claude-2.1',
-      summaryModel: 'claude-3-5-sonnet-20240620',
-      imageSize: '1024x1024'
+      summaryModel: 'claude-3-5-sonnet-20240620'
     },
     dune: {
       active: false,
@@ -47,6 +45,10 @@ jest.mock('./../../src/config', () => {
       apiKey: ''
     },
     fluxApi: {
+      active: false,
+      apiKey: ''
+    },
+    dallE: {
       active: false,
       apiKey: ''
     },
