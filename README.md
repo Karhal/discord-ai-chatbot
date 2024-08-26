@@ -1,149 +1,141 @@
-# Discord-GPT
+# Discord AI Chatbot
 
-Welcome to the Discord-GPT project, an advanced integration of GPT with Discord to create interactive and engaging chat experiences. This bot leverages the power of artificial intelligence to provide natural and contextual responses, making each interaction unique and personalized.
+Discord AI Chatbot is an advanced AI-powered Discord bot that leverages the capabilities of AI models like GPT or Claude to provide interactive and engaging chat experiences. This bot integrates various features and tools to enhance user interactions and provide real-time information.
 
 ## Features
 
-- **Brave and Google News Search**: Integrates real-time searches to provide updated information.
+- **AI-Powered Conversations**: Utilizes AI models for natural and contextual responses.
+- **Image Generation**: Creates images based on user descriptions using DALL-E or Flux.
+- **Web Search**: Integrates Brave Search and Google Search for up-to-date information.
 - **Cryptocurrency Price Tracking**: Offers live updates on cryptocurrency prices.
-- **Image Generation**: Creates images based on descriptions provided by users.
-- **Customization**: Allows extensive customization through `config.ts`, including language choice, API keys, and more.
+- **Google Lighthouse Integration**: Analyzes webpage performance.
+- **Memory Function**: Ability to remember and recall information from conversations.
+- **Multi-language Support**: Configurable to respond in different languages.
 
 ## Prerequisites
 
-Before getting started, make sure you have Node.js installed on your system. You will also need API keys for OpenAI, Brave Search, and other services used by the bot.
+- Node.js (latest LTS version recommended)
+- npm (comes with Node.js)
+- Discord Bot Token
+- API keys for various services (OpenAI, Brave Search, Google, etc.)
 
 ## Installation
 
-1. Clone this repository to your local machine.
-2. Run `npm install` to install all necessary dependencies.
-3. Copy `src/config.ts.dist` to `src/config.ts` and fill it with your own values.
-4. Launch the bot with `npm run start`.
+1. Clone the repository:
+   ```
+   git clone https://github.com/yourusername/Discord-GPT.git
+   cd Discord-GPT
+   ```
+
+2. Install dependencies:
+   ```
+   npm install
+   ```
+
+3. Set up configuration:
+   - Copy `src/config.ts.dist` to `src/config.ts`
+   - Edit `src/config.ts` with your API keys and preferences
+
+4. Start the bot:
+   ```
+   npm run start
+   ```
 
 ## Configuration
 
-Open `config.ts` and adjust the settings as needed. You can set your Discord bot token, API keys for the various services, and other customization options.
+The `src/config.ts` file contains all the configuration options. Here are some key areas:
 
-## Configuration for environnements prod/local
+- Discord bot token
+- AI client selection (OpenAI or Claude)
+- API keys for various services
+- Language settings
+- Feature toggles
 
-1. duplicate config.ts.dist to config.ts.local for local purpose
-2. duplicate config.ts.dist to config.ts.prod for production purpose
+Refer to the comments in the config file for detailed explanations of each option.
 
-## build dans deploy for prod
+## Setting Up API Keys
 
-1. do to scripts folder
-2. run ./build-prod.sh (execute chmod +x build-prod.sh if file is not executable)
-3. copy dist/index.cjs and package.json on the same directory on you're host
-4. run npm install
-5. run pm2 start index.cjs -i 1 --name=yourbot --time
-6. optionnaly run pm2 save for start when your host restart
+### Discord Bot Token
+1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
+2. Create a new application and add a bot to it
+3. Copy the bot token and add it to your `config.ts`
 
-### Creating a Discord Bot Token
+### OpenAI API Key
+1. Sign up at [OpenAI](https://beta.openai.com/signup/)
+2. Navigate to the API section and generate an API key
+3. Add the key to your `config.ts`
 
-1. Go to the [Discord Developer Portal](https://discord.com/developers/applications).
-2. Click on "New Application" and give your application a name.
-3. Navigate to the "Bot" section on the left sidebar and click "Add Bot".
-4. Click "Yes, do it!" to confirm.
-5. Under the "Token" section, click "Copy" to copy your bot token. This token will be used in your `config.ts` file.
-6. On discord go to moderator view and copy bot Id to put in config
+### Claude API Key
+To use Claude as your AI model:
 
-### Obtaining API Keys
+1. Go to the [Anthropic AI website](https://www.anthropic.com/).
+2. Sign up for an account or log in if you already have one.
+3. Navigate to the API section in your account dashboard.
+4. Generate a new API key.
+5. Copy the API key and add it to your `config.ts` file under the `claude.apiKey` field.
 
-- **OpenAI API Key**:
+Note: Anthropic may have specific requirements or a waitlist for API access. Check their current policies and follow their instructions to obtain API access.
 
-  1. Sign up at [OpenAI](https://beta.openai.com/signup/).
-  2. Navigate to the API section and generate an API key.
-  3. Copy the API key and paste it into your `config.ts` file.
+### Other API Keys
+Follow similar processes for other services like Brave Search, Google Search, CoinAPI, etc. Refer to each service's documentation for specific instructions.
 
-- **Brave Search API Key**:
+## Running in Production
 
-  1. Sign up at [Brave Search](https://search.brave.com/).
-  2. Follow their instructions to obtain an API key.
-  3. Copy the API key and paste it into your `config.ts` file.
+For production deployment:
 
-- **SerpAPI Token**:
+1. Build the project:
+   ```
+   npm run build
+   ```
 
-  1. Sign up at [SerpAPI](https://serpapi.com/users/sign_up).
-  2. Create an account or log in if you already have one.
-  3. Navigate to the dashboard.
-  4. Copy the API key provided in the dashboard.
-  5. Paste the API key into your `config.ts` file.
-  6. Select Google domain at [SerpAPI Google domains](https://serpapi.com/google-domains)
-  7. Paste the google_domain into your `config.ts` file.
+2. Copy the `dist/index.cjs` and `package.json` to your production server
 
-- **CoinAPI Key**:
-  To use the CoinAPI features, you need to obtain an API key. Follow these steps:
+3. Install production dependencies:
+   ```
+   npm install --production
+   ```
 
-  1. Go to the [CoinAPI website](https://docs.coinapi.io/).
-  2. Click on the "Get a free API Key" button.
-  3. Sign up for an account if you don't have one, or log in if you already have an account.
-  4. Follow the instructions to generate your API key.
-  5. Once you have your API key, add it to your `config.ts` file.
+4. Use a process manager like PM2 to run the bot:
+   ```
+   pm2 start index.cjs --name discord-gpt
+   ```
 
-- **Google Lighthouse API Key**:
+## Development
 
-  1. Sign up at [Google console](https://console.cloud.google.com/).
-  2. Follow their instructions to obtain an API key.
-  3. Activate PageSpeed Insights API module (https://console.cloud.google.com/apis/api/pagespeedonline.googleapis.com)
-  4. Copy the API key and paste it into your `config.ts` file.
-
-- **Google Search**:
-  To use Google Search API features, you need to create de Search engine and obtain a apikey
-  1. Go to the [Programmable search engine](https://programmablesearchengine.google.com/controlpanel/create)
-  2. Create your Search engine with your preferences
-  3. Go to you new search engine panel [Programmable search engine panel](https://programmablesearchengine.google.com/controlpanel/all)
-  4. copy ID of search engine it to parameter cs of your `config.ts` file
-  5. Get an API key, go to [Programmable search engine overview](https://developers.google.com/custom-search/v1/overview)
-  6. Click on "Obtain key"
-  7. Paste the API key into your `config.ts` file.
-
-## Running the Bot
-
-1. Ensure all necessary API keys and configurations are set in `config.ts`.
-2. Run `npm run start` to launch the bot.
-3. Invite the bot to your Discord server using the OAuth2 URL generated in the Discord Developer Portal.
-
-## Running Tests
-
-To ensure everything is working correctly, you can run the provided tests.
-
-1. Run `npm test` to execute the tests once.
-2. Run `npm run test:watch` to run the tests in watch mode, which will re-run tests on file changes.
-
-## Troubleshooting
-
-- **Bot Not Responding**: Ensure the bot is online and the token in `config.ts` is correct.
-- **API Errors**: Double-check that all API keys are correctly entered and have the necessary permissions.
-- **Dependencies Issues**: Run `npm install` again to ensure all dependencies are correctly installed.
-- **Discord permissions**: Be sure your bot has a correct role in Discord and can write messages and embed files.
+- Run tests: `npm test`
+- Run in watch mode: `npm run test:watch`
+- Lint code: `npm run lint`
 
 ## Contributing
 
-We welcome contributions! Please fork the repository and submit a pull request with your changes.
+Contributions are welcome! Please follow these steps:
 
-#### Commit Message Structure
+1. Fork the repository
+2. Create a new branch: `git checkout -b feature/your-feature-name`
+3. Make your changes and commit them using Conventional Commits
+4. Push to your fork and submit a pull request
 
-When contributing, please follow the Conventional Commits specification for your commit messages. The structure is as follows:
+### Commit Message Format
 
-```
-<type>[(scope)][!]: <description>
-[body]
-[footer]
-```
+Follow the Conventional Commits specification:
+<type>[optional scope]: <description>
+[optional body]
+[optional footer(s)]
 
-- **Type**: The main types are `feat` (for new features) and `fix` (for bug fixes). Other types include `build`, `chore`, `docs`, etc.
-- **Scope (optional)**: Describes the part of the code or documentation affected by the changes, e.g., `api`, `parser`. Multiple scopes can be separated by `,`, `/`, or `\`.
-- **Exclamation mark (optional)**: Indicates an important commit. Should include a `BREAKING CHANGE` footer.
-- **Description**: A brief sentence describing the changes.
-- **Body (optional)**: Detailed description of the changes.
-- **Footer (optional)**: Typically includes `BREAKING CHANGE` to explain significant changes affecting the application's architecture.
+Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 
-**Examples:**
+Example: `feat(search): add Google Search integration`
 
-- Short commit message:
+## Troubleshooting
 
-`fix: /users api endpoint error fix`
+- **Bot not responding**: Check your Discord token and bot permissions
+- **API errors**: Verify API keys in `config.ts`
+- **Dependency issues**: Try deleting `node_modules` and running `npm install` again
 
 ## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for more details.
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+## Support
+
+For support, please open an issue on the GitHub repository or join our Discord community [link to Discord].

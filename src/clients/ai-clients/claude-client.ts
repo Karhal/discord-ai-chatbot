@@ -75,9 +75,10 @@ export default class ClaudeClient implements AIClientType {
     return this.handleToolUseResponse(toolUseItem, systemPrompt, messages);
   }
 
-  private findToolUseItem(message: Anthropic.Message): any {
-    const content = message.content;
-    return content.find((item: { type: string }) => item.type === 'tool_use');
+  private findToolUseItem(message: Anthropic.Message): Anthropic.ToolUseBlock | undefined {
+    return message.content.find((item): item is Anthropic.ToolUseBlock =>
+      item.type === 'tool_use'
+    );
   }
 
   private handleSimpleTextResponse(message: Anthropic.Message): string {
@@ -119,8 +120,9 @@ export default class ClaudeClient implements AIClientType {
     return tools.find((tool) => tool.name === toolName);
   }
 
-  private async executeToolFunction(tool: AITool, args: object): Promise<any> {
-    return await tool.function.function(JSON.stringify(args));
+  private async executeToolFunction(tool: AITool, args: object): Promise<object> {
+    const result = await tool.function.function(JSON.stringify(args));
+    return result as object;
   }
 
   private updateMessages(messages: MessageInput[], toolUseItem: Anthropic.ToolUseBlock, toolResult: object): void {
