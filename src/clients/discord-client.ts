@@ -10,6 +10,7 @@ export default class DiscordClient {
   private discordConfig: DiscordConfigType;
 
   aiClient: AIClientType = new AIClient();
+  ready = false;
 
   constructor() {
     this.discordConfig = ConfigManager.config.discord;

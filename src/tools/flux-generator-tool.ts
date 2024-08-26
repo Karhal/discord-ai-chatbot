@@ -2,7 +2,6 @@ import ImageHandler from '../handlers/image-handler';
 import AbstractTool from './absract-tool';
 import ConfigManager from '../configManager';
 import * as fal from '@fal-ai/serverless-client';
-console.log(ConfigManager.config);
 fal.config({
   credentials: ConfigManager.config.fluxApi.apiKey
 });
