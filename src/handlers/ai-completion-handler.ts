@@ -52,7 +52,8 @@ class AiCompletionHandler {
     """MEMORY:${memory}"""\n
     """PREVIOUSLY:${summary}"""\n
     """NOTE:
-    - You have to respond to the user in the context of the conversation. Respond only to the last user message in JSON format.
+    - You have to respond to the user in the context of the conversation.
+    - Respond only to the last user message in JSON format.
     - JSON response keys: "content", "author" (you).
     """`;
   }
@@ -71,10 +72,7 @@ class AiCompletionHandler {
     }
   }
 
-  addMessageToChannel(
-    message: MessageInput,
-    limit = this.discordConfig.maxHistory
-  ) {
+  addMessageToChannel(message: MessageInput, limit = this.discordConfig.maxHistory) {
     if (this.messages) {
       const channelMessages = this.messages.filter(
         (msg) => msg.channelId === message.channelId
@@ -94,10 +92,7 @@ class AiCompletionHandler {
     }
   }
 
-  addMessageArrayToChannel(
-    messages: Array<MessageInput>,
-    limit = this.discordConfig.maxHistory
-  ) {
+  addMessageArrayToChannel(messages: Array<MessageInput>, limit = this.discordConfig.maxHistory) {
     messages.forEach((message) => {
       this.addMessageToChannel(message, limit);
     });
@@ -127,18 +122,13 @@ class AiCompletionHandler {
       .slice(0, count);
   }
 
-  setChannelHistory(
-    channelId: string,
-    messages: Collection<string, Message<boolean>>
-  ) {
+  setChannelHistory(channelId: string, messages: Collection<string, Message<boolean>>) {
     this.eraseMessagesWithChannelId(channelId);
     const handlerMessages = this.createMessagesArrayFromHistory(messages);
     this.addMessageArrayToChannel(handlerMessages);
   }
 
-  createMessagesArrayFromHistory(
-    messagesChannelHistory: Collection<string, Message<boolean>>
-  ) {
+  createMessagesArrayFromHistory(messagesChannelHistory: Collection<string, Message<boolean>>) {
     const messages: MessageInput[] = [];
     messagesChannelHistory.reverse().forEach((msg: Message) => {
       if (msg.content !== '') {
