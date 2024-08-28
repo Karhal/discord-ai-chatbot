@@ -50,7 +50,6 @@ export default class MessageCreate extends EventDiscord {
     if (response) {
       message.channel.send(response);
     }
-    FileHandler.createFolder(ConfigManager.config.tmpFolder.path);
     const attachmentsPath = FileHandler.getFolderFilenameFullPaths(
       ConfigManager.config.tmpFolder.path
     );
