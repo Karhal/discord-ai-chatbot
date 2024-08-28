@@ -10,7 +10,7 @@
     "start:dev": "tsx watch src/index.ts",
     "build": "tsup src/index.ts --minify",
     "lint": "eslint . --ext .ts",
-    "prepare": "husky install"
+    "prepare": "node -e \"if(process.env.NODE_ENV !== 'production') { require('husky').install() }\""
   },
   "keywords": [],
   "author": "",
