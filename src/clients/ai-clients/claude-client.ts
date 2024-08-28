@@ -88,11 +88,15 @@ export default class ClaudeClient implements AIClientType {
     try {
       const parsedContent = JSON.parse(content);
       if (typeof parsedContent === 'object' && parsedContent !== null) {
-        return parsedContent.content || '';
+        if (parsedContent.content && typeof parsedContent.content === 'string') {
+          return parsedContent.content;
+        }
+        return '';
       }
     }
     catch (error) {
-      // Not valid JSON, fall through to return original content
+      // Not valid JSON, return the original content
+      console.log(error);
     }
 
     return content;
