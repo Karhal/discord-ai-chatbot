@@ -17,8 +17,6 @@
   "license": "ISC",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.26.0",
-    "@discordjs/opus": "latest",
-    "@discordjs/voice": "latest",
     "@fal-ai/serverless-client": "^0.14.2",
     "@google-cloud/speech": "latest",
     "@google-cloud/text-to-speech": "latest",
