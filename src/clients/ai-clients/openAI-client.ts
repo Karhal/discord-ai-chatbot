@@ -15,19 +15,14 @@ export default class OpenAIClient implements AIClientType {
     });
   }
 
-  private async message(
-    options: ChatCompletionCreateParamsNonStreaming
-  ): Promise<string | null> {
+  private async message(options: ChatCompletionCreateParamsNonStreaming): Promise<string | null> {
     if (!this.client) return null;
 
     const response = await this.client.chat.completions.create(options);
     return response?.choices[0]?.message?.content || null;
   }
 
-  async getSummary(
-    systemPrompt: string,
-    messages: MessageInput[]
-  ): Promise<string | null> {
+  async getSummary(systemPrompt: string, messages: MessageInput[]): Promise<string | null> {
     const options = {
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
       model: this.openAIConfig.summaryModel
@@ -37,10 +32,7 @@ export default class OpenAIClient implements AIClientType {
     return response;
   }
 
-  async getAiCompletion(
-    systemPrompt: string,
-    messages: MessageInput[]
-  ): Promise<string> {
+  async getAiCompletion(systemPrompt: string, messages: MessageInput[]): Promise<string> {
     const options = {
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
       model: this.openAIConfig.model,
