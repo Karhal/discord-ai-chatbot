@@ -23,8 +23,8 @@ Discord AI Chatbot is an advanced AI-powered Discord bot that leverages the capa
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/Discord-GPT.git
-   cd Discord-GPT
+   git clone git@github.com:Karhal/discord-ai-chatbot.git
+   cd discord-ai-chatbot
    ```
 
 2. Install dependencies:
