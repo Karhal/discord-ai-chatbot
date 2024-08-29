@@ -81,24 +81,28 @@ Follow similar processes for other services like Brave Search, Google Search, Co
 
 ## Running in Production
 
-For production deployment:
+To run this application in a production environment, follow these steps:
 
-1. Build the project:
-   ```
-   npm run build
-   ```
-
-2. Copy the `dist/index.cjs` and `package.json` to your production server
-
-3. Install production dependencies:
+1. Install production dependencies only:
    ```
    npm install --production
    ```
 
-4. Use a process manager like PM2 to run the bot:
+2. Build the project:
    ```
-   pm2 start index.cjs --name discord-gpt
+   npm run build
    ```
+
+3. Start the application:
+   ```
+   npm start
+   ```
+
+The `--production` flag ensures that only dependencies listed in the "dependencies" section of `package.json` are installed, excluding devDependencies. This reduces the installation size and potential security risks in the production environment.
+
+The build process uses `tsup` to compile and minify the TypeScript code. The production build is generated in the `dist` directory, with `index.cjs` as the main entry point.
+
+Make sure to set up any necessary environment variables before running the application in production.
 
 ## Development
 
