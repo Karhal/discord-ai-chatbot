@@ -13,32 +13,24 @@ export default class MessageCreate extends EventDiscord {
     const maxHistory: number = ConfigManager.config.discord.maxHistory;
     if (
       !this.theMessageContainsBotName(message) ||
-      message.author.id === this.discordClient?.user?.id
+      message.author.id === this.discordClient?.user?.id ||
+      message.author.bot
     ) {
       return;
     }
 
     const channelId: string = message.channelId;
-    const messagesChannelHistory: Collection<
-      string,
-      Message<boolean>
-    > = await message.channel.messages.fetch({
+    const messagesChannelHistory: Collection<string, Message<boolean>> = await message.channel.messages.fetch({
       limit: maxHistory
     });
-    const aiCompletionHandler = new AiCompletionHandler(
-      this.aiClient,
-      ConfigManager.config.AIPrompt
-    );
+    const aiCompletionHandler = new AiCompletionHandler(this.aiClient, ConfigManager.config.AIPrompt);
 
     aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
     message.channel.sendTyping();
     const summary = await aiCompletionHandler.getSummary(channelId);
     if (summary) {
       message.channel.sendTyping();
-      const content = await aiCompletionHandler.getAiCompletion(
-        summary,
-        channelId
-      );
+      const content = await aiCompletionHandler.getAiCompletion(summary, channelId);
 
       await this.sendResponse(message, content);
     }
@@ -50,9 +42,7 @@ export default class MessageCreate extends EventDiscord {
     if (response) {
       message.channel.send(response);
     }
-    const attachmentsPath = FileHandler.getFolderFilenameFullPaths(
-      ConfigManager.config.tmpFolder.path
-    );
+    const attachmentsPath = FileHandler.getFolderFilenameFullPaths(ConfigManager.config.tmpFolder.path);
     console.log('Attachments:', attachmentsPath);
     if (attachmentsPath.length > 0) {
       await message.channel.send({ files: [...attachmentsPath] });
@@ -67,8 +57,7 @@ export default class MessageCreate extends EventDiscord {
     const botId = this.discordClient.user?.id;
     if (!!botName || !!botId) {
       return (
-        (!!botName &&
-          message.content.toLowerCase().includes(botName.toLowerCase())) ||
+        (!!botName && message.content.toLowerCase().includes(botName.toLowerCase())) ||
         (!!botId && message.content.toLowerCase().includes('<@' + botId + '>'))
       );
     }
