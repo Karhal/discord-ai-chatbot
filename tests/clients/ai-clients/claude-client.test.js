@@ -2,68 +2,6 @@
 
 import ClaudeClient from '../../../src/clients/ai-clients/claude-client';
 
-//mock config
-jest.mock('./../../../src/config', () => {
-  return {
-    discord: {
-      lang: 'fr',
-      token: '<discord Token>',
-      maxHistory: 10
-    },
-    aiClient: 'openAI',
-    AIPrompt: 'You are a nice assistant in a discord server',
-    openAI: {
-      apiKey: '<openAiKey>',
-      model: 'gpt-4o',
-      summaryModel: 'gpt-4o-mini'
-    },
-    claude: {
-      apiKey: '<claudeKey>',
-      model: 'claude-2.1',
-      summaryModel: 'claude-3-5-sonnet-20240620'
-    },
-    dune: {
-      active: false,
-      apiKey: ''
-    },
-    serp: {
-      active: false,
-      apiKey: '',
-      lang: ''
-    },
-    braveSearch: {
-      active: false,
-      apiKey: '',
-      lang: ''
-    },
-    coin: {
-      active: false,
-      apiKey: '',
-      defaulAsset: 'USD'
-    },
-    googleLighthouse: {
-      active: false,
-      apiKey: ''
-    },
-    fluxApi: {
-      active: false,
-      apiKey: ''
-    },
-    dallE: {
-      active: false,
-      apiKey: ''
-    },
-    googleSearch: {
-      active: false,
-      apiKey: '',
-      cx: ''
-    },
-    tmpFolder: {
-      path: 'tmp_test'
-    }
-  };
-});
-
 describe('ClaudeClient', () => {
   let claudeClient;
 

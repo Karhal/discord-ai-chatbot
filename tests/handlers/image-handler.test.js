@@ -2,53 +2,6 @@
 import ImageHandler from './../../src/handlers/image-handler';
 jest.mock('./../../src/clients/ai-client');
 jest.mock('./../../src/tools');
-jest.mock('./../../src/config', () => {
-  return {
-    discord: {
-      lang: 'fr',
-      token: '<discord Token>',
-      maxHistory: 10
-    },
-    openAI: {
-      apiKey: '<openAiKey>',
-      model: 'gpt-4o',
-      summaryModel: 'gpt-4o-mini',
-      prompt: '',
-      imageSize: '1024x1024'
-    },
-    dune: {
-      active: false,
-      apiKey: ''
-    },
-    serp: {
-      active: false,
-      apiKey: '',
-      lang: ''
-    },
-    braveSearch: {
-      active: false,
-      apiKey: '',
-      lang: ''
-    },
-    coin: {
-      active: false,
-      apiKey: '',
-      defaulAsset: 'USD'
-    },
-    googleLighthouse: {
-      active: false,
-      apiKey: ''
-    },
-    googleSearch: {
-      active: false,
-      apiKey: '',
-      cx: ''
-    },
-    tmpFolder: {
-      path: './tmp_test'
-    }
-  };
-});
 
 it('should download images', async () => {
   const msg = {

@@ -96,7 +96,7 @@ export default class ClaudeClient implements AIClientType {
     }
     catch (error) {
       // Not valid JSON, return the original content
-      console.log(error);
+      //console.log(error);
     }
 
     return content;
