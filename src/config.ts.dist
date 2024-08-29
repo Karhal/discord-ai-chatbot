@@ -59,6 +59,10 @@ export default {
         imageSize: '1024x1024',
         active: false
     },
+    stability: {
+        apiKey: '',
+        active: false
+    },
     googleSearch : {
         active: false,
         apiKey: "",

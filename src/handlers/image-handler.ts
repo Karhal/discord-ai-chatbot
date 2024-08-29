@@ -1,5 +1,6 @@
 import fs from 'fs';
 import FileHandler from './file-handler';
+import ConfigManager from '../configManager';
 
 type ImageHandlerType = {
   deleteImages: () => void;
@@ -70,7 +71,7 @@ export default class ImageHandler implements ImageHandlerType {
       const imageName = this.generateImageName();
       const imageData = Buffer.from(response);
       const imagePath = FileHandler.saveArrayBufferToFile(
-        'tmp',
+        ConfigManager.config.tmpFolder.path,
         imageName,
         imageData
       );
@@ -83,8 +84,26 @@ export default class ImageHandler implements ImageHandlerType {
     }
   }
 
-  private generateImageName(): string {
+  private generateImageName(format = 'jpg'): string {
     const timestamp = new Date().getTime();
-    return `${timestamp}.jpg`;
+    return `${timestamp}.${format}`;
+  }
+
+  public async saveBase64Image(base64Data: string, format: string): Promise<string> {
+    try {
+      const buffer = Buffer.from(base64Data, 'base64');
+      const imageName = this.generateImageName(format);
+      const imagePath = FileHandler.saveArrayBufferToFile(
+        ConfigManager.config.tmpFolder.path,
+        imageName,
+        buffer
+      );
+
+      return imagePath;
+    }
+    catch (error) {
+      console.error('Error saving base64 image:', error);
+      throw error;
+    }
   }
 }

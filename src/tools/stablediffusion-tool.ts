@@ -1,31 +1,19 @@
-import OpenAI from 'openai';
+import { FormData } from 'formdata-node';
 import ImageHandler from '../handlers/image-handler';
 import AbstractTool from './absract-tool';
 import ConfigManager from '../configManager';
 
-type openAIImageSize =
-  | '1024x1024'
-  | '256x256'
-  | '512x512'
-  | '1792x1024'
-  | '1024x1792'
-  | null
-  | undefined;
-
-export default class DallETool extends AbstractTool {
-  readonly toolName = DallETool.name;
-  dallEConfig = ConfigManager.config.dallE;
-  public isActivated = ConfigManager.config.dallE.active;
-  client: OpenAI;
-  private imageSize: openAIImageSize;
+export default class StableDiffusionTool extends AbstractTool {
+  readonly toolName = StableDiffusionTool.name;
+  public isActivated = ConfigManager.config.stability.active;
+  private stabilityConfig = ConfigManager.config.stability;
+  private apiKey: string;
 
   constructor() {
     super();
-    this.imageSize = this.dallEConfig.imageSize as openAIImageSize;
-    this.client = new OpenAI({
-      apiKey: this.dallEConfig.apiKey
-    });
+    this.apiKey = this.stabilityConfig.apiKey;
   }
+
   readonly description =
     'Use this tool only when the user asks you to draw or to show a picture of something in the last message. \
     The tool will generate an image based on the prompt you provide and add it as an attachment on discord.';
@@ -45,33 +33,51 @@ export default class DallETool extends AbstractTool {
   };
 
   async generateImage(prompt: string): Promise<string | null> {
-    if (!this.client) return null;
 
-    const response = await this.client.images.generate({
-      model: 'dall-e-3',
-      prompt: prompt,
-      n: 1,
-      size: this.imageSize
-    });
-    return response?.data[0]?.url || null;
-  }
+    const formData = new FormData();
+    formData.append('prompt', prompt);
+    formData.append('output_format', 'webp');
+    try {
+      const response = await fetch(
+        'https://api.stability.ai/v2beta/stable-image/generate/ultra',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${this.apiKey}`,
+            Accept: 'image/*'
+          },
+          body: formData
+        }
+      );
+
+      if (response.ok) {
+        const arrayBuffer = await response.arrayBuffer();
+        return Buffer.from(arrayBuffer).toString('base64');
+      }
+      else {
+        const errorText = await response.text();
+        throw new Error(`${response.status}: ${errorText}`);
+      }
+    }
+    catch (error) {
+      console.error('Error generating image:', error);
+      return 'Error generating image';
+    }
+  };
 
   readonly execute = async (promptAsString: string) => {
     try {
       const prompt = JSON.parse(promptAsString);
       const imageHandler = new ImageHandler();
 
-      const imgUrl = await this.generateImage(prompt.imagePrompt);
-      if (imgUrl) {
-        await imageHandler.downloadImages([imgUrl]);
+      const imageBuffer = await this.generateImage(prompt.imagePrompt);
+      if (imageBuffer) {
+        await imageHandler.saveBase64Image(imageBuffer, 'webp');
       }
       return JSON.stringify({ image_ready: true });
     }
     catch (error: unknown) {
       console.error(error);
-      if (error instanceof Error && 'status' in error && error.status === 400) {
-        return (error as { error?: { message?: string } }).error?.message || null;
-      }
       return JSON.stringify({ error: 'An unexpected error occurred' });
     }
   };

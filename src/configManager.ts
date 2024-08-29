@@ -15,6 +15,7 @@ export interface ConfigType {
   googleSearch: GoogleSearchConfigType;
   fluxApi: FluxApiConfigType;
   tmpFolder: TmpFolderConfigType;
+  stability: StabilityConfigType;
 }
 
 export interface OpenAIClientConfigType {
@@ -84,6 +85,10 @@ export interface TmpFolderConfigType extends ActivatorConfigType {
   path: string;
 }
 
+export interface StabilityConfigType extends ActivatorConfigType {
+  apiKey: string;
+}
+
 export default class ConfigManager {
   static get config() {
     return ConfigManager.getConfig();
@@ -100,6 +105,11 @@ export default class ConfigManager {
     active: configValues.dallE.active || process.env.DALLE_ACTIVE === 'true' || false,
     apiKey: configValues.dallE.apiKey || process.env.DALLE_API_KEY || '',
     imageSize: configValues.dallE.imageSize || process.env.IMAGE_SIZE || '1024x1024'
+  };
+
+  private stabilityConfig: StabilityConfigType = {
+    active: configValues.stability.active || process.env.STABILITY_ACTIVE === 'true' || false,
+    apiKey: configValues.stability.apiKey || process.env.STABILITY_API_KEY || ''
   };
 
   private openAIConfig: OpenAIClientConfigType = {
@@ -237,7 +247,8 @@ export default class ConfigManager {
     googleLighthouse: this.lighthouseConfig,
     fluxApi: this.fluxApiConfig,
     dallE: this.dallEConfig,
-    tmpFolder: this.tmpFolderConfig
+    tmpFolder: this.tmpFolderConfig,
+    stability: this.stabilityConfig
   };
 
   private static getInstance() {
@@ -301,6 +312,10 @@ export default class ConfigManager {
     }
     if (this._config.dallE?.active && !this._config.dallE?.apiKey) {
       throw new Error('No DallE API key configured');
+    }
+
+    if (this._config.stability?.active && !this._config.stability?.apiKey) {
+      throw new Error('No Stability API key configured');
     }
   }
 }

@@ -9,6 +9,7 @@ import DallETool from './dalle-tool';
 import MapSearchTool from './map-search-tool';
 import SerpSearchTool from './serp-search-tool';
 import WriteMemoryTool from './write-memory-tool';
+import StableDiffusionTool from './stablediffusion-tool';
 
 const toolList: (typeof AbstractTool)[] = [
   WriteMemoryTool,
@@ -20,7 +21,8 @@ const toolList: (typeof AbstractTool)[] = [
   CryptoPriceTool,
   SerpSearchTool,
   GoogleLighthouseTool,
-  FluxGeneratorTool
+  FluxGeneratorTool,
+  StableDiffusionTool
 ];
 
 export default toolList;
