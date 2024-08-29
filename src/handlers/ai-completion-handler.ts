@@ -53,8 +53,8 @@ class AiCompletionHandler {
     """PREVIOUSLY:${summary}"""\n
     """NOTE:
     - You have to respond to the user in the context of the conversation.
-    - Respond only to the last user message, in a brut JSON format.
-    - Your response should be only a JSON like: {"content": "<your response>", "author": "<your name>" }.
+    - Respond only to the last user message, in a raw JSON format.
+    - Your response should be only a JSON like: {"content": "your response", "author": "your name" }.
     """`;
   }
 
