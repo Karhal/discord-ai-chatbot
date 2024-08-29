@@ -3,12 +3,14 @@ import { AIClientType } from '../../types/AIClientType';
 import ConfigManager from '../../configManager';
 import { AITool, MessageInput } from '../../types/types';
 import { tools } from './../../tools-manager';
+import { EventEmitter } from 'events';
 
-export default class ClaudeClient implements AIClientType {
+export default class ClaudeClient extends EventEmitter implements AIClientType {
   client: Anthropic;
   claudeAIConfig = ConfigManager.config.claude;
 
   constructor() {
+    super();
     this.client = new Anthropic({
       apiKey: this.claudeAIConfig.apiKey
     });
@@ -51,6 +53,7 @@ export default class ClaudeClient implements AIClientType {
 
   private async message(options: Anthropic.MessageCreateParams): Promise<Anthropic.Message | null> {
     if (!this.client) return null;
+    this.emit('working', options);
     const response = await this.client.messages.create(options);
 
     return response || null;

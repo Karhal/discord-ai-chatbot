@@ -1,5 +1,4 @@
 import AiCompletionHandler from '../handlers/ai-completion-handler';
-import ConfigManager from '../configManager';
 import EventDiscord from '../clients/events-discord';
 import { Collection, Events, Message } from 'discord.js';
 import FileHandler from '../handlers/file-handler';
@@ -10,6 +9,7 @@ export default class MessageCreate extends EventDiscord {
   message: Message | null = null;
 
   handler = async (message: Message): Promise<void> => {
+
     const maxHistory: number = ConfigManager.config.discord.maxHistory;
     if (
       !this.theMessageContainsBotName(message) ||
@@ -23,15 +23,18 @@ export default class MessageCreate extends EventDiscord {
     const messagesChannelHistory: Collection<string, Message<boolean>> = await message.channel.messages.fetch({
       limit: maxHistory
     });
-    const aiCompletionHandler = new AiCompletionHandler(this.aiClient, ConfigManager.config.AIPrompt);
 
+    const aiCompletionHandler = new AiCompletionHandler(this.aiClient, this.config.AIPrompt);
+    this.setupEventListeners(aiCompletionHandler, message);
     aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
-    message.channel.sendTyping();
     const summary = await aiCompletionHandler.getSummary(channelId);
+
     if (summary) {
       message.channel.sendTyping();
       const content = await aiCompletionHandler.getAiCompletion(summary, channelId);
 
+    if (summary) {
+      const content = await aiCompletionHandler.getAiCompletion(summary, channelId);
       await this.sendResponse(message, content);
     }
     console.log('Done.');
@@ -62,5 +65,11 @@ export default class MessageCreate extends EventDiscord {
       );
     }
     return false;
+  }
+
+  private setupEventListeners(aiCompletionHandler: AiCompletionHandler, message: Message): void {
+    aiCompletionHandler.on('completionRequested', (data) => {
+      message.channel.sendTyping();
+    });
   }
 }

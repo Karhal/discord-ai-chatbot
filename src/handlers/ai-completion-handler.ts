@@ -4,16 +4,18 @@ import { Collection, Message } from 'discord.js';
 import { MessageInput } from '../types/types';
 import { tools } from './../tools-manager';
 import ConfigManager, { DiscordConfigType } from '../configManager';
+import { EventEmitter } from 'events';
 
-class AiCompletionHandler {
+class AiCompletionHandler extends EventEmitter {
   private messages: MessageInput[] = [];
   public summary: string | null = null;
   private discordConfig: DiscordConfigType;
 
   constructor(
-    private aiClient: AIClientType,
+    private aiClient: AIClientType & EventEmitter,
     private prompt: string
   ) {
+    super();
     this.discordConfig = ConfigManager.config.discord;
   }
 
@@ -65,7 +67,10 @@ class AiCompletionHandler {
       const systemPrompt = this.createCompletionPrompt(summary);
       const messages = this.getFormattedMessages(5, channelId);
       console.log('Fetch completion args:', systemPrompt, messages);
-
+      this.aiClient.on('completionRequested', (data) => {
+        console.log('Completion requested:', data);
+        this.emit('completionRequested', data);
+      });
       return await this.aiClient.getAiCompletion(systemPrompt, messages, tools);
     }
     catch (error) {
