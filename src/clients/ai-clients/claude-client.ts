@@ -14,10 +14,7 @@ export default class ClaudeClient implements AIClientType {
     });
   }
 
-  async getSummary(
-    systemPrompt: string,
-    messages: MessageInput[]
-  ): Promise<string | null> {
+  async getSummary(systemPrompt: string, messages: MessageInput[]): Promise<string | null> {
     const options: Anthropic.MessageCreateParams = {
       model: this.claudeAIConfig.summaryModel,
       max_tokens: this.claudeAIConfig.maxTokens,
@@ -31,10 +28,7 @@ export default class ClaudeClient implements AIClientType {
     return response?.content[0]?.text || null;
   }
 
-  async getAiCompletion(
-    systemPrompt: string,
-    messages: MessageInput[]
-  ): Promise<string> {
+  async getAiCompletion(systemPrompt: string, messages: MessageInput[]): Promise<string> {
     const options: Anthropic.MessageCreateParams = {
       model: this.claudeAIConfig.model,
       max_tokens: this.claudeAIConfig.maxTokens,
@@ -55,7 +49,7 @@ export default class ClaudeClient implements AIClientType {
     return await this.handleResponse(response, systemPrompt, messages);
   }
 
-  private async message(options: Anthropic.MessageCreateParams ): Promise<Anthropic.Message | null> {
+  private async message(options: Anthropic.MessageCreateParams): Promise<Anthropic.Message | null> {
     if (!this.client) return null;
     const response = await this.client.messages.create(options);
 
@@ -76,13 +70,11 @@ export default class ClaudeClient implements AIClientType {
   }
 
   private findToolUseItem(message: Anthropic.Message): Anthropic.ToolUseBlock | undefined {
-    return message.content.find((item): item is Anthropic.ToolUseBlock =>
-      item.type === 'tool_use'
-    );
+    return message.content.find((item): item is Anthropic.ToolUseBlock => item.type === 'tool_use');
   }
 
   private handleSimpleTextResponse(message: Anthropic.Message): string {
-    const content = message.content[0].text;
+    const content = message.content[0].text.trim();
     console.log(content);
 
     try {
@@ -96,7 +88,7 @@ export default class ClaudeClient implements AIClientType {
     }
     catch (error) {
       // Not valid JSON, return the original content
-      //console.log(error);
+      console.log(error);
     }
 
     return content;
@@ -131,8 +123,20 @@ export default class ClaudeClient implements AIClientType {
 
   private updateMessages(messages: MessageInput[], toolUseItem: Anthropic.ToolUseBlock, toolResult: object): void {
     messages.push(
-      { role: 'assistant', content: [{ type: 'tool_use', id: toolUseItem.id, name: toolUseItem.name, input: toolUseItem.input }] },
-      { role: 'user', content: [{ type: 'tool_result', tool_use_id: toolUseItem.id, content: [{ type: 'text', text: JSON.stringify(toolResult) }] }] }
+      {
+        role: 'assistant',
+        content: [{ type: 'tool_use', id: toolUseItem.id, name: toolUseItem.name, input: toolUseItem.input }]
+      },
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'tool_result',
+            tool_use_id: toolUseItem.id,
+            content: [{ type: 'text', text: JSON.stringify(toolResult) }]
+          }
+        ]
+      }
     );
   }
 

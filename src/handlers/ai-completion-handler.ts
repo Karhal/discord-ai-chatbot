@@ -31,12 +31,14 @@ class AiCompletionHandler {
   }
 
   private getFormattedMessages(count: number, channelId: string): { role: string; content: string }[] {
-    return [{
-      role: 'user',
-      content: this.getLastMessagesOfAChannel(count, channelId)
-        .map(msg => msg.content)
-        .join('\n')
-    }];
+    return [
+      {
+        role: 'user',
+        content: this.getLastMessagesOfAChannel(count, channelId)
+          .map((msg) => msg.content)
+          .join('\n')
+      }
+    ];
   }
 
   private createSummaryPrompt(): string {
@@ -53,8 +55,8 @@ class AiCompletionHandler {
     """PREVIOUSLY:${summary}"""\n
     """NOTE:
     - You have to respond to the user in the context of the conversation.
-    - Respond only to the last user message, in a raw JSON format.
-    - Your response should be only a JSON like: {"content": "your response", "author": "your name" }.
+    - Respond only to the last user message, in a strictly valid raw JSON string.
+    - Example of response:{"content": "your response", "author": "your name" }
     """`;
   }
 
@@ -74,9 +76,7 @@ class AiCompletionHandler {
 
   addMessageToChannel(message: MessageInput, limit = this.discordConfig.maxHistory) {
     if (this.messages) {
-      const channelMessages = this.messages.filter(
-        (msg) => msg.channelId === message.channelId
-      );
+      const channelMessages = this.messages.filter((msg) => msg.channelId === message.channelId);
 
       channelMessages.push(message);
       if (limit) {
@@ -85,9 +85,7 @@ class AiCompletionHandler {
           channelMessages.shift();
         }
       }
-      this.messages = this.messages.filter(
-        (msg) => msg.channelId !== message.channelId
-      );
+      this.messages = this.messages.filter((msg) => msg.channelId !== message.channelId);
       this.messages = [...channelMessages, ...this.messages];
     }
   }
@@ -100,26 +98,20 @@ class AiCompletionHandler {
 
   eraseMessagesWithChannelId(channelId: string) {
     if (this.messages) {
-      this.messages = this.messages.filter(
-        (msg) => msg.channelId !== channelId
-      );
+      this.messages = this.messages.filter((msg) => msg.channelId !== channelId);
     }
   }
 
   getLastMessagesOfAChannel(count: number, channelId: string) {
     if (!this.messages) return [];
 
-    return this.messages
-      .filter((msg) => msg.channelId === channelId)
-      .slice(-count);
+    return this.messages.filter((msg) => msg.channelId === channelId).slice(-count);
   }
 
   getFirstMessagesOfAChannel(count: number, channelId: string) {
     if (!this.messages) return [];
 
-    return this.messages
-      .filter((msg) => msg.channelId === channelId)
-      .slice(0, count);
+    return this.messages.filter((msg) => msg.channelId === channelId).slice(0, count);
   }
 
   setChannelHistory(channelId: string, messages: Collection<string, Message<boolean>>) {
