@@ -74,7 +74,7 @@ export default class ClaudeClient implements AIClientType {
   }
 
   private handleSimpleTextResponse(message: Anthropic.Message): string {
-    const content = message.content[0].text.trim();
+    const content = this.escapeNewLines(message.content[0].text.trim());
     console.log(content);
 
     try {
@@ -143,5 +143,9 @@ export default class ClaudeClient implements AIClientType {
   private async getSecondCallResponse(systemPrompt: string, messages: MessageInput[]): Promise<string> {
     const result = await this.getAiCompletion(systemPrompt, messages);
     return result;
+  }
+
+  private escapeNewLines(jsonString: string): string {
+    return jsonString.replace(/\n/g, '\\n');
   }
 }
