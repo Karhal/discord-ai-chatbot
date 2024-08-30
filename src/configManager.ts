@@ -100,7 +100,8 @@ export default class ConfigManager {
   private AIPrompt: string =
     configValues.AIPrompt || process.env.AI_PROMPT || 'You are a nice assistant in a discord server';
 
-  private triggerWords: string[] = configValues.triggerWords || process.env.TRIGGER_WORDS || [];
+  private triggerWords: string[] =
+    configValues.triggerWords || (process.env.TRIGGER_WORDS ? process.env.TRIGGER_WORDS.split(',') : []);
 
   private dallEConfig: DallEConfigType = {
     active: configValues.dallE.active || process.env.DALLE_ACTIVE === 'true' || false,
