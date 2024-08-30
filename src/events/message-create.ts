@@ -55,10 +55,12 @@ export default class MessageCreate extends EventDiscord {
   theMessageContainsBotName(message: Message): boolean {
     const botName = this.discordClient.user?.username;
     const botId = this.discordClient.user?.id;
+    const triggerWords = ConfigManager.config.triggerWords;
     if (!!botName || !!botId) {
       return (
         (!!botName && message.content.toLowerCase().includes(botName.toLowerCase())) ||
-        (!!botId && message.content.toLowerCase().includes('<@' + botId + '>'))
+        (!!botId && message.content.toLowerCase().includes('<@' + botId + '>')) ||
+        triggerWords.some((word) => message.content.toLowerCase().includes(word.toLowerCase()))
       );
     }
     return false;
