@@ -2,14 +2,15 @@ import AiCompletionHandler from '../handlers/ai-completion-handler';
 import EventDiscord from '../clients/events-discord';
 import { Collection, Events, Message } from 'discord.js';
 import FileHandler from '../handlers/file-handler';
+import ConfigManager from '../configManager';
 
 export default class MessageCreate extends EventDiscord {
   eventName: Events = Events.MessageCreate;
   intervalDate: NodeJS.Timeout | null = null;
   message: Message | null = null;
+  config = ConfigManager.config;
 
   handler = async (message: Message): Promise<void> => {
-
     const maxHistory: number = ConfigManager.config.discord.maxHistory;
     if (
       !this.theMessageContainsBotName(message) ||
@@ -30,10 +31,6 @@ export default class MessageCreate extends EventDiscord {
     const summary = await aiCompletionHandler.getSummary(channelId);
 
     if (summary) {
-      message.channel.sendTyping();
-      const content = await aiCompletionHandler.getAiCompletion(summary, channelId);
-
-    if (summary) {
       const content = await aiCompletionHandler.getAiCompletion(summary, channelId);
       await this.sendResponse(message, content);
     }
@@ -45,12 +42,12 @@ export default class MessageCreate extends EventDiscord {
     if (response) {
       message.channel.send(response);
     }
-    const attachmentsPath = FileHandler.getFolderFilenameFullPaths(ConfigManager.config.tmpFolder.path);
+    const attachmentsPath = FileHandler.getFolderFilenameFullPaths(this.config.tmpFolder.path);
     console.log('Attachments:', attachmentsPath);
     if (attachmentsPath.length > 0) {
       await message.channel.send({ files: [...attachmentsPath] });
       console.log('Attachments sent');
-      FileHandler.emptyFolder(ConfigManager.config.tmpFolder.path);
+      FileHandler.emptyFolder(this.config.tmpFolder.path);
     }
     return true;
   }
