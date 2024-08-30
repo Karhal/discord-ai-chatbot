@@ -16,6 +16,7 @@ export interface ConfigType {
   fluxApi: FluxApiConfigType;
   tmpFolder: TmpFolderConfigType;
   stability: StabilityConfigType;
+  triggerWords: string[];
 }
 
 export interface OpenAIClientConfigType {
@@ -97,9 +98,9 @@ export default class ConfigManager {
   private static _instance: ConfigManager;
 
   private AIPrompt: string =
-    configValues.AIPrompt ||
-    process.env.AI_PROMPT ||
-    'You are a nice assistant in a discord server';
+    configValues.AIPrompt || process.env.AI_PROMPT || 'You are a nice assistant in a discord server';
+
+  private triggerWords: string[] = configValues.triggerWords || process.env.TRIGGER_WORDS || [];
 
   private dallEConfig: DallEConfigType = {
     active: configValues.dallE.active || process.env.DALLE_ACTIVE === 'true' || false,
@@ -115,86 +116,55 @@ export default class ConfigManager {
   private openAIConfig: OpenAIClientConfigType = {
     apiKey: configValues.openAI.apiKey || process.env.OPENAI_API_KEY || '',
     model: configValues.openAI.model || process.env.OPENAI_MODEL || 'gpt-4o',
-    summaryModel:
-      configValues.openAI.summaryModel ||
-      process.env.OPENAI_SUMMARY_MODEL ||
-      'gpt-4o-mini',
+    summaryModel: configValues.openAI.summaryModel || process.env.OPENAI_SUMMARY_MODEL || 'gpt-4o-mini',
     maxTokens:
-      configValues.openAI.maxTokens ||
-      (process.env.OPENAI_MAX_TOKENS
-        ? parseInt(process.env.OPENAI_MAX_TOKENS)
-        : 2000),
+      configValues.openAI.maxTokens || (process.env.OPENAI_MAX_TOKENS ? parseInt(process.env.OPENAI_MAX_TOKENS) : 2000),
     temperature:
       configValues.openAI.temperature ||
-      (process.env.OPENAI_TEMPERATURE
-        ? parseFloat(process.env.OPENAI_TEMPERATURE)
-        : 0.5)
+      (process.env.OPENAI_TEMPERATURE ? parseFloat(process.env.OPENAI_TEMPERATURE) : 0.5)
   };
 
   private claudeConfig: ClaudeClientConfigType = {
     apiKey: configValues.claude.apiKey || process.env.CLAUDE_API_KEY || '',
-    model:
-      configValues.claude.model ||
-      process.env.CLAUDE_MODEL ||
-      'claude-3-5-sonnet-20240620',
-    summaryModel:
-      configValues.claude.summaryModel ||
-      process.env.CLAUDE_SUMMARY_MODEL ||
-      'claude-3-haiku-20240307',
+    model: configValues.claude.model || process.env.CLAUDE_MODEL || 'claude-3-5-sonnet-20240620',
+    summaryModel: configValues.claude.summaryModel || process.env.CLAUDE_SUMMARY_MODEL || 'claude-3-haiku-20240307',
     maxTokens:
-      configValues.claude.maxTokens ||
-      (process.env.CLAUDE_MAX_TOKENS
-        ? parseInt(process.env.CLAUDE_MAX_TOKENS)
-        : 2000),
+      configValues.claude.maxTokens || (process.env.CLAUDE_MAX_TOKENS ? parseInt(process.env.CLAUDE_MAX_TOKENS) : 2000),
     temperature:
       configValues.claude.temperature ||
-      (process.env.CLAUDE_TEMPERATURE
-        ? parseFloat(process.env.CLAUDE_TEMPERATURE)
-        : 0.5)
+      (process.env.CLAUDE_TEMPERATURE ? parseFloat(process.env.CLAUDE_TEMPERATURE) : 0.5)
   };
 
   private discordConfig: DiscordConfigType = {
     token: configValues.discord.token || process.env.DISCORD_TOKEN || '',
-    maxHistory:
-      configValues.discord.maxHistory ||
-      Number(process.env.DISCORD_MAX_HISTORY) ||
-      10,
+    maxHistory: configValues.discord.maxHistory || Number(process.env.DISCORD_MAX_HISTORY) || 10,
     lang: configValues.discord.lang || process.env.DISCORD_LANG || 'en'
   };
 
   private duneConfig: DuneConfigType = {
-    active:
-      configValues.dune.active || process.env.DUNE_ACTIVE === 'true' || false,
+    active: configValues.dune.active || process.env.DUNE_ACTIVE === 'true' || false,
     apiKey: configValues.dune.apiKey || process.env.DUNE_API_KEY || ''
   };
 
   private serpConfig: SerpConfigType = {
-    active:
-      configValues.serp.active || process.env.SERP_ACTIVE === 'true' || false,
+    active: configValues.serp.active || process.env.SERP_ACTIVE === 'true' || false,
     apiKey: configValues.serp.apiKey ?? process.env.SERP_API_KEY ?? '',
     lang: configValues.serp.lang || process.env.SERP_LANG || 'en',
-    google_domain:
-      configValues.serp.google_domain || process.env.SERP_GOOGLE_DOMAIN || '',
+    google_domain: configValues.serp.google_domain || process.env.SERP_GOOGLE_DOMAIN || '',
     hl: configValues.serp.hl || process.env.SERP_HL || '',
     gl: configValues.serp.gl || process.env.SERP_GL || ''
   };
 
   private braveSearchConfig: BraveSearchConfigType = {
-    active:
-      configValues.braveSearch.active ||
-      process.env.BRAVE_SEARCH_ACTIVE === 'true' ||
-      false,
-    apiKey:
-      configValues.braveSearch.apiKey ?? process.env.BRAVE_SEARCH_API_KEY ?? '',
+    active: configValues.braveSearch.active || process.env.BRAVE_SEARCH_ACTIVE === 'true' || false,
+    apiKey: configValues.braveSearch.apiKey ?? process.env.BRAVE_SEARCH_API_KEY ?? '',
     lang: configValues.braveSearch.lang || process.env.BRAVE_SEARCH_LANG || 'en'
   };
 
   private coinConfig: CoinConfigType = {
-    active:
-      configValues.coin.active || process.env.COIN_ACTIVE === 'true' || false,
+    active: configValues.coin.active || process.env.COIN_ACTIVE === 'true' || false,
     apiKey: configValues.coin.apiKey ?? process.env.COIN_API_KEY ?? '',
-    defaultAsset:
-      configValues.coin.defaultAsset || process.env.COIN_DEFAULT_ASSET || 'USD'
+    defaultAsset: configValues.coin.defaultAsset || process.env.COIN_DEFAULT_ASSET || 'USD'
   };
 
   private tmpFolderConfig: TmpFolderConfigType = {
@@ -203,33 +173,18 @@ export default class ConfigManager {
   };
 
   private lighthouseConfig: LighthouseConfigType = {
-    active:
-      configValues.googleLighthouse.active ||
-      process.env.LIGHTHOUSE_ACTIVE === 'true' ||
-      false,
-    apiKey:
-      configValues.googleLighthouse.apiKey ??
-      process.env.LIGHTHOUSE_API_KEY ??
-      ''
+    active: configValues.googleLighthouse.active || process.env.LIGHTHOUSE_ACTIVE === 'true' || false,
+    apiKey: configValues.googleLighthouse.apiKey ?? process.env.LIGHTHOUSE_API_KEY ?? ''
   };
 
   private googleSearchConfig: GoogleSearchConfigType = {
-    active:
-      configValues.googleSearch.active ||
-      process.env.GOOGLE_SEARCH_ACTIVE === 'true' ||
-      false,
-    apiKey:
-      configValues.googleSearch.apiKey ??
-      process.env.GOOGLE_SEARCH_API_KEY ??
-      '',
+    active: configValues.googleSearch.active || process.env.GOOGLE_SEARCH_ACTIVE === 'true' || false,
+    apiKey: configValues.googleSearch.apiKey ?? process.env.GOOGLE_SEARCH_API_KEY ?? '',
     cx: configValues.googleSearch.cx ?? process.env.GOOGLE_SEARCH_CX ?? ''
   };
 
   private fluxApiConfig: FluxApiConfigType = {
-    active:
-      configValues.fluxApi.active ||
-      process.env.FLUX_API_ACTIVE === 'true' ||
-      false,
+    active: configValues.fluxApi.active || process.env.FLUX_API_ACTIVE === 'true' || false,
     apiKey: configValues.fluxApi.apiKey ?? process.env.FLUX_API_KEY ?? ''
   };
 
@@ -248,7 +203,8 @@ export default class ConfigManager {
     fluxApi: this.fluxApiConfig,
     dallE: this.dallEConfig,
     tmpFolder: this.tmpFolderConfig,
-    stability: this.stabilityConfig
+    stability: this.stabilityConfig,
+    triggerWords: this.triggerWords
   };
 
   private static getInstance() {
@@ -282,10 +238,7 @@ export default class ConfigManager {
     if (this._config.dune?.active && !this._config.dune?.apiKey) {
       throw new Error('No Dune API key configured');
     }
-    if (
-      this._config.serp?.active &&
-      (!this._config.serp?.apiKey || !this._config.serp?.google_domain)
-    ) {
+    if (this._config.serp?.active && (!this._config.serp?.apiKey || !this._config.serp?.google_domain)) {
       throw new Error('No SERP API key or Google domain configured');
     }
     if (this._config.braveSearch?.active && !this._config.braveSearch?.apiKey) {
@@ -295,16 +248,10 @@ export default class ConfigManager {
       throw new Error('No Coin API key configured');
     }
 
-    if (
-      this._config.googleLighthouse?.active &&
-      !this._config.googleLighthouse?.apiKey
-    ) {
+    if (this._config.googleLighthouse?.active && !this._config.googleLighthouse?.apiKey) {
       throw new Error('No Lighthouse API key configured');
     }
-    if (
-      this._config.googleSearch?.active &&
-      (!this._config.googleSearch?.apiKey || !this._config.googleSearch?.cx)
-    ) {
+    if (this._config.googleSearch?.active && (!this._config.googleSearch?.apiKey || !this._config.googleSearch?.cx)) {
       throw new Error('No GoogleSearch API key or CX configured');
     }
     if (this._config.fluxApi?.active && !this._config.fluxApi?.apiKey) {

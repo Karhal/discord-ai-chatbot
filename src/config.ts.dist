@@ -6,6 +6,7 @@ export default {
         lang: "en"
     },
     aiClient: 'openAI',
+    triggerWords: [],
     openAI : {
         apiKey : "XXXXX",
         model : "gpt-4o",
