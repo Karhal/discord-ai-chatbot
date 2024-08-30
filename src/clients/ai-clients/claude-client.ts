@@ -54,9 +54,17 @@ export default class ClaudeClient extends EventEmitter implements AIClientType {
   private async message(options: Anthropic.MessageCreateParams): Promise<Anthropic.Message | null> {
     if (!this.client) return null;
     this.emit('working', options);
-    const response = await this.client.messages.create(options);
+    const intervalId = setInterval(() => {
+      this.emit('working', options);
+    }, 4000);
 
-    return response || null;
+    try {
+      const response = await this.client.messages.create(options);
+      return response || null;
+    }
+    finally {
+      clearInterval(intervalId);
+    }
   }
 
   private async handleResponse(
