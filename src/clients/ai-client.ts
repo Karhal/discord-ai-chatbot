@@ -23,6 +23,7 @@ export default class AIClient extends EventEmitter implements AIClientType {
     }
     if (this.client) {
       this.client.on('working', (data) => {
+        console.log('#### #### AI Client working:', data);
         this.emit('completionRequested', data);
       });
     }

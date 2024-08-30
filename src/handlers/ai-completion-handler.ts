@@ -23,7 +23,6 @@ class AiCompletionHandler extends EventEmitter {
     try {
       const systemPrompt = this.createSummaryPrompt();
       const messages = this.getFormattedMessages(5, channelId);
-      console.log('Fetch summary args:', systemPrompt, messages);
       return await this.aiClient.getSummary(systemPrompt, messages);
     }
     catch (error) {
@@ -66,9 +65,8 @@ class AiCompletionHandler extends EventEmitter {
     try {
       const systemPrompt = this.createCompletionPrompt(summary);
       const messages = this.getFormattedMessages(5, channelId);
-      console.log('Fetch completion args:', systemPrompt, messages);
       this.aiClient.on('completionRequested', (data) => {
-        console.log('Completion requested:', data);
+        console.log('Completion requested');
         this.emit('completionRequested', data);
       });
       return await this.aiClient.getAiCompletion(systemPrompt, messages, tools);
