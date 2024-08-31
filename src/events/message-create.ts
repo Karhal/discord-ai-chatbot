@@ -1,4 +1,3 @@
-import AiCompletionHandler from '../handlers/ai-completion-handler';
 import EventDiscord from '../clients/events-discord';
 import { Collection, Events, Message } from 'discord.js';
 import FileHandler from '../handlers/file-handler';
@@ -25,13 +24,12 @@ export default class MessageCreate extends EventDiscord {
       limit: maxHistory
     });
 
-    const aiCompletionHandler = new AiCompletionHandler(this.aiClient, this.config.AIPrompt);
-    this.setupEventListeners(aiCompletionHandler, message);
-    aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
-    const summary = await aiCompletionHandler.getSummary(channelId);
+    this.setupEventListeners(message);
+    this.aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
+    const summary = await this.aiCompletionHandler.getSummary(channelId);
 
     if (summary) {
-      const content = await aiCompletionHandler.getAiCompletion(summary, channelId);
+      const content = await this.aiCompletionHandler.getAiCompletion(summary, channelId);
       await this.sendResponse(message, content);
     }
     console.log('Done.');
@@ -66,8 +64,8 @@ export default class MessageCreate extends EventDiscord {
     return false;
   }
 
-  private setupEventListeners(aiCompletionHandler: AiCompletionHandler, message: Message): void {
-    aiCompletionHandler.on('completionRequested', (data) => {
+  private setupEventListeners(message: Message): void {
+    this.aiCompletionHandler.on('completionRequested', (data) => {
       if (message.channel) {
         message.channel.sendTyping();
       }
