@@ -68,7 +68,12 @@ export default class MessageCreate extends EventDiscord {
 
   private setupEventListeners(aiCompletionHandler: AiCompletionHandler, message: Message): void {
     aiCompletionHandler.on('completionRequested', (data) => {
-      message.channel.sendTyping();
+      if (message.channel) {
+        message.channel.sendTyping();
+      }
+      else {
+        console.error('Channel is null or undefined');
+      }
     });
   }
 }
