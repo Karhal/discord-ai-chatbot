@@ -4,12 +4,14 @@ import { MessageInput } from '../../types/types';
 import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources';
 import ConfigManager from '../../configManager';
 import { tools } from './../../tools-manager';
+import { EventEmitter } from 'events';
 
-export default class OpenAIClient implements AIClientType {
+export default class OpenAIClient extends EventEmitter implements AIClientType {
   client: OpenAI;
   openAIConfig = ConfigManager.config.openAI;
 
   constructor() {
+    super();
     this.client = new OpenAI({
       apiKey: this.openAIConfig.apiKey
     });
