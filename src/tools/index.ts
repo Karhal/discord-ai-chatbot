@@ -10,12 +10,14 @@ import MapSearchTool from './map-search-tool';
 import SerpSearchTool from './serp-search-tool';
 import WriteMemoryTool from './write-memory-tool';
 import StableDiffusionTool from './stablediffusion-tool';
+import GiphyTool from './giphy-tool';
 
 const toolList: (typeof AbstractTool)[] = [
   WriteMemoryTool,
   DallETool,
   BraveSearchTool,
   DuneTool,
+  GiphyTool,
   GoogleSearchTool,
   MapSearchTool,
   CryptoPriceTool,

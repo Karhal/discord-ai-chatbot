@@ -8,6 +8,7 @@ export interface ConfigType {
   AIPrompt: string;
   claude: ClaudeClientConfigType;
   dune: DuneConfigType;
+  giphy: GiphyConfigType;
   serp: SerpConfigType;
   braveSearch: BraveSearchConfigType;
   coin: CoinConfigType;
@@ -90,6 +91,10 @@ export interface StabilityConfigType extends ActivatorConfigType {
   apiKey: string;
 }
 
+export interface GiphyConfigType extends ActivatorConfigType {
+  apiKey: string;
+}
+
 export default class ConfigManager {
   static get config() {
     return ConfigManager.getConfig();
@@ -112,6 +117,11 @@ export default class ConfigManager {
   private stabilityConfig: StabilityConfigType = {
     active: configValues.stability.active || process.env.STABILITY_ACTIVE === 'true' || false,
     apiKey: configValues.stability.apiKey || process.env.STABILITY_API_KEY || ''
+  };
+
+  private giphyConfig: GiphyConfigType = {
+    active: configValues.giphy.active || process.env.GIPHY_ACTIVE === 'true' || false,
+    apiKey: configValues.giphy.apiKey || process.env.GIPHY_API_KEY || ''
   };
 
   private openAIConfig: OpenAIClientConfigType = {
@@ -196,6 +206,7 @@ export default class ConfigManager {
     claude: this.claudeConfig,
     AIPrompt: this.AIPrompt,
     dune: this.duneConfig,
+    giphy: this.giphyConfig,
     serp: this.serpConfig,
     braveSearch: this.braveSearchConfig,
     coin: this.coinConfig,
@@ -248,7 +259,6 @@ export default class ConfigManager {
     if (this._config.coin?.active && !this._config.coin?.apiKey) {
       throw new Error('No Coin API key configured');
     }
-
     if (this._config.googleLighthouse?.active && !this._config.googleLighthouse?.apiKey) {
       throw new Error('No Lighthouse API key configured');
     }
@@ -261,9 +271,12 @@ export default class ConfigManager {
     if (this._config.dallE?.active && !this._config.dallE?.apiKey) {
       throw new Error('No DallE API key configured');
     }
-
     if (this._config.stability?.active && !this._config.stability?.apiKey) {
       throw new Error('No Stability API key configured');
+    }
+    console.log(this._config.giphy);
+    if (this._config.giphy?.active && !this._config.giphy?.apiKey) {
+      throw new Error('No Giphy API key configured');
     }
   }
 }

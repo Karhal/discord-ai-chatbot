@@ -69,6 +69,10 @@ export default {
         apiKey: "",
         cx: "",
     },
+    giphy : {
+        active: false,
+        apiKey: ""
+    },
     tmpFolder: {
         path: 'tmp'
   }
