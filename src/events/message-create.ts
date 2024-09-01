@@ -2,6 +2,8 @@ import EventDiscord from '../clients/events-discord';
 import { Collection, Events, Message } from 'discord.js';
 import FileHandler from '../handlers/file-handler';
 import ConfigManager from '../configManager';
+import { Client } from 'discord.js';
+import { AIClientType } from '../types/AIClientType';
 
 export default class MessageCreate extends EventDiscord {
   eventName: Events = Events.MessageCreate;
@@ -9,30 +11,34 @@ export default class MessageCreate extends EventDiscord {
   message: Message | null = null;
   config = ConfigManager.config;
 
+  constructor(
+    public discordClient: Client,
+    public aiClient: AIClientType
+  ) {
+    super(discordClient, aiClient);
+    this.setupEventListeners();
+  }
+
   handler = async (message: Message): Promise<void> => {
-    const maxHistory: number = ConfigManager.config.discord.maxHistory;
-    if (
-      !this.theMessageContainsBotName(message) ||
-      message.author.id === this.discordClient?.user?.id ||
-      message.author.bot
-    ) {
-      return;
+    try {
+      if (this.shouldIgnoreMessage(message)) {
+        return;
+      }
+      this.message = message;
+      const channelId = message.channelId;
+      const messagesChannelHistory = await this.fetchChannelHistory(message, this.config.discord.maxHistory);
+      this.aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
+      const summary = await this.aiCompletionHandler.getSummary(channelId);
+
+      if (summary) {
+        const content = await this.aiCompletionHandler.getAiCompletion(summary, channelId);
+        await this.sendResponse(message, content);
+      }
+      console.log('Done.');
     }
-
-    const channelId: string = message.channelId;
-    const messagesChannelHistory: Collection<string, Message<boolean>> = await message.channel.messages.fetch({
-      limit: maxHistory
-    });
-
-    this.setupEventListeners(message);
-    this.aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
-    const summary = await this.aiCompletionHandler.getSummary(channelId);
-
-    if (summary) {
-      const content = await this.aiCompletionHandler.getAiCompletion(summary, channelId);
-      await this.sendResponse(message, content);
+    catch (error) {
+      console.error('Error handling message:', error);
     }
-    console.log('Done.');
   };
 
   async sendResponse(message: Message, response: string): Promise<boolean> {
@@ -50,7 +56,19 @@ export default class MessageCreate extends EventDiscord {
     return true;
   }
 
-  theMessageContainsBotName(message: Message): boolean {
+  private async fetchChannelHistory(message: Message, limit: number): Promise<Collection<string, Message<boolean>>> {
+    return await message.channel.messages.fetch({ limit });
+  }
+
+  private shouldIgnoreMessage(message: Message): boolean {
+    return (
+      !this.theMessageContainsBotName(message) ||
+      message.author.id === this.discordClient?.user?.id ||
+      message.author.bot
+    );
+  }
+
+  private theMessageContainsBotName(message: Message): boolean {
     const botName = this.discordClient.user?.username;
     const botId = this.discordClient.user?.id;
     const triggerWords = ConfigManager.config.triggerWords;
@@ -64,10 +82,11 @@ export default class MessageCreate extends EventDiscord {
     return false;
   }
 
-  private setupEventListeners(message: Message): void {
+  private setupEventListeners(): void {
     this.aiCompletionHandler.on('completionRequested', (data) => {
-      if (message.channel) {
-        message.channel.sendTyping();
+      const channel = this.message?.channel;
+      if (channel) {
+        channel.sendTyping();
       }
       else {
         console.error('Channel is null or undefined');
