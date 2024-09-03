@@ -35,6 +35,7 @@ export default class OpenAIClient extends EventEmitter implements AIClientType {
   }
 
   async getAiCompletion(systemPrompt: string, messages: MessageInput[]): Promise<string> {
+    systemPrompt = `${systemPrompt}.\n\n"""NOTE: Your response must be a raw json: {"content": "your response", "author": "you"}" """`;
     const options = {
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
       model: this.openAIConfig.model,

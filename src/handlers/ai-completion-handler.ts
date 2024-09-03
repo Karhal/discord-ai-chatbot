@@ -54,11 +54,8 @@ class AiCompletionHandler extends EventEmitter {
     return `${this.prompt}.\n\n
     """MEMORY:${memory}"""\n
     """PREVIOUSLY:${summary}"""\n
-    """NOTE:
-    - You have to respond to the user in the context of the conversation.
-    - Respond only to the last user message, in a strictly valid raw JSON string.
-    - Example of response:{"content": "your response", "author": "your name" }
-    """`;
+    """NOTE: Respond only to the very last message from the json conversation."""\n
+    `;
   }
 
   async getAiCompletion(summary: string, channelId: string): Promise<string> {
