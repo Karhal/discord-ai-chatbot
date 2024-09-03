@@ -19,7 +19,8 @@ export default class GiphyTool extends AbstractTool {
   readonly description =
     'Use this tool randomly when you, as an assistant, you want to attach a gif to your answer, \
     chose an appropriate tag relative to the conversation\
-    include the returned url in your final response. The url must be clear and entoured by spaces';
+    include the returned url in your final response. The url must be clear and entoured by spaces. \
+    Do not make comment about the gif, just send the link.';
 
   readonly parameters = {
     type: 'object',
@@ -49,6 +50,7 @@ export default class GiphyTool extends AbstractTool {
     const url = new URL('https://api.giphy.com/v1/gifs/random');
     url.searchParams.append('api_key', this.giphyApiKey);
     url.searchParams.append('tag', tag);
+
     const requestOptions: RequestInit = {
       method: 'GET',
       redirect: 'follow'

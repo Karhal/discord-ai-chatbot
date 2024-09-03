@@ -7,7 +7,7 @@ export default class WriteMemoryTool extends AbstractTool {
   public isActivated = true;
 
   readonly description =
-    'Use this tool when the user asks you to remember something. Remember only what the user says from the last message and nothing else, one information at time. Use the same language used by the user. Example : Hey <bot>, remember that I like to eat pizza. Send to the function \'<user> like to eat pizza\'';
+    'Use this tool only when the user explicitely asks you to remember something. Remember only what the user says from the last message and nothing else, one information at time. Use the same language used by the user. Example : Hey <bot>, remember that I like to eat pizza. Send to the function \'<user> like to eat pizza\'';
 
   readonly parameters = {
     type: 'object',
@@ -26,25 +26,14 @@ export default class WriteMemoryTool extends AbstractTool {
       console.log(data);
 
       const fileHandler = new FileHandler();
-      await fileHandler.appendToFile(
-        './',
-        WriteMemoryTool.MEMORY_FILE,
-        `${data.memoryString}\n`
-      );
-      const lines = await fileHandler.readFile(
-        './',
-        WriteMemoryTool.MEMORY_FILE
-      );
+      await fileHandler.appendToFile('./', WriteMemoryTool.MEMORY_FILE, `${data.memoryString}\n`);
+      const lines = await fileHandler.readFile('./', WriteMemoryTool.MEMORY_FILE);
 
       if (lines && lines.split('\n').length > 10) {
         const lastTenLines = lines.split('\n').slice(-10);
-        await fileHandler.writeFile(
-          './',
-          WriteMemoryTool.MEMORY_FILE,
-          lastTenLines.join('\n')
-        );
+        await fileHandler.writeFile('./', WriteMemoryTool.MEMORY_FILE, lastTenLines.join('\n'));
       }
-      return JSON.stringify({ memory_tool_success: true });
+      return JSON.stringify({ memory_tool_success: true, info: 'Memory has been successfully written' });
     }
     catch (error) {
       console.error('Error reading file:', error);
