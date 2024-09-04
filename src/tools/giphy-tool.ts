@@ -17,17 +17,17 @@ export default class GiphyTool extends AbstractTool {
   public isActivated = ConfigManager.config.giphy.active;
 
   readonly description =
-    'Use this tool randomly when you, as an assistant, you want to attach a gif to your answer, \
-    chose an appropriate tag relative to the conversation\
+    'Use this tool when you want to attach a gif to your answer, \
+    chose an appropriate tag relative to the conversation \
     include the returned url in your final response. The url must be clear and entoured by spaces. \
-    Do not make comment about the gif, just send the link.';
+    Do not make comment about the gif, only send the link.';
 
   readonly parameters = {
     type: 'object',
     properties: {
       keyword: {
         type: 'string',
-        description: 'The keyword you want to get the gif for.'
+        description: 'The keyword you want to get the gif for. Keep it simple and relevant.'
       }
     }
   };
