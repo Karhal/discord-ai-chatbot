@@ -46,21 +46,23 @@ export default class GiphyTool extends AbstractTool {
     }
   };
 
-  private async fetchGif(tag: string): Promise<string> {
-    const url = new URL('https://api.giphy.com/v1/gifs/random');
+  private async fetchGif(query: string): Promise<string> {
+    const url = new URL('https://api.giphy.com/v1/gifs/search');
     url.searchParams.append('api_key', this.giphyApiKey);
-    url.searchParams.append('tag', tag);
+    url.searchParams.append('q', query);
+    url.searchParams.append('limit', '1');
 
     const requestOptions: RequestInit = {
       method: 'GET',
       redirect: 'follow'
     };
-
+    console.log(url.toString());
     const response = await fetch(url.toString(), requestOptions);
     if (!response.ok) {
       throw new Error('Failed to fetch GIF');
     }
     const result: GiphyResponse = await response.json();
-    return result.data.embed_url;
+    const randomIndex = Math.floor(Math.random() * result.data.length);
+    return result.data[randomIndex].embed_url;
   }
 }
