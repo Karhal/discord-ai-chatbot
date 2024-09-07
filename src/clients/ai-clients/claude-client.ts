@@ -74,7 +74,7 @@ export default class ClaudeClient extends EventEmitter implements AIClientType {
   ): Promise<string> {
     const toolUseItem = this.findToolUseItem(response);
     if (!toolUseItem) {
-      return this.handleSimpleTextResponse(response);
+      return response.content[0].text;
     }
 
     return this.handleToolUseResponse(toolUseItem, systemPrompt, messages);
@@ -82,27 +82,6 @@ export default class ClaudeClient extends EventEmitter implements AIClientType {
 
   private findToolUseItem(message: Anthropic.Message): Anthropic.ToolUseBlock | undefined {
     return message.content.find((item): item is Anthropic.ToolUseBlock => item.type === 'tool_use');
-  }
-
-  private handleSimpleTextResponse(message: Anthropic.Message): string {
-    const content = this.escapeNewLines(message.content[0].text.trim());
-    console.log(content);
-
-    try {
-      const parsedContent = JSON.parse(content);
-      if (typeof parsedContent === 'object' && parsedContent !== null) {
-        if (parsedContent.content && typeof parsedContent.content === 'string') {
-          return parsedContent.content;
-        }
-        return '';
-      }
-    }
-    catch (error) {
-      // Not valid JSON, return the original content
-      console.log(error);
-    }
-
-    return content;
   }
 
   private async handleToolUseResponse(
@@ -154,9 +133,5 @@ export default class ClaudeClient extends EventEmitter implements AIClientType {
   private async getSecondCallResponse(systemPrompt: string, messages: MessageInput[]): Promise<string> {
     const result = await this.getAiCompletion(systemPrompt, messages);
     return result;
-  }
-
-  private escapeNewLines(jsonString: string): string {
-    return jsonString.replace(/\n/g, '\\n');
   }
 }

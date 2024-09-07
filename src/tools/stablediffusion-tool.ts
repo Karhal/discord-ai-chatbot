@@ -78,7 +78,7 @@ export default class StableDiffusionTool extends AbstractTool {
       if (imageBuffer) {
         await imageHandler.saveBase64Image(imageBuffer, 'webp');
       }
-      return JSON.stringify({ image_ready: true });
+      return JSON.stringify({ image_ready: true, info: 'Image generated and saved will be send as attachement' });
     }
     catch (error: unknown) {
       console.error(error);

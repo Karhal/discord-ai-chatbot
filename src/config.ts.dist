@@ -7,6 +7,7 @@ export default {
     },
     aiClient: 'openAI',
     triggerWords: [],
+    AIPrompt: 'You are a nice assistant',
     openAI : {
         apiKey : "XXXXX",
         model : "gpt-4o",
