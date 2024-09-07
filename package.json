@@ -21,6 +21,7 @@
     "@google-cloud/speech": "latest",
     "@google-cloud/text-to-speech": "latest",
     "discord.js": "latest",
+    "js-yaml": "^4.1.0",
     "openai": "latest",
     "serpapi": "latest"
   },

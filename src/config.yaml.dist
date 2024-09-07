@@ -1,0 +1,59 @@
+discord:
+  token: 'XXXXX'
+  maxHistory: 20
+  lang: 'en'
+aiClient: 'openAI'
+triggerWords: []
+openAI:
+  apiKey: 'XXXXX'
+  model: 'gpt-4o'
+  summaryModel: 'gpt-4o-mini'
+  imageSize: '1024x1024'
+  maxTokens: 4000
+  temperature: 0.5
+claude:
+  apiKey: 'XXXXX'
+  model: 'claude-3-5-sonnet-20240620'
+  summaryModel: 'claude-3-haiku-20240307'
+  prompt: 'You are a nice assistant in a discord server'
+  maxTokens: 2000
+  temperature: 0.5
+dune:
+  active: false
+  apiKey: ''
+serp:
+  active: false
+  apiKey: ''
+  google_domain: ''
+  lang: ''
+  gl: 'us'
+  hl: 'en'
+braveSearch:
+  active: false
+  apiKey: ''
+coin:
+  active: false
+  apiKey: ''
+  defaultAsset: ''
+googleLighthouse:
+  active: false
+  apiKey: ''
+fluxApi:
+  active: false
+  apiKey: ''
+dallE:
+  active: false
+  apiKey: ''
+  imageSize: '1024x1024'
+stability:
+  active: false
+  apiKey: ''
+googleSearch:
+  active: false
+  apiKey: ''
+  cx: ''
+giphy:
+  active: false
+  apiKey: ''
+tmpFolder:
+  path: 'tmp'

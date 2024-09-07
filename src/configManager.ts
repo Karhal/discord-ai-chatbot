@@ -1,4 +1,8 @@
-import configValues from './config';
+//import configValues from './config';
+import * as yaml from 'js-yaml';
+import * as fs from 'fs';
+const fileContents = fs.readFileSync('./src/config.yaml', 'utf8');
+const configValues = yaml.load(fileContents) as any;
 
 export interface ConfigType {
   aiClient: string;
