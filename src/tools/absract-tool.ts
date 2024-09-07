@@ -1,4 +1,5 @@
 import { ToolType } from '../types/types';
+import ConfigManager from '../configManager';
 
 export default abstract class AbstractTool implements ToolType {
   abstract toolName: string;
@@ -6,8 +7,10 @@ export default abstract class AbstractTool implements ToolType {
   abstract description: string;
   abstract parameters: { type: string; properties: object };
   public abstract execute: (...args: string[]) => Promise<any>;
+  config = ConfigManager.getConfig();
 
   buildTool = () => {
+    console.log('config:', this.config);
     console.log(this.execute);
     return {
       type: 'function',
