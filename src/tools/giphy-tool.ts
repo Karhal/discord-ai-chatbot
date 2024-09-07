@@ -17,10 +17,9 @@ export default class GiphyTool extends AbstractTool {
   public isActivated = ConfigManager.config.giphy.active;
 
   readonly description =
-    'Use this tool when you want to attach a gif to your answer, \
+    'Use this tool when you want to support the feeling of your message with an appropriate gif. \
     chose an appropriate tag relative to the conversation \
-    include the returned url in your final response. The url must be clear and entoured by spaces. \
-    Do not make comment about the gif, only send the link.';
+    include the returned url in your final response. The url must be clear and entoured by spaces';
 
   readonly parameters = {
     type: 'object',

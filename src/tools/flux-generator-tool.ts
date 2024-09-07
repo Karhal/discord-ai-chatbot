@@ -55,7 +55,8 @@ export default class FluxGeneratorTool extends AbstractTool {
       await imageHandler.downloadImages(imgUrls);
 
       return JSON.stringify({ image_ready: true });
-    } catch (error: unknow) {
+    }
+    catch (error: unknow) {
       console.log(error);
       if (error && error.status === 400) {
         return error?.error?.message || null;
