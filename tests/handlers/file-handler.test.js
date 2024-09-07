@@ -4,57 +4,6 @@ import fs from 'fs';
 import path from 'path';
 
 jest.mock('fs');
-jest.mock('./../../src/config', () => {
-  return {
-    discord: {
-      lang: 'fr',
-      token: '<discord Token>',
-      maxHistory: 10
-    },
-    openAI: {
-      apiKey: '<openAiKey>',
-      model: 'gpt-4o',
-      summaryModel: 'gpt-4o-mini',
-      prompt: '',
-      imageSize: '1024x1024'
-    },
-    dune: {
-      active: false,
-      apiKey: ''
-    },
-    serp: {
-      active: false,
-      apiKey: '',
-      lang: ''
-    },
-    braveSearch: {
-      active: false,
-      apiKey: '',
-      lang: ''
-    },
-    coin: {
-      active: false,
-      apiKey: '',
-      defaulAsset: 'USD'
-    },
-    googleLighthouse: {
-      active: false,
-      apiKey: ''
-    },
-    fluxApi: {
-      active: false,
-      apiKey: ''
-    },
-    googleSearch: {
-      active: false,
-      apiKey: '',
-      cx: ''
-    },
-    tmpFolder: {
-      path: 'tmp_test'
-    }
-  };
-});
 
 describe('FileHandler', () => {
   afterEach(() => {
@@ -95,12 +44,8 @@ describe('FileHandler', () => {
       FileHandler.emptyFolder(folderName);
 
       expect(unlinkSyncSpy).toHaveBeenCalledTimes(2);
-      expect(unlinkSyncSpy).toHaveBeenCalledWith(
-        path.join('.', folderName, 'file1.txt')
-      );
-      expect(unlinkSyncSpy).toHaveBeenCalledWith(
-        path.join('.', folderName, 'file2.txt')
-      );
+      expect(unlinkSyncSpy).toHaveBeenCalledWith(path.join('.', folderName, 'file1.txt'));
+      expect(unlinkSyncSpy).toHaveBeenCalledWith(path.join('.', folderName, 'file2.txt'));
     });
 
     it('should do nothing if the folder does not exist', () => {
@@ -121,10 +66,7 @@ describe('FileHandler', () => {
       const folderPath = 'testFolder';
       const result = FileHandler.getFolderFilenameFullPaths(folderPath);
 
-      expect(result).toEqual([
-        path.join('.', folderPath, 'file1.txt'),
-        path.join('.', folderPath, 'file2.txt')
-      ]);
+      expect(result).toEqual([path.join('.', folderPath, 'file1.txt'), path.join('.', folderPath, 'file2.txt')]);
     });
   });
 
@@ -137,10 +79,7 @@ describe('FileHandler', () => {
 
       const result = FileHandler.saveStringToFile(folder, filename, content);
 
-      expect(writeFileSyncSpy).toHaveBeenCalledWith(
-        path.join(folder, filename),
-        content
-      );
+      expect(writeFileSyncSpy).toHaveBeenCalledWith(path.join(folder, filename), content);
       expect(result).toBe(path.join(folder, filename));
     });
   });
@@ -152,16 +91,9 @@ describe('FileHandler', () => {
       const filename = 'testFile.txt';
       const content = Buffer.from('Hello, World!');
 
-      const result = FileHandler.saveArrayBufferToFile(
-        folder,
-        filename,
-        content
-      );
+      const result = FileHandler.saveArrayBufferToFile(folder, filename, content);
 
-      expect(writeFileSyncSpy).toHaveBeenCalledWith(
-        path.join(folder, filename),
-        content
-      );
+      expect(writeFileSyncSpy).toHaveBeenCalledWith(path.join(folder, filename), content);
       expect(result).toBe(path.join(folder, filename));
     });
   });
@@ -201,11 +133,7 @@ describe('FileHandler', () => {
       const content = 'File content';
       const result = fileHandler.writeFile(baseDir, filePath, content);
 
-      expect(writeFileSyncSpy).toHaveBeenCalledWith(
-        path.join(baseDir, filePath),
-        content,
-        'utf8'
-      );
+      expect(writeFileSyncSpy).toHaveBeenCalledWith(path.join(baseDir, filePath), content, 'utf8');
       expect(result).toBe(true);
     });
 
@@ -234,11 +162,7 @@ describe('FileHandler', () => {
       const content = 'File content';
       const result = fileHandler.appendToFile(baseDir, filePath, content);
 
-      expect(appendFileSyncSpy).toHaveBeenCalledWith(
-        path.join(baseDir, filePath),
-        content,
-        'utf8'
-      );
+      expect(appendFileSyncSpy).toHaveBeenCalledWith(path.join(baseDir, filePath), content, 'utf8');
       expect(result).toBe(true);
     });
 
