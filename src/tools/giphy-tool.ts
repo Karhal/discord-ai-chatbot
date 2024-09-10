@@ -51,7 +51,7 @@ export default class GiphyTool extends AbstractTool {
     const url = new URL('https://api.giphy.com/v1/gifs/search');
     url.searchParams.append('api_key', this.giphyApiKey);
     url.searchParams.append('q', query);
-    url.searchParams.append('limit', '1');
+    url.searchParams.append('limit', '10');
 
     const requestOptions: RequestInit = {
       method: 'GET',
