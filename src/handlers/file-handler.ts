@@ -69,6 +69,19 @@ export default class FileHandler {
     }
   }
 
+  static readFileAsBuffer(filePath: string): Buffer | null {
+    try {
+      if (!fs.existsSync(filePath)) {
+        console.error('File does not exist:', filePath);
+        return null;
+      }
+      return fs.readFileSync(filePath);
+    } catch (error) {
+      console.error('Error reading file as buffer:', error);
+      return null;
+    }
+  }
+
   writeFile(baseDir: string, filePath: string, content: string) {
     try {
       const fullPath = path.join(baseDir, filePath);

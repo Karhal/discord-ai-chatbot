@@ -23,7 +23,8 @@
     "discord.js": "latest",
     "js-yaml": "^4.1.0",
     "openai": "latest",
-    "serpapi": "latest"
+    "serpapi": "latest",
+    "sharp": "^0.33.5"
   },
   "type": "module",
   "devDependencies": {

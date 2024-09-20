@@ -62,6 +62,7 @@ class AiCompletionHandler extends EventEmitter {
     try {
       const systemPrompt = this.createCompletionPrompt(summary);
       const messages = this.getFormattedMessages(5, channelId);
+      console.log(messages);
       this.aiClient.on('completionRequested', (data) => {
         console.log('Completion requested');
         this.emit('completionRequested', data);
