@@ -3,7 +3,7 @@ import * as yaml from 'js-yaml';
 import * as fs from 'fs';
 const fileContents = fs.readFileSync('./src/config.yaml', 'utf8');
 const configValues = yaml.load(fileContents) as any;
-
+console.log(configValues);
 export interface ConfigType {
   aiClient: string;
   discord: DiscordConfigType;
@@ -22,6 +22,7 @@ export interface ConfigType {
   tmpFolder: TmpFolderConfigType;
   stability: StabilityConfigType;
   triggerWords: string[];
+  imageToVideo: ImageToVideoConfigType;
 }
 
 export interface OpenAIClientConfigType {
@@ -96,6 +97,10 @@ export interface StabilityConfigType extends ActivatorConfigType {
 }
 
 export interface GiphyConfigType extends ActivatorConfigType {
+  apiKey: string;
+}
+
+export interface ImageToVideoConfigType extends ActivatorConfigType {
   apiKey: string;
 }
 
@@ -188,12 +193,12 @@ export default class ConfigManager {
   };
 
   private lighthouseConfig: LighthouseConfigType = {
-    active: configValues.googleLighthouse.active || process.env.LIGHTHOUSE_ACTIVE === 'true' || false,
+    active: configValues.googleLighthouse.active || process.env.LIGHTHOUSE_ACTIVE === 'false' || false,
     apiKey: configValues.googleLighthouse.apiKey ?? process.env.LIGHTHOUSE_API_KEY ?? ''
   };
 
   private googleSearchConfig: GoogleSearchConfigType = {
-    active: configValues.googleSearch.active || process.env.GOOGLE_SEARCH_ACTIVE === 'true' || false,
+    active: configValues.googleSearch.active || process.env.GOOGLE_SEARCH_ACTIVE === 'false' || false,
     apiKey: configValues.googleSearch.apiKey ?? process.env.GOOGLE_SEARCH_API_KEY ?? '',
     cx: configValues.googleSearch.cx ?? process.env.GOOGLE_SEARCH_CX ?? ''
   };
@@ -201,6 +206,11 @@ export default class ConfigManager {
   private fluxApiConfig: FluxApiConfigType = {
     active: configValues.fluxApi.active || process.env.FLUX_API_ACTIVE === 'true' || false,
     apiKey: configValues.fluxApi.apiKey ?? process.env.FLUX_API_KEY ?? ''
+  };
+
+  private imageToVideoConfig: ImageToVideoConfigType = {
+    active: configValues.imageToVideo.active || process.env.IMAGE_TO_VIDEO_ACTIVE === 'true' || false,
+    apiKey: configValues.imageToVideo.apiKey || process.env.IMAGE_TO_VIDEO_API_KEY || ''
   };
 
   private _config: ConfigType = {
@@ -220,7 +230,8 @@ export default class ConfigManager {
     dallE: this.dallEConfig,
     tmpFolder: this.tmpFolderConfig,
     stability: this.stabilityConfig,
-    triggerWords: this.triggerWords
+    triggerWords: this.triggerWords,
+    imageToVideo: this.imageToVideoConfig
   };
 
   private static getInstance() {
@@ -278,9 +289,11 @@ export default class ConfigManager {
     if (this._config.stability?.active && !this._config.stability?.apiKey) {
       throw new Error('No Stability API key configured');
     }
-    console.log(this._config.giphy);
     if (this._config.giphy?.active && !this._config.giphy?.apiKey) {
       throw new Error('No Giphy API key configured');
+    }
+    if (this._config.imageToVideo?.active && !this._config.imageToVideo?.apiKey) {
+      throw new Error('No Image to Video API key configured');
     }
   }
 }

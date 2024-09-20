@@ -48,6 +48,9 @@ dallE:
 stability:
   active: false
   apiKey: ''
+imageToVideo:
+  active: false
+  apiKey: ''
 googleSearch:
   active: false
   apiKey: ''

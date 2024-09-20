@@ -54,7 +54,7 @@ export default class FileHandler {
     return pathToSave;
   }
 
-  readFile(baseDir: string, filePath: string) {
+  static readFile(baseDir: string, filePath: string) {
     try {
       const fullPath = path.join(baseDir, filePath);
       if (!fs.existsSync(fullPath)) {

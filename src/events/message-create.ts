@@ -51,7 +51,7 @@ export default class MessageCreate extends EventDiscord {
     if (attachmentsPath.length > 0) {
       await message.channel.send({ files: [...attachmentsPath] });
       console.log('Attachments sent');
-      FileHandler.emptyFolder(this.config.tmpFolder.path);
+      //FileHandler.emptyFolder(this.config.tmpFolder.path);
     }
     return true;
   }
