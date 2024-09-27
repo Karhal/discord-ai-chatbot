@@ -18,8 +18,6 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.26.0",
     "@fal-ai/serverless-client": "^0.14.2",
-    "@google-cloud/speech": "latest",
-    "@google-cloud/text-to-speech": "latest",
     "discord.js": "latest",
     "js-yaml": "^4.1.0",
     "openai": "latest",
