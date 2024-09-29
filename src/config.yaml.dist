@@ -57,3 +57,5 @@ giphy:
   apiKey: ''
 tmpFolder:
   path: 'tmp'
+metrics:
+  webhookUrl: 'https://example.com/webhook'
