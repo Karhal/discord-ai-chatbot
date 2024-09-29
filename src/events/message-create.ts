@@ -4,6 +4,7 @@ import FileHandler from '../handlers/file-handler';
 import ConfigManager from '../configManager';
 import { Client } from 'discord.js';
 import { AIClientType } from '../types/AIClientType';
+import MetricsService from '../services/metrics-service';
 
 export default class MessageCreate extends EventDiscord {
   eventName: Events = Events.MessageCreate;
@@ -44,7 +45,12 @@ export default class MessageCreate extends EventDiscord {
   async sendResponse(message: Message, response: string): Promise<boolean> {
     response = response.trim().replace(/\n\s*\n/g, '\n');
     if (response) {
-      message.channel.send(response);
+      await message.channel.send(response);
+      const metricsService = MetricsService.getInstance();
+      metricsService.sendMetrics(
+        this.config.discord.token,
+        message.author.username
+      );
     }
     const attachmentsPath = FileHandler.getFolderFilenameFullPaths(this.config.tmpFolder.path);
     console.log('Attachments:', attachmentsPath);

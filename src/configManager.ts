@@ -22,6 +22,7 @@ export interface ConfigType {
   tmpFolder: TmpFolderConfigType;
   stability: StabilityConfigType;
   triggerWords: string[];
+  metrics: MetricsConfigType;
 }
 
 export interface OpenAIClientConfigType {
@@ -97,6 +98,10 @@ export interface StabilityConfigType extends ActivatorConfigType {
 
 export interface GiphyConfigType extends ActivatorConfigType {
   apiKey: string;
+}
+
+export interface MetricsConfigType {
+  webhookUrl?: string;
 }
 
 export default class ConfigManager {
@@ -203,6 +208,10 @@ export default class ConfigManager {
     apiKey: configValues.fluxApi.apiKey ?? process.env.FLUX_API_KEY ?? ''
   };
 
+  private metricsConfig: MetricsConfigType = {
+    webhookUrl: configValues.metrics?.webhookUrl || process.env.METRICS_WEBHOOK_URL || undefined
+  };
+
   private _config: ConfigType = {
     aiClient: configValues.aiClient || process.env.AI_CLIENT || 'openAI',
     discord: this.discordConfig,
@@ -220,7 +229,8 @@ export default class ConfigManager {
     dallE: this.dallEConfig,
     tmpFolder: this.tmpFolderConfig,
     stability: this.stabilityConfig,
-    triggerWords: this.triggerWords
+    triggerWords: this.triggerWords,
+    metrics: this.metricsConfig
   };
 
   private static getInstance() {
