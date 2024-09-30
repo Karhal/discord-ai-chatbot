@@ -1,8 +1,10 @@
+botname:''
 discord:
   token: ''
   maxHistory: 20
   lang: 'en'
 aiClient: 'openAI'
+AIPrompt: 'You are a nice assistant in a discord server'
 triggerWords: []
 openAI:
   apiKey: ''
