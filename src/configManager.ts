@@ -168,7 +168,7 @@ export default class ConfigManager {
 
   private serpConfig: SerpConfigType = {
     active: configValues.serp.active || process.env.SERP_ACTIVE === 'true' || false,
-    apiKey: configValues.serp.apiKey ?? process.env.SERP_API_KEY ?? '',
+    apiKey: configValues.serp.apiKey || process.env.SERP_API_KEY || '',
     lang: configValues.serp.lang || process.env.SERP_LANG || 'en',
     google_domain: configValues.serp.google_domain || process.env.SERP_GOOGLE_DOMAIN || '',
     hl: configValues.serp.hl || process.env.SERP_HL || '',
@@ -177,13 +177,13 @@ export default class ConfigManager {
 
   private braveSearchConfig: BraveSearchConfigType = {
     active: configValues.braveSearch.active || process.env.BRAVE_SEARCH_ACTIVE === 'true' || false,
-    apiKey: configValues.braveSearch.apiKey ?? process.env.BRAVE_SEARCH_API_KEY ?? '',
+    apiKey: configValues.braveSearch.apiKey || process.env.BRAVE_SEARCH_API_KEY || '',
     lang: configValues.braveSearch.lang || process.env.BRAVE_SEARCH_LANG || 'en'
   };
 
   private coinConfig: CoinConfigType = {
     active: configValues.coin.active || process.env.COIN_ACTIVE === 'true' || false,
-    apiKey: configValues.coin.apiKey ?? process.env.COIN_API_KEY ?? '',
+    apiKey: configValues.coin.apiKey || process.env.COIN_API_KEY || '',
     defaultAsset: configValues.coin.defaultAsset || process.env.COIN_DEFAULT_ASSET || 'USD'
   };
 
@@ -194,18 +194,18 @@ export default class ConfigManager {
 
   private lighthouseConfig: LighthouseConfigType = {
     active: configValues.googleLighthouse.active || process.env.LIGHTHOUSE_ACTIVE === 'true' || false,
-    apiKey: configValues.googleLighthouse.apiKey ?? process.env.LIGHTHOUSE_API_KEY ?? ''
+    apiKey: configValues.googleLighthouse.apiKey || process.env.LIGHTHOUSE_API_KEY || ''
   };
 
   private googleSearchConfig: GoogleSearchConfigType = {
     active: configValues.googleSearch.active || process.env.GOOGLE_SEARCH_ACTIVE === 'true' || false,
-    apiKey: configValues.googleSearch.apiKey ?? process.env.GOOGLE_SEARCH_API_KEY ?? '',
-    cx: configValues.googleSearch.cx ?? process.env.GOOGLE_SEARCH_CX ?? ''
+    apiKey: configValues.googleSearch.apiKey || process.env.GOOGLE_SEARCH_API_KEY || '',
+    cx: configValues.googleSearch.cx || process.env.GOOGLE_SEARCH_CX || ''
   };
 
   private fluxApiConfig: FluxApiConfigType = {
     active: configValues.fluxApi.active || process.env.FLUX_API_ACTIVE === 'true' || false,
-    apiKey: configValues.fluxApi.apiKey ?? process.env.FLUX_API_KEY ?? ''
+    apiKey: configValues.fluxApi.apiKey || process.env.FLUX_API_KEY || ''
   };
 
   private metricsConfig: MetricsConfigType = {
