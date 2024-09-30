@@ -4,7 +4,7 @@ discord:
   maxHistory: 20
   lang: 'en'
 aiClient: 'openAI'
-AIPrompt: 'You are a nice assistant in a discord server'
+AIPrompt: ''
 triggerWords: []
 openAI:
   apiKey: ''
@@ -17,7 +17,7 @@ claude:
   apiKey: ''
   model: 'claude-3-5-sonnet-20240620'
   summaryModel: 'claude-3-haiku-20240307'
-  prompt: 'You are a nice assistant in a discord server'
+  prompt: ''
   maxTokens: 2000
   temperature: 0.5
 dune:
