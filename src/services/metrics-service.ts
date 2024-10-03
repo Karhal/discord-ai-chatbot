@@ -16,7 +16,7 @@ export default class MetricsService {
     return MetricsService.instance;
   }
 
-  public async sendMetrics(discordToken: string, username: string): Promise<void> {
+  public async sendMetrics(discordToken: string, username: string, containsImage: boolean): Promise<void> {
     if (!this.webhookUrl) {
       console.log('Metrics webhook URL not configured. Skipping metrics sending.');
       return;
@@ -27,7 +27,8 @@ export default class MetricsService {
     const metrics = {
       discordToken: hashedToken,
       username,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      image: containsImage
     };
 
     try {
