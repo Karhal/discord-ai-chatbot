@@ -47,10 +47,19 @@ export default class MessageCreate extends EventDiscord {
     if (response) {
       await message.channel.send(response);
       const metricsService = MetricsService.getInstance();
-      metricsService.sendMetrics(
+      const attachmentsPath = FileHandler.getFolderFilenameFullPaths(this.config.tmpFolder.path);
+      await metricsService.sendMetrics(
         this.config.discord.token,
-        message.author.username
+        message.author.username,
+        false
       );
+      for (let i = 0; i < attachmentsPath.length; i++) {
+        await metricsService.sendMetrics(
+          this.config.discord.token,
+          message.author.username,
+          true
+        );
+      }
     }
     const attachmentsPath = FileHandler.getFolderFilenameFullPaths(this.config.tmpFolder.path);
     console.log('Attachments:', attachmentsPath);
