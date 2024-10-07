@@ -16,7 +16,7 @@ interface LocalResults {
 }
 
 export default class MapSearchTool extends AbstractTool {
-  readonly toolName = MapSearchTool.name;
+  readonly toolName = 'map-search';
   public readonly isActivated = ConfigManager.config.serp.active;
 
   public readonly description =

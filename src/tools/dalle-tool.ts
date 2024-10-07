@@ -13,7 +13,7 @@ type openAIImageSize =
   | undefined;
 
 export default class DallETool extends AbstractTool {
-  readonly toolName = DallETool.name;
+  readonly toolName = 'dalle';
   dallEConfig = ConfigManager.config.dallE;
   public isActivated = ConfigManager.config.dallE.active;
   client: OpenAI;
@@ -58,21 +58,28 @@ export default class DallETool extends AbstractTool {
 
   readonly execute = async (promptAsString: string) => {
     try {
+      console.log('generating image for prompt:', promptAsString);
       const prompt = JSON.parse(promptAsString);
+      console.log('prompt', prompt);
       const imageHandler = new ImageHandler();
 
       const imgUrl = await this.generateImage(prompt.imagePrompt);
       if (imgUrl) {
+        console.log('imgUrl', imgUrl);
         await imageHandler.downloadImages([imgUrl]);
+      }
+      else {
+        console.log('No image URL generated');
       }
       return JSON.stringify({ image_ready: true });
     }
     catch (error: unknown) {
-      console.error(error);
+      console.log('An unexpected error occurred during generation of image');
+      console.log(error);
       if (error instanceof Error && 'status' in error && error.status === 400) {
         return (error as { error?: { message?: string } }).error?.message || null;
       }
-      return JSON.stringify({ error: 'An unexpected error occurred' });
+      return JSON.stringify({ error: 'An unexpected error occurred during generation of image' });
     }
   };
 }

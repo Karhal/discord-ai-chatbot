@@ -1,6 +1,7 @@
-//import configValues from './config';
 import * as yaml from 'js-yaml';
 import * as fs from 'fs';
+import path from 'path';
+
 const fileContents = fs.readFileSync('./src/config.yaml', 'utf8');
 const configValues = yaml.load(fileContents) as any;
 
@@ -112,108 +113,102 @@ export default class ConfigManager {
   private static _instance: ConfigManager;
 
   private AIPrompt: string =
-    configValues.AIPrompt || process.env.AI_PROMPT || 'You are a nice assistant in a discord server';
+    process.env.AI_PROMPT || configValues.AIPrompt || 'You are a nice assistant in a discord server';
 
   private triggerWords: string[] =
-    configValues.triggerWords || (process.env.TRIGGER_WORDS ? process.env.TRIGGER_WORDS.split(',') : []);
+    (process.env.TRIGGER_WORDS ? process.env.TRIGGER_WORDS.split(',') : []) || configValues.triggerWords || [];
 
   private dallEConfig: DallEConfigType = {
-    active: configValues.dallE.active || process.env.DALLE_ACTIVE === 'true' || false,
-    apiKey: configValues.dallE.apiKey || process.env.DALLE_API_KEY || '',
-    imageSize: configValues.dallE.imageSize || process.env.IMAGE_SIZE || '1024x1024'
+    active: process.env.DALLE_ACTIVE === 'true' || configValues.dallE?.active || false,
+    apiKey: process.env.DALLE_API_KEY || configValues.dallE?.apiKey || '',
+    imageSize: process.env.IMAGE_SIZE || configValues.dallE?.imageSize || '1024x1024'
   };
 
   private stabilityConfig: StabilityConfigType = {
-    active: configValues.stability.active || process.env.STABILITY_ACTIVE === 'true' || false,
-    apiKey: configValues.stability.apiKey || process.env.STABILITY_API_KEY || ''
+    active: process.env.STABILITY_ACTIVE === 'true' || configValues.stability?.active || false,
+    apiKey: process.env.STABILITY_API_KEY || configValues.stability?.apiKey || ''
   };
 
   private giphyConfig: GiphyConfigType = {
-    active: configValues.giphy.active || process.env.GIPHY_ACTIVE === 'true' || false,
-    apiKey: configValues.giphy.apiKey || process.env.GIPHY_API_KEY || ''
+    active: process.env.GIPHY_ACTIVE === 'true' || configValues.giphy?.active || false,
+    apiKey: process.env.GIPHY_API_KEY || configValues.giphy?.apiKey || ''
   };
 
   private openAIConfig: OpenAIClientConfigType = {
-    apiKey: configValues.openAI.apiKey || process.env.OPENAI_API_KEY || '',
-    model: configValues.openAI.model || process.env.OPENAI_MODEL || 'gpt-4o',
-    summaryModel: configValues.openAI.summaryModel || process.env.OPENAI_SUMMARY_MODEL || 'gpt-4o-mini',
-    maxTokens:
-      configValues.openAI.maxTokens || (process.env.OPENAI_MAX_TOKENS ? parseInt(process.env.OPENAI_MAX_TOKENS) : 2000),
-    temperature:
-      configValues.openAI.temperature ||
-      (process.env.OPENAI_TEMPERATURE ? parseFloat(process.env.OPENAI_TEMPERATURE) : 0.5)
+    apiKey: process.env.OPENAI_API_KEY || configValues.openAI?.apiKey || '',
+    model: process.env.OPENAI_MODEL || configValues.openAI?.model || 'gpt-4o',
+    summaryModel: process.env.OPENAI_SUMMARY_MODEL || configValues.openAI?.summaryModel || 'gpt-4o-mini',
+    maxTokens: process.env.OPENAI_MAX_TOKENS ? parseInt(process.env.OPENAI_MAX_TOKENS) : configValues.openAI?.maxTokens || 2000,
+    temperature: process.env.OPENAI_TEMPERATURE ? parseFloat(process.env.OPENAI_TEMPERATURE) : configValues.openAI?.temperature || 0.5
   };
 
   private claudeConfig: ClaudeClientConfigType = {
-    apiKey: configValues.claude.apiKey || process.env.CLAUDE_API_KEY || '',
-    model: configValues.claude.model || process.env.CLAUDE_MODEL || 'claude-3-5-sonnet-20240620',
-    summaryModel: configValues.claude.summaryModel || process.env.CLAUDE_SUMMARY_MODEL || 'claude-3-haiku-20240307',
-    maxTokens:
-      configValues.claude.maxTokens || (process.env.CLAUDE_MAX_TOKENS ? parseInt(process.env.CLAUDE_MAX_TOKENS) : 2000),
-    temperature:
-      configValues.claude.temperature ||
-      (process.env.CLAUDE_TEMPERATURE ? parseFloat(process.env.CLAUDE_TEMPERATURE) : 0.5)
+    apiKey: process.env.CLAUDE_API_KEY || configValues.claude?.apiKey || '',
+    model: process.env.CLAUDE_MODEL || configValues.claude?.model || 'claude-3-5-sonnet-20240620',
+    summaryModel: process.env.CLAUDE_SUMMARY_MODEL || configValues.claude?.summaryModel || 'claude-3-haiku-20240307',
+    maxTokens: process.env.CLAUDE_MAX_TOKENS ? parseInt(process.env.CLAUDE_MAX_TOKENS) : configValues.claude?.maxTokens || 2000,
+    temperature: process.env.CLAUDE_TEMPERATURE ? parseFloat(process.env.CLAUDE_TEMPERATURE) : configValues.claude?.temperature || 0.5
   };
 
   private discordConfig: DiscordConfigType = {
-    token: configValues.discord.token || process.env.DISCORD_TOKEN || '',
-    maxHistory: configValues.discord.maxHistory || Number(process.env.DISCORD_MAX_HISTORY) || 10,
-    lang: configValues.discord.lang || process.env.DISCORD_LANG || 'en'
+    token: process.env.DISCORD_TOKEN || configValues.discord?.token || '',
+    maxHistory: Number(process.env.DISCORD_MAX_HISTORY) || configValues.discord?.maxHistory || 10,
+    lang: process.env.DISCORD_LANG || configValues.discord?.lang || 'en'
   };
 
   private duneConfig: DuneConfigType = {
-    active: configValues.dune.active || process.env.DUNE_ACTIVE === 'true' || false,
-    apiKey: configValues.dune.apiKey || process.env.DUNE_API_KEY || ''
+    active: process.env.DUNE_ACTIVE === 'true' || configValues.dune?.active || false,
+    apiKey: process.env.DUNE_API_KEY || configValues.dune?.apiKey || ''
   };
 
   private serpConfig: SerpConfigType = {
-    active: configValues.serp.active || process.env.SERP_ACTIVE === 'true' || false,
-    apiKey: configValues.serp.apiKey || process.env.SERP_API_KEY || '',
-    lang: configValues.serp.lang || process.env.SERP_LANG || 'en',
-    google_domain: configValues.serp.google_domain || process.env.SERP_GOOGLE_DOMAIN || '',
-    hl: configValues.serp.hl || process.env.SERP_HL || '',
-    gl: configValues.serp.gl || process.env.SERP_GL || ''
+    active: process.env.SERP_ACTIVE === 'true' || configValues.serp?.active || false,
+    apiKey: process.env.SERP_API_KEY || configValues.serp?.apiKey || '',
+    lang: process.env.SERP_LANG || configValues.serp?.lang || 'en',
+    google_domain: process.env.SERP_GOOGLE_DOMAIN || configValues.serp?.google_domain || '',
+    hl: process.env.SERP_HL || configValues.serp?.hl || '',
+    gl: process.env.SERP_GL || configValues.serp?.gl || ''
   };
 
   private braveSearchConfig: BraveSearchConfigType = {
-    active: configValues.braveSearch.active || process.env.BRAVE_SEARCH_ACTIVE === 'true' || false,
-    apiKey: configValues.braveSearch.apiKey || process.env.BRAVE_SEARCH_API_KEY || '',
-    lang: configValues.braveSearch.lang || process.env.BRAVE_SEARCH_LANG || 'en'
+    active: process.env.BRAVE_SEARCH_ACTIVE === 'true' || configValues.braveSearch?.active || false,
+    apiKey: process.env.BRAVE_SEARCH_API_KEY || configValues.braveSearch?.apiKey || '',
+    lang: process.env.BRAVE_SEARCH_LANG || configValues.braveSearch?.lang || 'en'
   };
 
   private coinConfig: CoinConfigType = {
-    active: configValues.coin.active || process.env.COIN_ACTIVE === 'true' || false,
-    apiKey: configValues.coin.apiKey || process.env.COIN_API_KEY || '',
-    defaultAsset: configValues.coin.defaultAsset || process.env.COIN_DEFAULT_ASSET || 'USD'
+    active: process.env.COIN_ACTIVE === 'true' || configValues.coin?.active || false,
+    apiKey: process.env.COIN_API_KEY || configValues.coin?.apiKey || '',
+    defaultAsset: process.env.COIN_DEFAULT_ASSET || configValues.coin?.defaultAsset || 'USD'
   };
 
   private tmpFolderConfig: TmpFolderConfigType = {
     active: true,
-    path: configValues.tmpFolder.path || process.env.TMP_FOLDER_PATH || 'tmp'
+    path: process.env.TMP_FOLDER_PATH || configValues.tmpFolder?.path || 'tmp'
   };
 
   private lighthouseConfig: LighthouseConfigType = {
-    active: configValues.googleLighthouse.active || process.env.LIGHTHOUSE_ACTIVE === 'true' || false,
-    apiKey: configValues.googleLighthouse.apiKey || process.env.LIGHTHOUSE_API_KEY || ''
+    active: process.env.LIGHTHOUSE_ACTIVE === 'true' || configValues.googleLighthouse?.active || false,
+    apiKey: process.env.LIGHTHOUSE_API_KEY || configValues.googleLighthouse?.apiKey || ''
   };
 
   private googleSearchConfig: GoogleSearchConfigType = {
-    active: configValues.googleSearch.active || process.env.GOOGLE_SEARCH_ACTIVE === 'true' || false,
-    apiKey: configValues.googleSearch.apiKey || process.env.GOOGLE_SEARCH_API_KEY || '',
-    cx: configValues.googleSearch.cx || process.env.GOOGLE_SEARCH_CX || ''
+    active: process.env.GOOGLE_SEARCH_ACTIVE === 'true' || configValues.googleSearch?.active || false,
+    apiKey: process.env.GOOGLE_SEARCH_API_KEY || configValues.googleSearch?.apiKey || '',
+    cx: process.env.GOOGLE_SEARCH_CX || configValues.googleSearch?.cx || ''
   };
 
   private fluxApiConfig: FluxApiConfigType = {
-    active: configValues.fluxApi.active || process.env.FLUX_API_ACTIVE === 'true' || false,
-    apiKey: configValues.fluxApi.apiKey || process.env.FLUX_API_KEY || ''
+    active: process.env.FLUX_API_ACTIVE === 'true' || configValues.fluxApi?.active || false,
+    apiKey: process.env.FLUX_API_KEY || configValues.fluxApi?.apiKey || ''
   };
 
   private metricsConfig: MetricsConfigType = {
-    webhookUrl: configValues.metrics?.webhookUrl || process.env.METRICS_WEBHOOK_URL || undefined
+    webhookUrl: process.env.METRICS_WEBHOOK_URL || configValues.metrics?.webhookUrl || undefined
   };
 
   private _config: ConfigType = {
-    aiClient: configValues.aiClient || process.env.AI_CLIENT || 'openAI',
+    aiClient: process.env.AI_CLIENT || configValues.aiClient || 'openAI',
     discord: this.discordConfig,
     openAI: this.openAIConfig,
     claude: this.claudeConfig,
@@ -249,6 +244,18 @@ export default class ConfigManager {
   }
 
   private validateConfigIntegrity(): void {
+    console.log('Configuration:', this._config);
+
+    const tmpFolderPath = path.resolve(this._config.tmpFolder.path);
+    try {
+      fs.accessSync(tmpFolderPath, fs.constants.W_OK);
+      console.log(`Temporary folder ${tmpFolderPath} is writable.`);
+    }
+    catch (err) {
+      console.error(`Error: Temporary folder ${tmpFolderPath} is not writable.`);
+      throw new Error(`Temporary folder ${tmpFolderPath} is not writable. Please check permissions.`);
+    }
+
     if (!this._config.AIPrompt) {
       throw new Error('No Ai Prompt configured');
     }
@@ -288,7 +295,7 @@ export default class ConfigManager {
     if (this._config.stability?.active && !this._config.stability?.apiKey) {
       throw new Error('No Stability API key configured');
     }
-    console.log(this._config.giphy);
+
     if (this._config.giphy?.active && !this._config.giphy?.apiKey) {
       throw new Error('No Giphy API key configured');
     }

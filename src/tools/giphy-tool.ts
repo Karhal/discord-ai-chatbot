@@ -12,7 +12,7 @@ interface GiphyError {
 }
 
 export default class GiphyTool extends AbstractTool {
-  readonly toolName = GiphyTool.name;
+  readonly toolName = 'giphy';
   giphyApiKey = ConfigManager.config.giphy.apiKey;
   public isActivated = ConfigManager.config.giphy.active;
 

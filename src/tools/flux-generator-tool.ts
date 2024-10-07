@@ -6,7 +6,7 @@ fal.config({
   credentials: ConfigManager.config.fluxApi.apiKey
 });
 export default class FluxGeneratorTool extends AbstractTool {
-  readonly toolName = FluxGeneratorTool.name;
+  readonly toolName = 'flux';
   public isActivated = ConfigManager.config.fluxApi.active;
 
   readonly description =

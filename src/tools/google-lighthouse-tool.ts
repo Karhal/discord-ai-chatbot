@@ -2,7 +2,7 @@ import ConfigManager from '../configManager';
 import AbstractTool from './absract-tool';
 
 export default class GoogleLighthouseTool extends AbstractTool {
-  readonly toolName = GoogleLighthouseTool.name;
+  readonly toolName = 'google-lighthouse';
   public isActivated = ConfigManager.config.googleLighthouse.active;
 
   readonly description =

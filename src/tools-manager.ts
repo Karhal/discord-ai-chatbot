@@ -8,11 +8,10 @@ const tools: AITool[] = [];
 toolList.forEach((toolClass) => {
   const instance = new toolClass();
   if (instance.isActivated) {
-    console.log(`${toolClass.name} loaded`);
     tools.push(instance.buildTool());
   }
 });
-
+console.log(tools);
 const readMemory = () => {
   const memoryFilePath = `./${WriteMemoryTool.MEMORY_FILE}`;
   if (!fs.existsSync(memoryFilePath)) {

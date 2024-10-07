@@ -3,7 +3,7 @@ import ConfigManager from '../configManager';
 import AbstractTool from './absract-tool';
 
 export default class SerpSearchTool extends AbstractTool {
-  readonly toolName = SerpSearchTool.name;
+  readonly toolName = 'serp-search';
   public readonly isActivated = ConfigManager.config.serp.active;
 
   public readonly description =
