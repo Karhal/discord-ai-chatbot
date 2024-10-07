@@ -2,11 +2,11 @@ import ConfigManager from '../configManager';
 import AbstractTool from './absract-tool';
 
 export default class BraveSearchTool extends AbstractTool {
-  readonly toolName = BraveSearchTool.name;
+  readonly toolName = 'brave-search';
   readonly isActivated = ConfigManager.config.braveSearch.active;
 
   readonly description =
-    'Use this tool only when you need to make a search on the web. Then interpret the results and provide a summary.';
+    'Use this tool only when you need to make a search on the web asked by the user. Then interpret the results and provide a summary.';
 
   readonly parameters = {
     type: 'object',

@@ -2,7 +2,7 @@ import FileHandler from '../handlers/file-handler';
 import AbstractTool from './absract-tool';
 
 export default class WriteMemoryTool extends AbstractTool {
-  readonly toolName = WriteMemoryTool.name;
+  readonly toolName = 'write-memory';
   public static readonly MEMORY_FILE = 'memory.txt';
   public isActivated = true;
 

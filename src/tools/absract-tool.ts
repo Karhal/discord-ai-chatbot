@@ -10,7 +10,6 @@ export default abstract class AbstractTool implements ToolType {
   config = ConfigManager.getConfig();
 
   buildTool = () => {
-    console.log('config:', this.config);
     console.log(this.execute);
     return {
       type: 'function',

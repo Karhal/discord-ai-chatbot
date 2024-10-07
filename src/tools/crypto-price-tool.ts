@@ -2,7 +2,7 @@ import ConfigManager from '../configManager';
 import AbstractTool from './absract-tool';
 
 export default class CryptoPriceTool extends AbstractTool {
-  readonly toolName = CryptoPriceTool.name;
+  readonly toolName = 'crypto-price';
   private defaultAsset = ConfigManager.config.coin.defaultAsset;
   readonly isActivated = ConfigManager.config.coin.active;
 

@@ -1,32 +1,31 @@
-botname:''
+botname:
 discord:
-  token: ''
+  token: 
   maxHistory: 20
   lang: 'en'
 aiClient: 'openAI'
-AIPrompt: ''
+AIPrompt: 
 triggerWords: []
 openAI:
-  apiKey: ''
+  apiKey: 
   model: 'gpt-4o'
   summaryModel: 'gpt-4o-mini'
   imageSize: '1024x1024'
   maxTokens: 4000
-  temperature: 0.5
+  temperature: 0.7
 claude:
-  apiKey: ''
+  apiKey: 
   model: 'claude-3-5-sonnet-20240620'
   summaryModel: 'claude-3-haiku-20240307'
-  prompt: ''
   maxTokens: 2000
-  temperature: 0.5
+  temperature: 0.6
 dune:
   active: false
   apiKey: ''
 serp:
   active: false
   apiKey: ''
-  google_domain: ''
+  google_domain: 'google.com'
   lang: ''
   gl: 'us'
   hl: 'en'
@@ -58,6 +57,6 @@ giphy:
   active: false
   apiKey: ''
 tmpFolder:
-  path: 'tmp'
+  path: 'attachments'
 metrics:
   webhookUrl: ''

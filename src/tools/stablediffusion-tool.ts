@@ -4,7 +4,7 @@ import AbstractTool from './absract-tool';
 import ConfigManager from '../configManager';
 
 export default class StableDiffusionTool extends AbstractTool {
-  readonly toolName = StableDiffusionTool.name;
+  readonly toolName = 'stable-diffusion';
   public isActivated = ConfigManager.config.stability.active;
   private stabilityConfig = ConfigManager.config.stability;
   private apiKey: string;

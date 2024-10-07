@@ -2,7 +2,7 @@ import ConfigManager from '../configManager';
 import AbstractTool from './absract-tool';
 
 export default class GoogleSearchTool extends AbstractTool {
-  readonly toolName = GoogleSearchTool.name;
+  readonly toolName = 'google-search';
   public isActivated = ConfigManager.config.googleSearch.active;
   private apiKey = ConfigManager.config.googleSearch.apiKey;
   private cx = ConfigManager.config.googleSearch.cx;

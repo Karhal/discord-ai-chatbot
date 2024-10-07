@@ -2,7 +2,7 @@ import ConfigManager from '../configManager';
 import AbstractTool from './absract-tool';
 
 export default class DuneTool extends AbstractTool {
-  readonly toolName = DuneTool.name;
+  readonly toolName = 'dune';
   duneApiKey = ConfigManager.config.dune.apiKey;
   public isActivated = ConfigManager.config.dune.active;
 
