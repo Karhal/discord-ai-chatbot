@@ -43,19 +43,26 @@ class AiCompletionHandler extends EventEmitter {
   }
 
   private createSummaryPrompt(): string {
-    return `Craft a short summary of the given conversation that is detailed while maintaining clarity and conciseness. 
-      Rely strictly on the provided text. Format the summary in one paragraph form for easy understanding. 
-      The summary has to be the shortest possible (<100 words) and give a good idea of what the discussion is about. 
-      Use the following language: ${this.discordConfig.lang}\n\n"""Text:`;
+    return `As a professional summarizer, create a concise and comprehensive summary of the provided conversation
+    while adhering to these guidelines:
+    Craft a summary that is detailed, thorough, in-depth, and complex, while maintaining clarity and conciseness 
+    in the ${this.discordConfig.lang} language.
+    Incorporate main ideas and essential information, eliminating extraneous language and focusing on critical aspects.
+    Rely strictly on the provided text, without including external information.
+    Format the summary in paragraph form for easy understanding.
+    By following this optimized prompt, you will generate an effective summary that encapsulates 
+    the essence of the given text in a clear, concise, and reader-friendly manner.
+    \n\n"""CONVERSATION:"`;
   }
 
   private createCompletionPrompt(summary: string): string {
     const memory: string = readMemory();
-    return `${this.prompt}.\n\n
+    const fullprompt = `${this.prompt}.\n\n
     """MEMORY:${memory}"""\n
     """PREVIOUSLY:${summary}"""\n
-    """NOTE: Respond only to the very last message from the json conversation."""\n
     `;
+    console.log(fullprompt);
+    return fullprompt;
   }
 
   async getAiCompletion(summary: string, channelId: string): Promise<string> {
