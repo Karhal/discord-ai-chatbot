@@ -115,8 +115,16 @@ export default class ConfigManager {
   private AIPrompt: string =
     process.env.AI_PROMPT || configValues.AIPrompt || 'You are a nice assistant in a discord server';
 
-  private triggerWords: string[] =
-    (process.env.TRIGGER_WORDS ? process.env.TRIGGER_WORDS.split(',') : []) || configValues.triggerWords || [];
+  private triggerWords: string[] = (() => {
+    if (process.env.TRIGGER_WORDS) {
+      return process.env.TRIGGER_WORDS.split(',');
+    }
+    if (configValues.triggerWords && Array.isArray(configValues.triggerWords)) {
+      return configValues.triggerWords;
+    }
+    console.warn('No trigger words defined. Using an empty array.');
+    return [];
+  })();
 
   private dallEConfig: DallEConfigType = {
     active: process.env.DALLE_ACTIVE === 'true' || configValues.dallE?.active || false,
@@ -244,8 +252,8 @@ export default class ConfigManager {
   }
 
   private validateConfigIntegrity(): void {
-    console.log('Configuration:', this._config);
-
+    console.log('Configuration:', configValues);
+    console.log('triggerWords:', this.triggerWords);
     const tmpFolderPath = path.resolve(this._config.tmpFolder.path);
     try {
       fs.accessSync(tmpFolderPath, fs.constants.W_OK);
