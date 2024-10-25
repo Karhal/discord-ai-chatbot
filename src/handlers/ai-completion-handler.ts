@@ -61,7 +61,6 @@ class AiCompletionHandler extends EventEmitter {
     """MEMORY:${memory}"""\n
     """PREVIOUSLY:${summary}"""\n
     `;
-    console.log(fullprompt);
     return fullprompt;
   }
 
