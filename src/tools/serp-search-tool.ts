@@ -7,7 +7,7 @@ export default class SerpSearchTool extends AbstractTool {
   public readonly isActivated = ConfigManager.config.serp.active;
 
   public readonly description =
-    'Use this tool only when you need to get fresh news from Google. Then interpret the results and provide a summary.';
+    'Use this tool only when you need to get fresh news from Google. Then interpret the results and provide a very short summary (less than 2000 characters).';
 
   public readonly parameters = {
     type: 'object',

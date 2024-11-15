@@ -23,6 +23,10 @@ class AiCompletionHandler extends EventEmitter {
     try {
       const systemPrompt = this.createSummaryPrompt();
       const messages = this.getFormattedMessages(5, channelId);
+      console.log('Summary conversation:', {
+        systemPrompt,
+        messages
+      });
       return await this.aiClient.getSummary(systemPrompt, messages);
     }
     catch (error) {
@@ -58,6 +62,8 @@ class AiCompletionHandler extends EventEmitter {
   private createCompletionPrompt(summary: string): string {
     const memory: string = readMemory();
     const fullprompt = `${this.prompt}.\n\n
+    """INSTRUCTIONS: You will be given a summary of the conversation and a memory of the previous messages.
+    You will then have to answer the user's question based on the information provided in the summary and memory.
     """MEMORY:${memory}"""\n
     """PREVIOUSLY:${summary}"""\n
     `;
@@ -68,6 +74,10 @@ class AiCompletionHandler extends EventEmitter {
     try {
       const systemPrompt = this.createCompletionPrompt(summary);
       const messages = this.getFormattedMessages(5, channelId);
+      console.log('AI completion conversation:', {
+        systemPrompt,
+        messages
+      });
       this.aiClient.on('completionRequested', (data) => {
         console.log('Completion requested');
         this.emit('completionRequested', data);
