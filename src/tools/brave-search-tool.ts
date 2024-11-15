@@ -6,7 +6,7 @@ export default class BraveSearchTool extends AbstractTool {
   readonly isActivated = ConfigManager.config.braveSearch.active;
 
   readonly description =
-    'Use this tool only when you need to make a search on the web asked by the user. Then interpret the results and provide a summary.';
+    'Use this tool only when you need to make a search on the web asked by the user. Then interpret the results and provide a very short summary (less than 2000 characters).';
 
   readonly parameters = {
     type: 'object',
