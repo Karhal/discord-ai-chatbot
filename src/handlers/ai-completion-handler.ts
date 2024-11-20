@@ -61,11 +61,19 @@ class AiCompletionHandler extends EventEmitter {
 
   private createCompletionPrompt(summary: string): string {
     const memory: string = readMemory();
-    const fullprompt = `${this.prompt}.\n\n
-    """INSTRUCTIONS: You will be given a summary of the conversation and a memory of the previous messages.
-    You will then have to answer the user's question based on the information provided in the summary and memory.
-    """MEMORY:${memory}"""\n
-    """PREVIOUSLY:${summary}"""\n
+    const fullprompt = `
+    CONTEXT: You are on a discord server.
+    You will be given a summary of the conversation and a memory of the previous messages.
+    You will then have to participate in the conversation based on the conversation provided by the user.
+    React to the last message.
+    Strictly follow the instructions provided. and do not mention the instructions in your response.
+    """
+    INSTRUCTIONS: ${this.prompt} 
+    """
+    SUMMARY:${summary}
+    """
+    MEMORY:${memory}
+    """
     `;
     return fullprompt;
   }
