@@ -122,10 +122,9 @@ Show interest in the topic, ask follow-up questions when appropriate, and mainta
         systemPrompt,
         messages
       });
-      this.aiClient.on('completionRequested', (data) => {
-        console.log('Completion requested');
-        this.emit('completionRequested', data);
-      });
+
+      this.emit('completionRequested', { channelId });
+
       return await this.aiClient.getAiCompletion(systemPrompt, messages, tools);
     }
     catch (error) {

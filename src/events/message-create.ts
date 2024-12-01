@@ -99,12 +99,13 @@ export default class MessageCreate extends EventDiscord {
 
   private setupEventListeners(): void {
     this.aiCompletionHandler.on('completionRequested', (data) => {
-      const channel = this.message?.channel;
-      if (channel) {
-        channel.sendTyping();
-      }
-      else {
-        console.error('Channel is null or undefined');
+      if (data && data.channelId) {
+        const channel = this.discordClient.channels.cache.get(data.channelId);
+        if (channel && channel.isTextBased()) {
+          channel.sendTyping();
+        }
+      } else {
+        console.error('ChannelId manquant dans les données de completion');
       }
     });
   }
