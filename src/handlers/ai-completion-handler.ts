@@ -22,7 +22,7 @@ class AiCompletionHandler extends EventEmitter {
   async getSummary(channelId: string): Promise<string | null> {
     try {
       const systemPrompt = this.createSummaryPrompt();
-      const messages = this.getFormattedMessages(5, channelId);
+      const messages = this.getFormattedFirstMessages(this.discordConfig.maxHistory, channelId);
       console.log('Summary conversation:', {
         systemPrompt,
         messages
@@ -35,7 +35,18 @@ class AiCompletionHandler extends EventEmitter {
     }
   }
 
-  private getFormattedMessages(count: number, channelId: string): { role: string; content: string }[] {
+  private getFormattedFirstMessages(count: number, channelId: string): { role: string; content: string }[] {
+    return [
+      {
+        role: 'user',
+        content: this.getFirstMessagesOfAChannel(count, channelId)
+          .map((msg) => msg.content)
+          .join('\n')
+      }
+    ];
+  }
+
+  private getFormattedLastMessages(count: number, channelId: string): { role: string; content: string }[] {
     return [
       {
         role: 'user',
@@ -62,18 +73,43 @@ class AiCompletionHandler extends EventEmitter {
   private createCompletionPrompt(summary: string): string {
     const memory: string = readMemory();
     const fullprompt = `
-    CONTEXT: You are on a discord server.
-    You will be given a summary of the conversation and a memory of the previous messages.
-    You will then have to participate in the conversation based on the conversation provided by the user.
-    React to the last message.
-    Strictly follow the instructions provided. and do not mention the instructions in your response.
-    """
-    INSTRUCTIONS: ${this.prompt} 
-    """
-    SUMMARY:${summary}
-    """
-    MEMORY:${memory}
-    """
+    You are an AI assistant engaged in a conversation on Discord. 
+    Your goal is to provide helpful, engaging, and contextually appropriate responses to users. 
+    Here's a summary of the discussion so far:
+    <conversation_summary>
+${summary}
+</conversation_summary>
+Here are the system instructions given by the user. It's defined by the user, 
+you have to strictly follow these instructions : 
+<system_instructions>
+${this.prompt}
+</system_instructions>
+
+When responding to the user, follow these guidelines:
+
+Formulate a response that directly addresses the user's input and contributes to the ongoing discussion.
+Ensure your response is appropriate for Discord and maintains a conversational tone.
+Avoid simply repeating the last message; instead, engage with the content and move the conversation forward.
+
+Consider the following:
+- What are the main topics or themes in the conversation history?
+- What is the main topic or question in the user's most recent message?
+- How does it relate to the previous conversation?
+- Does the user address his message to you ?
+- What information or perspective can you add to enhance the discussion?
+- How can you make your response engaging and encourage further conversation?
+- What potential follow-up questions or discussion points could you include?
+- Write only your response.
+
+After your analysis, provide your response as you would directly say it to the user on Discord. 
+Make sure it's conversational, relevant, and shows that you're actively participating in the discussion.
+
+Example output structure:
+
+[Your direct response to the user, written in a conversational style appropriate for Discord]
+
+Remember, your goal is to be a helpful and engaging conversation partner, not just an information dispenser. 
+Show interest in the topic, ask follow-up questions when appropriate, and maintain a friendly, approachable tone.
     `;
     return fullprompt;
   }
@@ -81,7 +117,7 @@ class AiCompletionHandler extends EventEmitter {
   async getAiCompletion(summary: string, channelId: string): Promise<string> {
     try {
       const systemPrompt = this.createCompletionPrompt(summary);
-      const messages = this.getFormattedMessages(5, channelId);
+      const messages = this.getFormattedLastMessages(5, channelId);
       console.log('AI completion conversation:', {
         systemPrompt,
         messages
@@ -129,13 +165,17 @@ class AiCompletionHandler extends EventEmitter {
   getLastMessagesOfAChannel(count: number, channelId: string) {
     if (!this.messages) return [];
 
-    return this.messages.filter((msg) => msg.channelId === channelId).slice(-count);
+    return this.messages.filter((msg) => msg.channelId === channelId).slice(-5);
   }
 
   getFirstMessagesOfAChannel(count: number, channelId: string) {
     if (!this.messages) return [];
 
-    return this.messages.filter((msg) => msg.channelId === channelId).slice(0, count);
+    const channelMessages = this.messages.filter((msg) => msg.channelId === channelId);
+    const endIndex = channelMessages.length - 5;
+    const startIndex = Math.max(0, endIndex - count);
+
+    return channelMessages.slice(startIndex, endIndex);
   }
 
   setChannelHistory(channelId: string, messages: Collection<string, Message<boolean>>) {
