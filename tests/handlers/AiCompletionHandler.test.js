@@ -257,38 +257,66 @@ describe('AiCompletionHandler', () => {
         mockPrompt,
         mockTools
       );
-      const firstMessage = {
-        role: 'user',
-        content: 'first',
-        createdAt: '123',
-        channelId: 1,
-        author: { username: 'Ipsum' }
-      };
-      const secondMessage = {
-        role: 'assistant',
-        content: 'second',
-        createdAt: '123',
-        channelId: 1,
-        author: { username: 'Lorem' }
-      };
-      const thirdMessage = {
-        role: 'user',
-        content: 'third',
-        createdAt: '123',
-        channelId: 1,
-        author: { username: 'LoremIpsum' }
-      };
-      aiCompletionHandler.addMessageArrayToChannel(
-        [firstMessage, secondMessage, thirdMessage],
-        3
-      );
+      const messages = [
+        {
+          role: 'user',
+          content: 'first',
+          createdAt: '123',
+          channelId: 1,
+          author: { username: 'User1' }
+        },
+        {
+          role: 'assistant',
+          content: 'second',
+          createdAt: '123',
+          channelId: 1,
+          author: { username: 'Assistant' }
+        },
+        {
+          role: 'user',
+          content: 'third',
+          createdAt: '123',
+          channelId: 1,
+          author: { username: 'User2' }
+        },
+        {
+          role: 'assistant',
+          content: 'fourth',
+          createdAt: '123',
+          channelId: 1,
+          author: { username: 'Assistant' }
+        },
+        {
+          role: 'user',
+          content: 'fifth',
+          createdAt: '123',
+          channelId: 1,
+          author: { username: 'User3' }
+        },
+        {
+          role: 'assistant',
+          content: 'sixth',
+          createdAt: '123',
+          channelId: 1,
+          author: { username: 'Assistant' }
+        },
+        {
+          role: 'user',
+          content: 'seventh',
+          createdAt: '123',
+          channelId: 1,
+          author: { username: 'User4' }
+        }
+      ];
 
-      expect(aiCompletionHandler.getFirstMessagesOfAChannel(2, 1)).toContain(
-        firstMessage
-      );
-      expect(aiCompletionHandler.getFirstMessagesOfAChannel(2, 1)).toContain(
-        secondMessage
-      );
+      aiCompletionHandler.addMessageArrayToChannel(messages);
+
+      const result = aiCompletionHandler.getFirstMessagesOfAChannel(2, 1);
+      
+      // Should return messages before the last 5 messages
+      expect(result).toHaveLength(2);
+      expect(result[0].content).toBe('first');
+      expect(result[1].content).toBe('second');
     });
 
     it('should set a Channel History From a discord messages array', () => {
