@@ -19,10 +19,31 @@ export default class FluxGeneratorTool extends AbstractTool {
       imagePrompt: {
         type: 'string',
         description:
-          'Prompt for the image generation. The more specific your prompt, the better the image quality. \
-            Include details like the setting, objects, colors, mood, and any specific elements you want in the image. \
-            Consider Perspective and Composition. Specify Lighting and Time of Day. \
-            Specify Desired Styles or Themes.'
+          'Crafting the perfect image prompt requires strategic \
+          layering of descriptive elements to guide the AI\'s creative process. \
+          Begin by defining your core subject with exceptional precision, moving \
+          beyond basic descriptions to include specific poses, actions, and contextual details that \
+          breathe life into your vision. \
+          Your prompt should systematically integrate ten critical components to maximize \
+          image quality and creative output. \
+          Start with a crystal-clear topic description that captures not just what you want to see, \
+          but the intricate nuances of the scene. \
+          Specify the material rendering style—whether digital painting, photorealistic render, \
+          or abstract sketch—which fundamentally shapes the image\'s visual texture. \
+          Articulate a specific artistic style or boldly combine multiple aesthetic approaches to create unique visual \
+          landscapes. Elevate your prompt by invoking renowned artists whose signature styles can profoundly \
+          influence the image\'s character. Leverage art platform references like ArtStation to \
+          signal high-quality conceptual expectations. \
+          Emphasize sharpness and detail through precise descriptive language, ensuring crisp, \
+          well-defined visual elements. Atmospheric depth comes from carefully chosen extra details \
+          that communicate mood and emotional tone. Manipulate shade, color, and lighting to create specific visual \
+          atmospheres—whether moody, dramatic, or subtly nuanced. \
+          Each descriptive layer adds complexity and richness to the generated image. \
+          Crucially, include negative prompts to explicitly exclude undesired elements, technical imperfections, \
+          or stylistic aberrations. This final filtering mechanism ensures the output aligns \
+          precisely with your creative vision. \
+          The ultimate prompt is a symphonic blend of specificity, creativity, \
+          and technical guidance—a linguistic blueprint that transforms textual imagination into visual reality. '
       }
     }
   };
