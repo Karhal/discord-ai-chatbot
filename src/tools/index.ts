@@ -11,6 +11,7 @@ import SerpSearchTool from './serp-search-tool';
 import WriteMemoryTool from './write-memory-tool';
 import StableDiffusionTool from './stablediffusion-tool';
 import GiphyTool from './giphy-tool';
+import YoutubeTranscriptTool from './youtube-transcript-tool';
 
 const toolList: (typeof AbstractTool)[] = [
   WriteMemoryTool,
@@ -24,7 +25,8 @@ const toolList: (typeof AbstractTool)[] = [
   SerpSearchTool,
   GoogleLighthouseTool,
   FluxGeneratorTool,
-  StableDiffusionTool
+  StableDiffusionTool,
+  YoutubeTranscriptTool
 ];
 
 export default toolList;

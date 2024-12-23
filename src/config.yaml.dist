@@ -60,3 +60,5 @@ tmpFolder:
   path: 'attachments'
 metrics:
   webhookUrl: ''
+youtubeTranscript:
+  active: false
