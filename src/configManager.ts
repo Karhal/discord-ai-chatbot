@@ -24,6 +24,7 @@ export interface ConfigType {
   stability: StabilityConfigType;
   triggerWords: string[];
   metrics: MetricsConfigType;
+  youtubeTranscript: YoutubeTranscriptConfigType;
 }
 
 export interface OpenAIClientConfigType {
@@ -39,6 +40,10 @@ export interface ClaudeClientConfigType {
   summaryModel: string;
   temperature: number;
   maxTokens: number;
+}
+
+export interface YoutubeTranscriptConfigType {
+  active: boolean;
 }
 
 export interface DiscordConfigType {
@@ -125,6 +130,10 @@ export default class ConfigManager {
     console.warn('No trigger words defined. Using an empty array.');
     return [];
   })();
+
+  private youtubeTranscriptConfig: YoutubeTranscriptConfigType = {
+    active: process.env.YOUTUBE_TRANSCRIPT_ACTIVE === 'true' || configValues.youtubeTranscript?.active || false,
+  };
 
   private dallEConfig: DallEConfigType = {
     active: process.env.DALLE_ACTIVE === 'true' || configValues.dallE?.active || false,
@@ -233,7 +242,8 @@ export default class ConfigManager {
     tmpFolder: this.tmpFolderConfig,
     stability: this.stabilityConfig,
     triggerWords: this.triggerWords,
-    metrics: this.metricsConfig
+    metrics: this.metricsConfig,
+    youtubeTranscript: this.youtubeTranscriptConfig
   };
 
   private static getInstance() {
