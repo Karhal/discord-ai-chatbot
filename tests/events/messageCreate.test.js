@@ -99,6 +99,9 @@ jest.mock('../../src/configManager', () => {
         stability: {
           active: false,
           apiKey: 'mock_stability_key'
+        },
+        youtubeTranscript: {
+          active: false
         }
       }
     }
