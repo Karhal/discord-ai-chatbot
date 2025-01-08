@@ -6,7 +6,9 @@ export default class BraveSearchTool extends AbstractTool {
   readonly isActivated = ConfigManager.config.braveSearch.active;
 
   readonly description =
-    'Use this tool only when you need to make a search on the web asked by the user. Then interpret the results and provide a very short summary (less than 2000 characters).';
+    'Use this tool only when you need to make a search on the web. \
+    For example, if the user talks about a subject you do not know, use this tool to search the web for information about the subject. \
+    Then interpret the results and provide a very short summary (less than 2000 characters).';
 
   readonly parameters = {
     type: 'object',
@@ -33,12 +35,12 @@ export default class BraveSearchTool extends AbstractTool {
     };
 
     const response = await fetch(
-      `https://api.search.brave.com/res/v1/web/search?q=${queryParameters}&search_lang=${lang}&count=5&result_filter=news,web`,
+      `https://api.search.brave.com/res/v1/web/search?q=${queryParameters}&&count=5&result_filter=news,web`,
       requestOptions
     );
     const resultJSON = await response.json();
 
-    console.log({ news: resultJSON.news, web_search: resultJSON.web });
+    console.log(queryParameters, lang);
     return { news: resultJSON.news, web_search: resultJSON.web };
   };
 }

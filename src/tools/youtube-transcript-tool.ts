@@ -1,4 +1,4 @@
-import { YoutubeTranscript } from 'youtube-transcript';
+import { Innertube } from 'youtubei.js';
 import AbstractTool from './absract-tool';
 import ConfigManager from '../configManager';
 
@@ -7,36 +7,24 @@ export default class YoutubeTranscriptTool extends AbstractTool {
   readonly isActivated = ConfigManager.config.youtubeTranscript.active;
 
   readonly description =
-    'Use this tool only when the user asks for a summary of a youtube video. \
-    You are an expert analyst tasked with providing a comprehensive analysis of the above video transcript.\
-    Your analysis should be based solely on the content presented in the transcript, without adding personal \
-    interpretations.\n\n \
-    Instructions:\n\n1. Carefully read and analyze the transcript, focusing on key topics, \
-    data, trends, historical information, correlations, \turning points, important levels,\
-    and any anomalies or exceptions.\n\n2. In your analysis, consider the following aspects:\n  \
-    - Major topics or subjects discussed\n   - Data, statistics, or figures presented\n \
-    - Short-term and long-term trends or patterns\n   - Historical information \
-    and recent developments\n  - Correlations between different factors\n\
-    - Potential turning points or significant changes\n\
-    - Important levels, thresholds, or benchmarks\n\
-    - Any anomalies, exceptions, or unusual observations\n\n\
-    3. Before writing your final report, wrap your detailed breakdown inside <detailed_breakdown> tags. \
-    This should include:\n  - List of major topics\n - Key statements related to each aspect mentioned above,\
-     with relevant quotes from the transcript\n - Tools, methods, or indicators mentioned\n \
-     - Key predictions or explanations of trends\n   - Overall sentiment for each major topic\n   \
-    - Any contradictions or uncertainties\n   - Timeline of key events or developments\n   \
-    - Potential biases or limitations in the information presented\n\n\
-    4. Based on your analysis, prepare a concise yet comprehensive report that includes:\n  \
-    - Summaries of key points for each major topic\n   - Current situation update on the focus topic\n   \
-    - Brief forecast or implications for the future\n   - Timeline of key events\n   \
-    - Potential biases or limitations in the information\n\n5. Important reminders:\n  \
-    - Use only information and insights directly from the transcript\n  \
-    - Do not add your own interpretations beyond what\'s presented\n  \
-    - Maintain objectivity and accuracy in reporting the content\n   \
-    - Adhere to best practices in analysis as presented in the video\n\n\
-    6. Format your response as a continuous text without using any tags or special formatting. \
-    Ensure that your entire response, including the detailed breakdown and final report, \
-    is less than 2000 characters.\n\n Please proceed with your analysis and report based on these instructions.';
+    'Use this tool when the user questions you about a youtube video. \
+    The tool will provide you the transcript of the video. \
+    Your goal is to provide a concise, insightful analysis of the transcript\'s content. \
+    Follow these steps:\
+    1. Read the transcript.\
+    1b. Ignore all marketing and promotional content.\
+    2. Identify the main topics discussed\
+      - For each topic:\
+      - List key points\
+      - Consider potential implications or forecasts based on the content\
+      - Identify any potential biases or limitations in the content\
+    3. Based on your analysis, create a final report that:\
+      - Summarizes key points for each major topic\
+      - Includes a brief forecast or implications\
+      - Addresses potential biases or limitations\
+      - Suggests areas for further inquiry based on your brainstormed questions\
+      - Is formatted as continuous text without tags\
+      - Is less than 2000 characters in length.';
 
   readonly parameters = {
     type: 'object',
@@ -48,17 +36,54 @@ export default class YoutubeTranscriptTool extends AbstractTool {
     }
   };
 
+  private youtube: Innertube | null = null;
+
+  private async initYoutube() {
+    if (!this.youtube) {
+      this.youtube = await Innertube.create({
+        lang: 'en',
+        location: 'US',
+        retrieve_player: false,
+      });
+    }
+    return this.youtube;
+  }
+
+  private extractVideoId(url: string): string {
+    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+    const match = url.match(regex);
+    if (!match) throw new Error('Invalid YouTube URL');
+    return match[1];
+  }
+
   readonly execute = async (query: string) => {
+    console.log('Starting execute with query:', query);
     const queryParameters = JSON.parse(query);
+    console.log('Parsed parameters:', queryParameters);
 
     try {
-      const transcript = await YoutubeTranscript.fetchTranscript(queryParameters.url);
-      const formattedTranscript = transcript
-        .map(entry => `${entry.text}`)
+      console.log('Initializing Youtube...');
+      const youtube = await this.initYoutube();
+      console.log('Youtube initialized');
+
+      const videoId = this.extractVideoId(queryParameters.url);
+      console.log('Extracted video ID:', videoId);
+
+      console.log('Fetching video info for ID:', videoId);
+      const info = await youtube.getInfo(videoId);
+      console.log('Video info fetched');
+
+      console.log('Fetching transcript...');
+      const transcriptData = await info.getTranscript();
+      console.log('Transcript data:', transcriptData);
+
+      const formattedTranscript = transcriptData.transcript.content.body.initial_segments
+        .map(segment => segment.snippet.text)
         .join(' ');
 
       return { success: true, response: formattedTranscript };
     } catch (error) {
+      console.error('Error details:', error);
       return {
         success: false,
         response: `Failed to fetch transcript: ${error.message}`

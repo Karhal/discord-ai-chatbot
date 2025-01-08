@@ -9,7 +9,10 @@ export default class GoogleSearchTool extends AbstractTool {
   private lang = ConfigManager.config.discord.lang;
 
   public readonly description =
-    'Use this tool only when you need to make a search on the web. Then interpret the results and provide a very short summary (less than 2000 characters).';
+    'Use this tool only when you need to make a search on the web. \
+    For example, if the user talks about a subject you do not know, use this tool to search the web for information about the subject. \
+    Then interpret the results and provide a very short summary (less than 2000 characters). \
+    ';
 
   public readonly parameters = {
     type: 'object',

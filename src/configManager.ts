@@ -25,6 +25,7 @@ export interface ConfigType {
   triggerWords: string[];
   metrics: MetricsConfigType;
   youtubeTranscript: YoutubeTranscriptConfigType;
+  pupeeteer: PupeeteerConfigType;
 }
 
 export interface OpenAIClientConfigType {
@@ -109,6 +110,8 @@ export interface GiphyConfigType extends ActivatorConfigType {
 export interface MetricsConfigType {
   webhookUrl?: string;
 }
+
+export type PupeeteerConfigType = ActivatorConfigType;
 
 export default class ConfigManager {
   static get config() {
@@ -243,7 +246,10 @@ export default class ConfigManager {
     stability: this.stabilityConfig,
     triggerWords: this.triggerWords,
     metrics: this.metricsConfig,
-    youtubeTranscript: this.youtubeTranscriptConfig
+    youtubeTranscript: this.youtubeTranscriptConfig,
+    pupeeteer: {
+      active: process.env.PUPEETEER_ACTIVE === 'true' || configValues.pupeeteer?.active || false
+    }
   };
 
   private static getInstance() {
