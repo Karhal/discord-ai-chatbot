@@ -103,7 +103,7 @@ jest.mock('../../src/configManager', () => {
         youtubeTranscript: {
           active: false
         },
-        pupeeteer: {
+        puppeteer: {
           active: false
         }
       }

@@ -2,9 +2,9 @@ import ConfigManager from '../configManager';
 import AbstractTool from './absract-tool';
 import puppeteer from 'puppeteer';
 
-export default class PupeteerTool extends AbstractTool {
-  readonly toolName = 'pupeteer';
-  readonly isActivated = ConfigManager.config.pupeeteer.active;
+export default class PuppeteerTool extends AbstractTool {
+  readonly toolName = 'puppeteer';
+  readonly isActivated = ConfigManager.config.puppeteer.active;
 
   readonly description =
     'Use this tool to read the webpage and provide a summary of the content \
