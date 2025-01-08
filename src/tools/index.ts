@@ -12,7 +12,7 @@ import WriteMemoryTool from './write-memory-tool';
 import StableDiffusionTool from './stablediffusion-tool';
 import GiphyTool from './giphy-tool';
 import YoutubeTranscriptTool from './youtube-transcript-tool';
-import PupeteerTool from './pupeteer-tool';
+import PuppeteerTool from './puppeteer-tool';
 
 const toolList: (typeof AbstractTool)[] = [
   WriteMemoryTool,
@@ -28,7 +28,7 @@ const toolList: (typeof AbstractTool)[] = [
   FluxGeneratorTool,
   StableDiffusionTool,
   YoutubeTranscriptTool,
-  PupeteerTool
+  PuppeteerTool
 ];
 
 export default toolList;
