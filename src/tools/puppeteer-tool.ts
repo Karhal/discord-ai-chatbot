@@ -22,18 +22,22 @@ export default class PuppeteerTool extends AbstractTool {
     const browser = await puppeteer.launch();
     try {
       const page = await browser.newPage();
-      await page.goto(webpageUrl);
+      await page.goto(webpageUrl, {
+        timeout: 30000,
+        waitUntil: 'networkidle0'
+      });
       const bodyContent = await page.evaluate(() => {
         for (const script of document.body.querySelectorAll('script')) script.remove();
         return document.body.innerHTML;
       });
       console.log(bodyContent);
-      await browser.close();
       return { content: bodyContent };
     }
     catch (error) {
-      await browser.close();
       return { error: 'Failed to fetch webpage content' };
+    }
+    finally {
+      await browser.close();
     }
   };
 }
