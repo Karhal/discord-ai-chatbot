@@ -248,7 +248,7 @@ export default class ConfigManager {
     metrics: this.metricsConfig,
     youtubeTranscript: this.youtubeTranscriptConfig,
     puppeteer: {
-      active: process.env.PUPPETEER_ACTIVE === 'true' || configValues.puppeteer?.active || false
+      active: process.env.PUPPETEER_ACTIVE === 'true' || configValues.puppeteer?.active || true
     }
   };
 

@@ -19,7 +19,10 @@ export default class PuppeteerTool extends AbstractTool {
 
   readonly execute = async (webpageUrl: string) => {
     webpageUrl = JSON.parse(webpageUrl).webpageUrl;
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+    });
     try {
       const page = await browser.newPage();
       await page.goto(webpageUrl, {
