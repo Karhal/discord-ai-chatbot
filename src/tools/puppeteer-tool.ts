@@ -33,7 +33,6 @@ export default class PuppeteerTool extends AbstractTool {
         for (const script of document.body.querySelectorAll('script')) script.remove();
         return document.body.innerHTML;
       });
-      console.log(bodyContent);
       return { content: bodyContent };
     }
     catch (error) {
