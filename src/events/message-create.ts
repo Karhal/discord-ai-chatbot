@@ -45,7 +45,12 @@ export default class MessageCreate extends EventDiscord {
   async sendResponse(message: Message, response: string): Promise<boolean> {
     response = response.trim().replace(/\n\s*\n/g, '\n');
     if (response) {
-      await message.channel.send(response);
+      const chunks = this.splitResponseIntoChunks(response, 2000);
+
+      for (const chunk of chunks) {
+        await message.channel.send(chunk);
+      }
+
       const metricsService = MetricsService.getInstance();
       const attachmentsPath = FileHandler.getFolderFilenameFullPaths(this.config.tmpFolder.path);
       await metricsService.sendMetrics(
@@ -108,5 +113,30 @@ export default class MessageCreate extends EventDiscord {
         console.error('ChannelId manquant dans les données de completion');
       }
     });
+  }
+
+  private splitResponseIntoChunks(text: string, maxLength: number): string[] {
+    const chunks: string[] = [];
+    let currentChunk = '';
+
+    const lines = text.split('\n');
+
+    for (const line of lines) {
+      if (currentChunk.length + line.length + 1 <= maxLength) {
+        currentChunk += (currentChunk ? '\n' : '') + line;
+      }
+      else {
+        if (currentChunk) {
+          chunks.push(currentChunk);
+        }
+        currentChunk = line;
+      }
+    }
+
+    if (currentChunk) {
+      chunks.push(currentChunk);
+    }
+
+    return chunks;
   }
 }
