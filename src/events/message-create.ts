@@ -25,12 +25,10 @@ export default class MessageCreate extends EventDiscord {
 
   handler = async (message: Message): Promise<void> => {
     try {
-      // Modération en premier
       if (ConfigManager.config.moderation.enabled) {
         await this.moderationService.moderateMessage(message);
       }
 
-      // Si le message n'a pas été supprimé par la modération, continuer le traitement normal
       if (!message.deleted) {
         if (this.shouldIgnoreMessage(message)) {
           return;
@@ -120,7 +118,8 @@ export default class MessageCreate extends EventDiscord {
         if (channel && channel.isTextBased()) {
           channel.sendTyping();
         }
-      } else {
+      }
+      else {
         console.error('ChannelId manquant dans les données de completion');
       }
     });
