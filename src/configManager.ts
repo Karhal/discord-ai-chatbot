@@ -26,6 +26,7 @@ export interface ConfigType {
   metrics: MetricsConfigType;
   youtubeTranscript: YoutubeTranscriptConfigType;
   puppeteer: PuppeteerConfigType;
+  moderation: ModerationConfigType;
 }
 
 export interface OpenAIClientConfigType {
@@ -109,6 +110,16 @@ export interface GiphyConfigType extends ActivatorConfigType {
 
 export interface MetricsConfigType {
   webhookUrl?: string;
+}
+
+export interface ModerationConfigType {
+  enabled: boolean;
+  bannedWords: string[];
+  actions: {
+    timeout: number;
+    maxWarnings: number;
+  };
+  googleSafeBrowsingKey: string;
 }
 
 export type PuppeteerConfigType = ActivatorConfigType;
@@ -227,6 +238,16 @@ export default class ConfigManager {
     webhookUrl: process.env.METRICS_WEBHOOK_URL || configValues.metrics?.webhookUrl || undefined
   };
 
+  private moderationConfig: ModerationConfigType = {
+    enabled: process.env.MODERATION_ENABLED === 'true' || configValues.moderation?.enabled || false,
+    bannedWords: process.env.MODERATION_BANNED_WORDS ? process.env.MODERATION_BANNED_WORDS.split(',') : configValues.moderation?.bannedWords || [],
+    actions: {
+      timeout: process.env.MODERATION_TIMEOUT ? parseInt(process.env.MODERATION_TIMEOUT) : configValues.moderation?.actions?.timeout || 300000,
+      maxWarnings: process.env.MODERATION_MAX_WARNINGS ? parseInt(process.env.MODERATION_MAX_WARNINGS) : configValues.moderation?.actions?.maxWarnings || 3
+    },
+    googleSafeBrowsingKey: process.env.GOOGLE_SAFE_BROWSING_KEY || configValues.moderation?.googleSafeBrowsingKey || ''
+  };
+
   private _config: ConfigType = {
     aiClient: process.env.AI_CLIENT || configValues.aiClient || 'openAI',
     discord: this.discordConfig,
@@ -249,7 +270,8 @@ export default class ConfigManager {
     youtubeTranscript: this.youtubeTranscriptConfig,
     puppeteer: {
       active: process.env.PUPPETEER_ACTIVE === 'true' || configValues.puppeteer?.active || true
-    }
+    },
+    moderation: this.moderationConfig
   };
 
   private static getInstance() {

@@ -62,3 +62,12 @@ metrics:
   webhookUrl: ''
 youtubeTranscript:
   active: false
+moderation:
+  enabled: true
+  insults:
+    - "insult1"
+    - "insult2"
+  actions:
+    timeout: 300000  # 5 minutes en millisecondes
+    maxWarnings: 3
+  googleSafeBrowsingKey: ''
