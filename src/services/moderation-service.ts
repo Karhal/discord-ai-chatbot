@@ -25,7 +25,6 @@ export default class ModerationService {
 
   private async checkUrlWithGoogleSafeBrowsing(url: string): Promise<boolean> {
     const API_KEY = ConfigManager.config.moderation.googleSafeBrowsingKey;
-    console.log('API_KEY', API_KEY);
     const endpoint = `https://safebrowsing.googleapis.com/v4/threatMatches:find?key=${API_KEY}`;
 
     try {
@@ -126,7 +125,7 @@ export default class ModerationService {
   public async moderateMessage(message: Message): Promise<void> {
     if (message.author.bot) return;
 
-    if (!await this.canModerate(message.member)) {
+    if (!message.member || !await this.canModerate(message.member)) {
       console.warn('Bot lacks permission to moderate members');
       return;
     }
