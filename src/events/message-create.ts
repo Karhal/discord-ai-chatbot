@@ -5,40 +5,51 @@ import ConfigManager from '../configManager';
 import { Client } from 'discord.js';
 import { AIClientType } from '../types/AIClientType';
 import MetricsService from '../services/metrics-service';
+import ModerationService from '../services/moderation-service';
 
 export default class MessageCreate extends EventDiscord {
   eventName: Events = Events.MessageCreate;
   intervalDate: NodeJS.Timeout | null = null;
   message: Message | null = null;
   config = ConfigManager.config;
+  private moderationService: ModerationService;
 
   constructor(
     public discordClient: Client,
     public aiClient: AIClientType
   ) {
     super(discordClient, aiClient);
+    this.moderationService = ModerationService.getInstance();
     this.setupEventListeners();
   }
 
   handler = async (message: Message): Promise<void> => {
     try {
-      if (this.shouldIgnoreMessage(message)) {
-        return;
+      // Modération en premier
+      if (ConfigManager.config.moderation.enabled) {
+        await this.moderationService.moderateMessage(message);
       }
-      this.message = message;
-      const channelId = message.channelId;
-      const messagesChannelHistory = await this.fetchChannelHistory(message, this.config.discord.maxHistory);
-      this.aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
-      const summary = await this.aiCompletionHandler.getSummary(channelId);
 
-      if (summary) {
-        const content = await this.aiCompletionHandler.getAiCompletion(summary, channelId);
-        await this.sendResponse(message, content);
+      // Si le message n'a pas été supprimé par la modération, continuer le traitement normal
+      if (!message.deleted) {
+        if (this.shouldIgnoreMessage(message)) {
+          return;
+        }
+        this.message = message;
+        const channelId = message.channelId;
+        const messagesChannelHistory = await this.fetchChannelHistory(message, this.config.discord.maxHistory);
+        this.aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
+        const summary = await this.aiCompletionHandler.getSummary(channelId);
+
+        if (summary) {
+          const content = await this.aiCompletionHandler.getAiCompletion(summary, channelId);
+          await this.sendResponse(message, content);
+        }
+        console.log('Done.');
       }
-      console.log('Done.');
     }
     catch (error) {
-      console.error('Error handling message:', error);
+      console.error('Error in message handler:', error);
     }
   };
 
