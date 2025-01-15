@@ -64,7 +64,7 @@ youtubeTranscript:
   active: false
 moderation:
   enabled: true
-  insults:
+  bannedWords:
     - "insult1"
     - "insult2"
   actions:
