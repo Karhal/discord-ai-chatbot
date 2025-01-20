@@ -71,3 +71,6 @@ moderation:
     timeout: 300000  # 5 minutes en millisecondes
     maxWarnings: 3
   googleSafeBrowsingKey: ''
+tradingChart:
+  active: false
+  apiKey: ''

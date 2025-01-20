@@ -106,4 +106,9 @@ export default class ImageHandler implements ImageHandlerType {
       throw error;
     }
   }
+
+  public async getImageAsBase64(imagePath: string): Promise<string> {
+    const imageData = fs.readFileSync(imagePath);
+    return imageData.toString('base64');
+  }
 }
