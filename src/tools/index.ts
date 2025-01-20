@@ -13,7 +13,7 @@ import StableDiffusionTool from './stablediffusion-tool';
 import GiphyTool from './giphy-tool';
 import YoutubeTranscriptTool from './youtube-transcript-tool';
 import PuppeteerTool from './puppeteer-tool';
-
+import TradingChartTool from './trading-chart-tool';
 const toolList: (typeof AbstractTool)[] = [
   WriteMemoryTool,
   DallETool,
@@ -28,7 +28,8 @@ const toolList: (typeof AbstractTool)[] = [
   FluxGeneratorTool,
   StableDiffusionTool,
   YoutubeTranscriptTool,
-  PuppeteerTool
+  PuppeteerTool,
+  TradingChartTool
 ];
 
 export default toolList;

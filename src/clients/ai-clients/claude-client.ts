@@ -136,4 +136,33 @@ export default class ClaudeClient extends EventEmitter implements AIClientType {
     const result = await this.getAiCompletion(systemPrompt, messages);
     return result;
   }
+
+  async analyzeImage(imageBase64: string, prompt: string, mediaType: string): Promise<string> {
+    const options: Anthropic.MessageCreateParams = {
+      model: 'claude-3-sonnet-20240229',
+      max_tokens: 1024,
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: {
+                type: 'base64',
+                media_type: mediaType as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
+                data: imageBase64
+              }
+            },
+            {
+              type: 'text',
+              text: prompt
+            }
+          ]
+        }
+      ]
+    };
+
+    const response = await this.message(options);
+    return response?.content[0]?.text || '';
+  }
 }

@@ -27,6 +27,7 @@ export interface ConfigType {
   youtubeTranscript: YoutubeTranscriptConfigType;
   puppeteer: PuppeteerConfigType;
   moderation: ModerationConfigType;
+  tradingChart: TradingChartConfigType;
 }
 
 export interface OpenAIClientConfigType {
@@ -108,6 +109,10 @@ export interface GiphyConfigType extends ActivatorConfigType {
   apiKey: string;
 }
 
+export interface TradingChartConfigType extends ActivatorConfigType {
+  apiKey: string;
+}
+
 export interface MetricsConfigType {
   webhookUrl?: string;
 }
@@ -146,7 +151,12 @@ export default class ConfigManager {
   })();
 
   private youtubeTranscriptConfig: YoutubeTranscriptConfigType = {
-    active: process.env.YOUTUBE_TRANSCRIPT_ACTIVE === 'true' || configValues.youtubeTranscript?.active || false,
+    active: process.env.YOUTUBE_TRANSCRIPT_ACTIVE === 'true' || configValues.youtubeTranscript?.active || false
+  };
+
+  private tradingChartConfig: TradingChartConfigType = {
+    active: process.env.TRADING_CHART_ACTIVE === 'true' || configValues.tradingChart?.active || false,
+    apiKey: process.env.TRADING_CHART_API_KEY || configValues.tradingChart?.apiKey || ''
   };
 
   private dallEConfig: DallEConfigType = {
@@ -271,7 +281,8 @@ export default class ConfigManager {
     puppeteer: {
       active: process.env.PUPPETEER_ACTIVE === 'true' || configValues.puppeteer?.active || true
     },
-    moderation: this.moderationConfig
+    moderation: this.moderationConfig,
+    tradingChart: this.tradingChartConfig
   };
 
   private static getInstance() {
@@ -344,6 +355,9 @@ export default class ConfigManager {
 
     if (this._config.giphy?.active && !this._config.giphy?.apiKey) {
       throw new Error('No Giphy API key configured');
+    }
+    if (this._config.tradingChart?.active && !this._config.tradingChart?.apiKey) {
+      throw new Error('No Trading Chart API key configured');
     }
   }
 }
