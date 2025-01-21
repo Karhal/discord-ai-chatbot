@@ -9,7 +9,7 @@ export default class TradingChartTool extends AbstractTool {
   tradingChartConfig = ConfigManager.config.tradingChart;
   anthropicConfig = ConfigManager.config.claude;
   readonly description =
-    'Call this tool to get an analysis of a requested stock.';
+    'Call this tool to get an analysis of a requested stock chart.';
 
   readonly parameters = {
     type: 'object',
@@ -20,7 +20,7 @@ export default class TradingChartTool extends AbstractTool {
       },
       interval: {
         type: 'string',
-        description: 'Chart timeframe (e.g., "4H", "1D","1W")'
+        description: 'Chart timeframe (e.g. 4h, 6h, 12h, 1D, 1W, 1M, 3M)'
       }
     }
   };
@@ -29,15 +29,40 @@ export default class TradingChartTool extends AbstractTool {
     const queryParameters = JSON.parse(query);
     const requestBody = {
       theme: 'dark',
-      interval: queryParameters.interval || '1D',
+      interval: queryParameters.interval || '4h',
       symbol: queryParameters.symbol,
       override: {
         showStudyLastValue: false
       },
       studies: [
         {
-          name: 'Volume',
-          forceOverlay: true
+          name: 'Moving Average',
+          input: {
+            length: 9,
+            source: 'close',
+            offset: 0,
+            smoothingLine: 'SMA',
+            smoothingLength: 9
+          },
+          override: {
+            'Plot.linewidth': 1,
+            'Plot.plottype': 'line',
+            'Plot.color': 'rgb(255,65,129)'
+          }
+        },
+        {
+          name: 'Moving Average',
+          input: {
+            length: 18,
+            source: 'close',
+            offset: 0,
+            smoothingLine: 'SMA',
+            smoothingLength: 18
+          },
+          override: {
+            'Plot.linewidth': 1,
+            'Plot.plottype': 'line'
+          }
         },
         {
           name: 'MACD',
@@ -59,22 +84,25 @@ export default class TradingChartTool extends AbstractTool {
       redirect: 'follow'
     };
 
-    const result = await fetch(
-      'https://api.chart-img.com/v2/tradingview/advanced-chart/storage',
+    const response = await fetch(
+      'https://api.chart-img.com/v2/tradingview/advanced-chart',
       requestOptions
     );
-    const resultJSON = await result.json();
-    const imgUrl = resultJSON.url;
+
     const imageHandler = new ImageHandler();
-    const image = await imageHandler.downloadImages([imgUrl]);
-    
-    const imageBase64 = await imageHandler.getImageAsBase64(image[0]);
-    
+    const imagePath = await imageHandler.processImageResponse(response);
+
+    if (!imagePath) {
+      throw new Error('Failed to process chart image');
+    }
+
+    const imageBase64 = await imageHandler.getImageAsBase64(imagePath);
     const claudeClient = new ClaudeClient();
     const prompt = '# Role \
 You are an expert financial analyst specializing in technical analysis of stock charts.\
 Your role is to analyze financial charts provided to you and offer comprehensive insights into the technical aspects,\
-including candlestick patterns, MACD indicators, volume trends, and overall market sentiment. You must provide a detailed breakdown of the chart, highlighting key areas of interest and actionable insights.\
+including candlestick patterns, MACD indicators, EMA9 & EMA18 trends, and overall market sentiment.\
+ You must provide a detailed breakdown of the chart, highlighting key areas of interest and actionable insights.\
 When analyzing a stock chart, always include the following:\
 1. **Candlestick Analysis**:\
 - Identify and explain any significant candlestick patterns (e.g., bullish engulfing, doji, hammer).\
@@ -84,10 +112,9 @@ When analyzing a stock chart, always include the following:\
 - Describe the current state of the MACD line and Signal line (e.g., bullish crossover, bearish crossover).\
 - Discuss the MACD histogram and its implications for momentum.\
 - Identify any divergences between the MACD and the price action.\
-3. **Volume Analysis**:\
-- Highlight any significant changes in trading volume.\
-- Explain how volume supports or contradicts price movements.\
-- Indicate any unusual spikes in volume that may suggest institutional activity.\
+3. **EMA9 & EMA18 Analysis**:\
+- Highlight any significant trends in the EMA9 (red line) and EMA18 (blue line) lines.\
+- Discuss the importance of these levels for potential reversals or breakouts.\
 4. **Support and Resistance Levels**;\
 - Identify key support and resistance zones based on the chart.\
 - Discuss the importance of these levels for potential reversals or breakouts.\
@@ -99,9 +126,9 @@ When analyzing a stock chart, always include the following:\
 - Offer insights into market sentiment or other broader trends based on the chart';
     const analysis = await claudeClient.analyzeImage(imageBase64, prompt, 'image/png');
 
-    return { 
+    return {
       result: true,
-      analysis: analysis 
+      analysis: analysis
     };
   };
 }
