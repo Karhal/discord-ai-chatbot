@@ -49,7 +49,7 @@ export default class ImageHandler implements ImageHandlerType {
     }
   }
 
-  private async processImageResponse(
+  public async processImageResponse(
     response: Response
   ): Promise<string | null> {
     if (response.status === 200) {
