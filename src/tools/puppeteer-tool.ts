@@ -54,7 +54,6 @@ export default class PuppeteerTool extends AbstractTool {
         const content = document.body.innerHTML;
         return content.replace(/data:image\/[^;]+;base64[^"']+/g, '[image]');
       });
-      console.log(bodyContent);
       return { content: bodyContent };
     }
     catch (error) {
