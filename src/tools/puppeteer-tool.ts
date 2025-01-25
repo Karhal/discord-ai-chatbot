@@ -30,9 +30,31 @@ export default class PuppeteerTool extends AbstractTool {
         waitUntil: 'networkidle0'
       });
       const bodyContent = await page.evaluate(() => {
-        for (const script of document.body.querySelectorAll('script')) script.remove();
-        return document.body.innerHTML;
+        const elementsToRemove = [
+          'script',
+          'style',
+          'nav',
+          'footer',
+          'header',
+          'aside',
+          'iframe',
+          'noscript',
+          '.advertisement',
+          '.ads',
+          '#cookie-banner',
+          '.cookie-notice',
+          '.social-share',
+          '.comments-section'
+        ];
+
+        elementsToRemove.forEach(selector => {
+          document.querySelectorAll(selector).forEach(element => element.remove());
+        });
+
+        const content = document.body.innerHTML;
+        return content.replace(/data:image\/[^;]+;base64[^"']+/g, '[image]');
       });
+      console.log(bodyContent);
       return { content: bodyContent };
     }
     catch (error) {
