@@ -15,16 +15,18 @@ export default class AiCompletionHandler extends EventEmitter {
   private messageFormatter: MessageFormatter;
   private logger: Logger;
   private promptBuilder: AIPromptBuilder;
+  private botId: string;
 
   constructor(
     private aiClient: AIClientType & EventEmitter,
-    private prompt: string
+    botId: string
   ) {
     super();
     this.discordConfig = ConfigManager.config.discord;
     this.messageFormatter = new MessageFormatter();
     this.logger = new Logger();
-    this.promptBuilder = new AIPromptBuilder(this.discordConfig, this.prompt);
+    this.promptBuilder = new AIPromptBuilder(this.discordConfig, ConfigManager.config.AIPrompt);
+    this.botId = botId;
   }
 
   async getSummary(channelId: string): Promise<string | null> {
@@ -123,7 +125,7 @@ export default class AiCompletionHandler extends EventEmitter {
     messagesChannelHistory.reverse().forEach((msg: Message) => {
       if (msg.content === '') return;
 
-      const role = msg.author.bot ? 'assistant' : 'user';
+      const role = msg.author.id === this.botId ? 'assistant' : 'user';
       const content = msg.content;
       const author = msg.author.username;
 

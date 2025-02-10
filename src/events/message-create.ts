@@ -6,6 +6,8 @@ import { Client } from 'discord.js';
 import { AIClientType } from '../types/AIClientType';
 import MetricsService from '../services/metrics-service';
 import ModerationService from '../services/moderation-service';
+import AiCompletionHandler from '../handlers/ai-completion-handler';
+import { EventEmitter } from 'events';
 
 export default class MessageCreate extends EventDiscord {
   eventName: Events = Events.MessageCreate;
@@ -13,13 +15,19 @@ export default class MessageCreate extends EventDiscord {
   message: Message | null = null;
   config = ConfigManager.config;
   private moderationService: ModerationService;
+  private aiCompletionHandler: AiCompletionHandler;
 
   constructor(
     public discordClient: Client,
-    public aiClient: AIClientType
+    aiClient: AIClientType & EventEmitter,
+    botId: string
   ) {
     super(discordClient, aiClient);
     this.moderationService = ModerationService.getInstance();
+    this.aiCompletionHandler = new AiCompletionHandler(
+      aiClient,
+      botId
+    );
     this.setupEventListeners();
   }
 
