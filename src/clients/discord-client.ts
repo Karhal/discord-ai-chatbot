@@ -38,7 +38,11 @@ export default class DiscordClient {
     });
 
     this.discordClient.on('messageCreate', (event) => {
-      const eventHandler = new MessageCreate(this.discordClient, this.aiClient);
+      const eventHandler = new MessageCreate(
+        this.discordClient, 
+        this.aiClient, 
+        this.discordClient.user?.id || ''
+      );
       eventHandler.handler(event);
     });
 
