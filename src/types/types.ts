@@ -36,11 +36,16 @@ type AITool = {
   function: AIToolFunction;
 };
 
-type MessageInput = {
+export interface MessageInput {
   role: string;
-  content: string | object;
-  channelId?: string;
-};
+  content: string;
+  channelId: string;
+}
+
+export interface FormattedMessage {
+  role: string;
+  content: string;
+}
 
 interface ToolType {
   toolName: string;
@@ -59,5 +64,6 @@ export {
   AIToolParameter,
   AITool,
   MessageInput,
-  ToolType
+  ToolType,
+  FormattedMessage
 };

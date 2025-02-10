@@ -9,7 +9,6 @@ Discord AI Chatbot is an advanced AI-powered Discord bot that leverages the capa
 - **Web Search**: Integrates Brave Search and Google Search for up-to-date information.
 - **Cryptocurrency Price Tracking**: Offers live updates on cryptocurrency prices.
 - **Google Lighthouse Integration**: Analyzes webpage performance.
-- **Memory Function**: Ability to remember and recall information from conversations.
 - **Multi-language Support**: Configurable to respond in different languages.
 
 ## Prerequisites

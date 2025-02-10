@@ -20,8 +20,48 @@ export default class OpenAIClient extends EventEmitter implements AIClientType {
   private async message(options: ChatCompletionCreateParamsNonStreaming): Promise<string | null> {
     if (!this.client) return null;
 
-    const response = await this.client.chat.completions.create(options);
-    return response?.choices[0]?.message?.content || null;
+    try {
+      const response = await this.client.chat.completions.create(options);
+      return response?.choices[0]?.message?.content || null;
+    }
+    catch (error) {
+      console.error('Error with primary model:', error);
+
+      if (error instanceof Error && 
+          (error.message.includes('overloaded') || 
+           error.message.includes('capacity') ||
+           error.message.includes('rate limit'))) {
+
+        const currentModel = options.model;
+        let fallbackModel;
+
+        if (currentModel === this.openAIConfig.model) {
+          fallbackModel = this.openAIConfig.fallbackModel;
+        }
+        else if (currentModel === this.openAIConfig.summaryModel) {
+          fallbackModel = this.openAIConfig.fallbackSummaryModel;
+        }
+        else {
+          throw error;
+        }
+
+        console.log(`Retrying with fallback model: ${fallbackModel}`);
+
+        try {
+          const fallbackResponse = await this.client.chat.completions.create({
+            ...options,
+            model: fallbackModel
+          });
+          return fallbackResponse?.choices[0]?.message?.content || null;
+        }
+        catch (fallbackError) {
+          console.error('Error with fallback model:', fallbackError);
+          throw fallbackError;
+        }
+      }
+
+      throw error;
+    }
   }
 
   async getSummary(systemPrompt: string, messages: MessageInput[]): Promise<string | null> {
