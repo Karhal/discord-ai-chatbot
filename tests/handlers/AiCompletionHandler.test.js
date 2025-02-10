@@ -123,6 +123,7 @@ beforeEach(() => {
 
 describe('AiCompletionHandler', () => {
   let mockAiClient;
+  const mockBotId = '123456789';
   const mockPrompt = 'Test prompt';
 
   beforeEach(() => {
@@ -136,7 +137,7 @@ describe('AiCompletionHandler', () => {
 
   describe('addMessageToChannel', () => {
     it('should add a message to an empty channel', () => {
-      const aiCompletionHandler = new AiCompletionHandler(mockAiClient, mockPrompt);
+      const aiCompletionHandler = new AiCompletionHandler(mockAiClient, mockBotId);
       const message = {
         role: 'user',
         content: 'test message',
@@ -148,7 +149,7 @@ describe('AiCompletionHandler', () => {
     });
 
     it('should remove the oldest message when exceeding maxHistory', () => {
-      const aiCompletionHandler = new AiCompletionHandler(mockAiClient, mockPrompt);
+      const aiCompletionHandler = new AiCompletionHandler(mockAiClient, mockBotId);
       const firstMessage = {
         role: 'user',
         content: 'first',
@@ -169,7 +170,7 @@ describe('AiCompletionHandler', () => {
     });
 
     it('should add an array of messages to the messages array', () => {
-      const aiCompletionHandler = new AiCompletionHandler(mockAiClient, mockPrompt);
+      const aiCompletionHandler = new AiCompletionHandler(mockAiClient, mockBotId);
       const messages = [
         {
           role: 'user',
@@ -190,7 +191,7 @@ describe('AiCompletionHandler', () => {
     });
 
     it('should get the last messages of a given channel', () => {
-      const aiCompletionHandler = new AiCompletionHandler(mockAiClient, mockPrompt);
+      const aiCompletionHandler = new AiCompletionHandler(mockAiClient, mockBotId);
       const messages = [
         {
           role: 'user',
@@ -227,7 +228,7 @@ describe('AiCompletionHandler', () => {
     });
 
     it('should get the first messages of a given channel', () => {
-      const aiCompletionHandler = new AiCompletionHandler(mockAiClient, mockPrompt);
+      const aiCompletionHandler = new AiCompletionHandler(mockAiClient, mockBotId);
       const messages = [
         {
           role: 'user',
@@ -277,19 +278,25 @@ describe('AiCompletionHandler', () => {
 
   describe('createMessagesArrayFromHistory', () => {
     it('should format discord messages into MessageInput array', () => {
-      const aiCompletionHandler = new AiCompletionHandler(mockAiClient, mockPrompt);
+      const aiCompletionHandler = new AiCompletionHandler(mockAiClient, mockBotId);
       const mockCollection = {
         reverse: () => mockCollection,
         forEach: function(callback) {
           [
             {
               content: 'Hello',
-              author: { username: 'User1', bot: false },
+              author: { 
+                username: 'User1', 
+                id: '987654321'
+              },
               channelId: '123'
             },
             {
               content: 'Hi there',
-              author: { username: 'Bot', bot: true },
+              author: { 
+                username: 'Bot', 
+                id: mockBotId
+              },
               channelId: '123'
             }
           ].forEach(callback);
