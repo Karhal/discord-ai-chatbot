@@ -33,15 +33,22 @@ export default class DiscordClient {
 
   async loadEvents() {
     this.discordClient.once('ready', () => {
+      if (!this.discordClient.user?.id) {
+        throw new Error('Bot ID not available after ready event');
+      }
       const eventHandler = new Ready(this.discordClient, this.aiClient);
       eventHandler.handler();
     });
 
     this.discordClient.on('messageCreate', (event) => {
+      if (!this.discordClient.user?.id) {
+        return;
+      }
+
       const eventHandler = new MessageCreate(
-        this.discordClient, 
-        this.aiClient, 
-        this.discordClient.user?.id || ''
+        this.discordClient,
+        this.aiClient,
+        this.discordClient.user.id
       );
       eventHandler.handler(event);
     });
