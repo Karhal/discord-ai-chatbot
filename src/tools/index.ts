@@ -8,14 +8,12 @@ import GoogleSearchTool from './google-search-tool';
 import DallETool from './dalle-tool';
 import MapSearchTool from './map-search-tool';
 import SerpSearchTool from './serp-search-tool';
-import WriteMemoryTool from './write-memory-tool';
 import StableDiffusionTool from './stablediffusion-tool';
 import GiphyTool from './giphy-tool';
 import YoutubeTranscriptTool from './youtube-transcript-tool';
 import PuppeteerTool from './puppeteer-tool';
 import TradingChartTool from './trading-chart-tool';
 const toolList: (typeof AbstractTool)[] = [
-  WriteMemoryTool,
   DallETool,
   BraveSearchTool,
   DuneTool,

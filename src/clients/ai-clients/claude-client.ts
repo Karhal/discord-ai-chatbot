@@ -59,8 +59,47 @@ export default class ClaudeClient extends EventEmitter implements AIClientType {
     }, 4000);
 
     try {
+
       const response = await this.client.messages.create(options);
       return response || null;
+    }
+    catch (error) {
+      console.error('Error with primary model:', error);
+
+      if (error instanceof Error &&
+          (error.message.includes('overloaded') ||
+           error.message.includes('capacity') ||
+           error.message.includes('rate limit'))) {
+
+        const currentModel = options.model;
+        let fallbackModel;
+
+        if (currentModel === this.claudeAIConfig.model) {
+          fallbackModel = this.claudeAIConfig.fallbackModel;
+        }
+        else if (currentModel === this.claudeAIConfig.summaryModel) {
+          fallbackModel = this.claudeAIConfig.fallbackSummaryModel;
+        }
+        else {
+          throw error;
+        }
+
+        console.log(`Retrying with fallback model: ${fallbackModel}`);
+
+        try {
+          const fallbackResponse = await this.client.messages.create({
+            ...options,
+            model: fallbackModel
+          });
+          return fallbackResponse || null;
+        }
+        catch (fallbackError) {
+          console.error('Error with fallback model:', fallbackError);
+          throw fallbackError;
+        }
+      }
+
+      throw error;
     }
     finally {
       clearInterval(intervalId);
@@ -74,8 +113,8 @@ export default class ClaudeClient extends EventEmitter implements AIClientType {
   ): Promise<string> {
     const toolUseItem = this.findToolUseItem(response);
     if (!toolUseItem) {
-      console.log('no tool use item');
-      console.log(response);
+      /*console.log('no tool use item');
+      console.log(response);*/
       return response.content[0].text;
     }
 
