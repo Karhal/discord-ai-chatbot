@@ -16,11 +16,10 @@ export default class DuneTool extends AbstractTool {
     5. Look for correlations and causal relationships \
     6. Compare current trends with historical patterns \
     In your response: \
+    - Do NOT invent any data, only use the data provided by the queries \
     - Include specific numbers and percentages \
     - Highlight significant changes or patterns \
-    - Provide context for the numbers \
     - Calculate relevant ratios or growth rates \
-    - Draw meaningful conclusions based on the cross-referenced data \
     - Suggest potential implications or future trends \
     - Note any limitations in the data analysis \
     Format your response with: \
@@ -36,30 +35,32 @@ export default class DuneTool extends AbstractTool {
         type: 'string',
         description:
           'The queryId you want to get the results for. Take one from this list : \
-          - 2180075 (weekly DEX market share, order by _col1) on Ethereum, \
-          - 4323    (weekly DEX volume, order by _col1) on Ethereum \
           - 1933035 (Total ETH Staked, no order) \
           - 651474 (Number of active addresses on ETH, no order) \
           - 4582719 (Number of a daily new addresses on Base, order by time_) \
           - 1193168 (ETH daily transactions, order by dt) \
           - 3219693 (Solana daily transactions, order by day) \
           - 4275599 (Daily Unique Transactions on Ethereum L2 Blockchains, order by tx_date) \
-          - 1188618 (Longs VS Shorts on DEXs, order by time_day) \
+          - 2822170 (GMX Open Interest (V1 + V2), BTC OI, ETH OI, UNI OI, AVAX OI, LTC OI, XRP OI, ARB OI, DOGE OI, LINK OI, SOL OI, Open Interest, Daily Change, Weekly Change, Monthly Change, GMX Longs VS Shorts Open Interest, Long Open Interest, Short Open Interest, GMX V1 Open Interest, GMX V2 Open Interest, GMX Open Interest, Long Dominance, GMX Longs VS Shorts Weighting, Markets Skewness, Lineage, order by time) \
+          - 2743884 (GMX V2 GMX V2 Volume, 24H Unique Users, Weekly Unique Users, Monthly Unique Users, Unique Users, Total Users, 24H Volume, Weekly Volume, Monthly Volume, 24H Fees, Weekly Fees, Monthly Fees, Total Liquidations, GMX V2 Fees, Total Volume, Total Fees, Unique Users, Lineage, order by block_date) \
+          - 2827533 (GMX V2 Chain Volume Breakdown, Version Volume Comparison, Version Fees Comparison, Fees Breakdown, Version Volume Weighting, Version User Comparison, Volume Breakdown, Chain Users Breakdown, Chain Fees Breakdown, 24H Volume, Weekly Volume, Monthly Volume, 24H Fees, Weekly Fees, Monthly Fees, Total Fees, Total Volume, Total Users, 24H Users, Weekly Users, Monthly Users, User Breakdown, Weekly Arbitrum V1 Fees, Weekly Arbitrum V2 Fees, order by block_date) \
+          - 2831076 (GMX V1+V2 Total Value Locked, Daily Change, Weekly Change, Monthly Change, TVL, Lineage , day ) \
           '
       },
       orderBy: {
         type: 'string',
         description: 'The order by parameter to sort the results. it depends on the queryId. \
         Here are the parameter value for each queryId: \
-        - 2180075: _col1 \
-        - 4323: _col1 \
         - 1933035: null \
         - 651474: null \
         - 4582719: time_ \
         - 1193168: dt \
         - 3219693: day \
         - 4275599: tx_date \
-        - 1188618: time_day \
+        - 2822170: time \
+        - 2743884: block_date \
+        - 2827533: block_date \
+        - 2831076: day \
         ',
         default: ''
       }
@@ -80,11 +81,13 @@ export default class DuneTool extends AbstractTool {
     try {
       const orderByParam = orderBy ? `&sort_by=${orderBy}%20desc` : '';
       const response = await fetch(
-        `https://api.dune.com/api/v1/query/${query}/results/csv?limit=50${orderByParam}`,
+        `https://api.dune.com/api/v1/query/${query}/results?limit=50${orderByParam}`,
         requestOptions
       );
-      const result = await response.text();
-      return result;
+      const result = await response.json();
+      const resultData = result.result.rows;
+      console.log(resultData);
+      return resultData;
     }
     catch (error) {
       console.error(error);
