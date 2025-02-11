@@ -16,20 +16,6 @@ export default class ClaudeClient extends EventEmitter implements AIClientType {
     });
   }
 
-  async getSummary(systemPrompt: string, messages: MessageInput[]): Promise<string | null> {
-    const options: Anthropic.MessageCreateParams = {
-      model: this.claudeAIConfig.summaryModel,
-      max_tokens: this.claudeAIConfig.maxTokens,
-      temperature: this.claudeAIConfig.temperature,
-      system: systemPrompt,
-      messages: messages,
-      stream: false
-    };
-
-    const response = await this.message(options);
-    return response?.content[0]?.text || null;
-  }
-
   async getAiCompletion(systemPrompt: string, messages: MessageInput[]): Promise<string> {
     const options: Anthropic.MessageCreateParams = {
       model: this.claudeAIConfig.model,
@@ -76,9 +62,6 @@ export default class ClaudeClient extends EventEmitter implements AIClientType {
 
         if (currentModel === this.claudeAIConfig.model) {
           fallbackModel = this.claudeAIConfig.fallbackModel;
-        }
-        else if (currentModel === this.claudeAIConfig.summaryModel) {
-          fallbackModel = this.claudeAIConfig.fallbackSummaryModel;
         }
         else {
           throw error;

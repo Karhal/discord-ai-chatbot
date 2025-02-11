@@ -34,8 +34,6 @@ export interface OpenAIClientConfigType {
   apiKey: string;
   model: string;
   fallbackModel: string;
-  summaryModel: string;
-  fallbackSummaryModel: string;
   temperature: number;
   maxTokens: number;
 }
@@ -43,8 +41,6 @@ export interface ClaudeClientConfigType {
   apiKey: string;
   model: string;
   fallbackModel: string;
-  summaryModel: string;
-  fallbackSummaryModel: string;
   temperature: number;
   maxTokens: number;
 }
@@ -183,8 +179,6 @@ export default class ConfigManager {
     apiKey: process.env.OPENAI_API_KEY || configValues.openAI?.apiKey || '',
     model: process.env.OPENAI_MODEL || configValues.openAI?.model || 'gpt-4o',
     fallbackModel: process.env.OPENAI_FALLBACK_MODEL || configValues.openAI?.fallbackModel || 'gpt-3.5-turbo',
-    summaryModel: process.env.OPENAI_SUMMARY_MODEL || configValues.openAI?.summaryModel || 'gpt-4o-mini',
-    fallbackSummaryModel: process.env.OPENAI_FALLBACK_SUMMARY_MODEL || configValues.openAI?.fallbackSummaryModel || 'gpt-3.5-turbo',
     maxTokens: process.env.OPENAI_MAX_TOKENS ? parseInt(process.env.OPENAI_MAX_TOKENS) : configValues.openAI?.maxTokens || 2000,
     temperature: process.env.OPENAI_TEMPERATURE ? parseFloat(process.env.OPENAI_TEMPERATURE) : configValues.openAI?.temperature || 0.5
   };
@@ -193,8 +187,6 @@ export default class ConfigManager {
     apiKey: process.env.CLAUDE_API_KEY || configValues.claude?.apiKey || '',
     model: process.env.CLAUDE_MODEL || configValues.claude?.model || 'claude-3-5-sonnet-20240620',
     fallbackModel: process.env.CLAUDE_FALLBACK_MODEL || configValues.claude?.fallbackModel || 'claude-3-haiku-20240307',
-    summaryModel: process.env.CLAUDE_SUMMARY_MODEL || configValues.claude?.summaryModel || 'claude-3-haiku-20240307',
-    fallbackSummaryModel: process.env.CLAUDE_FALLBACK_SUMMARY_MODEL || configValues.claude?.fallbackSummaryModel || 'claude-2.1',
     maxTokens: process.env.CLAUDE_MAX_TOKENS ? parseInt(process.env.CLAUDE_MAX_TOKENS) : configValues.claude?.maxTokens || 2000,
     temperature: process.env.CLAUDE_TEMPERATURE ? parseFloat(process.env.CLAUDE_TEMPERATURE) : configValues.claude?.temperature || 0.5
   };
@@ -314,8 +306,6 @@ export default class ConfigManager {
 
     console.log('Model:', this._config.aiClient === 'openAI' ? this._config.openAI.model : this._config.claude.model);
     console.log('fallbackModel:', this._config.aiClient === 'openAI' ? this._config.openAI.fallbackModel : this._config.claude.fallbackModel);
-    console.log('summaryModel:', this._config.aiClient === 'openAI' ? this._config.openAI.summaryModel : this._config.claude.summaryModel);
-    console.log('fallbackSummaryModel:', this._config.aiClient === 'openAI' ? this._config.openAI.fallbackSummaryModel : this._config.claude.fallbackSummaryModel);
     console.log('triggerWords:', this.triggerWords);
     const tmpFolderPath = path.resolve(this._config.tmpFolder.path);
     try {

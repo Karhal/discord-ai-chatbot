@@ -6,27 +6,10 @@ export class AIPromptBuilder {
     private prompt: string
   ) {}
 
-  createSummaryPrompt(): string {
-    return `As a professional summarizer, create a concise and comprehensive summary of the provided conversation
-    while adhering to these guidelines:
-    Craft a summary that is detailed, thorough, in-depth, and complex, while maintaining clarity and conciseness 
-    in the ${this.config.lang} language.
-    Incorporate main ideas and essential information, eliminating extraneous language and focusing on critical aspects.
-    Rely strictly on the provided text, without including external information.
-    Format the summary in paragraph form for easy understanding.
-    By following this optimized prompt, you will generate an effective summary that encapsulates 
-    the essence of the given text in a clear, concise, and reader-friendly manner.
-    \n\n"""CONVERSATION:"`;
-  }
-
-  createCompletionPrompt(summary: string): string {
+  createCompletionPrompt(): string {
     return `
     You are an AI assistant engaged in a conversation on Discord. 
     Your goal is to provide helpful, engaging, and contextually appropriate responses to users. 
-    Here's a summary of the discussion so far:
-    <conversation_summary>
-    ${summary}
-    </conversation_summary>
 
     Here are the system instructions given by the user, you have to strictly follow these instructions : 
     <system_instructions>

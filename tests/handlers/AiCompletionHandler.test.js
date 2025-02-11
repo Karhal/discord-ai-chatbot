@@ -18,7 +18,6 @@ jest.mock('../../src/configManager', () => {
         openAI: {
           apiKey: 'mock_openai_key',
           model: 'gpt-4o',
-          summaryModel: 'gpt-4o-mini',
           imageSize: '1024x1024',
           maxTokens: 4000,
           temperature: 0.5
@@ -26,7 +25,6 @@ jest.mock('../../src/configManager', () => {
         claude: {
           apiKey: 'mock_claude_key',
           model: 'claude-3-5-sonnet-20240620',
-          summaryModel: 'claude-3-haiku-20240307',
           prompt: 'You are a nice assistant in a discord server',
           maxTokens: 2000,
           temperature: 0.5
@@ -128,7 +126,6 @@ describe('AiCompletionHandler', () => {
 
   beforeEach(() => {
     mockAiClient = {
-      getSummary: jest.fn(),
       getAiCompletion: jest.fn(),
       on: jest.fn(),
       emit: jest.fn()

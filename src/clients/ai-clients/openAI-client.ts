@@ -38,9 +38,6 @@ export default class OpenAIClient extends EventEmitter implements AIClientType {
         if (currentModel === this.openAIConfig.model) {
           fallbackModel = this.openAIConfig.fallbackModel;
         }
-        else if (currentModel === this.openAIConfig.summaryModel) {
-          fallbackModel = this.openAIConfig.fallbackSummaryModel;
-        }
         else {
           throw error;
         }
@@ -62,16 +59,6 @@ export default class OpenAIClient extends EventEmitter implements AIClientType {
 
       throw error;
     }
-  }
-
-  async getSummary(systemPrompt: string, messages: MessageInput[]): Promise<string | null> {
-    const options = {
-      messages: [{ role: 'system', content: systemPrompt }, ...messages],
-      model: this.openAIConfig.summaryModel
-    };
-
-    const response = await this.message(options);
-    return response;
   }
 
   async getAiCompletion(systemPrompt: string, messages: MessageInput[]): Promise<string> {

@@ -10,6 +10,7 @@ import AiCompletionHandler from '../handlers/ai-completion-handler';
 import { EventEmitter } from 'events';
 
 export default class MessageCreate extends EventDiscord {
+
   eventName: Events = Events.MessageCreate;
   intervalDate: NodeJS.Timeout | null = null;
   message: Message | null = null;
@@ -45,12 +46,8 @@ export default class MessageCreate extends EventDiscord {
         const channelId = message.channelId;
         const messagesChannelHistory = await this.fetchChannelHistory(message, this.config.discord.maxHistory);
         this.aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
-        const summary = await this.aiCompletionHandler.getSummary(channelId);
-
-        if (summary) {
-          const content = await this.aiCompletionHandler.getAiCompletion(summary, channelId);
-          await this.sendResponse(message, content);
-        }
+        const content = await this.aiCompletionHandler.getAiCompletion(channelId);
+        await this.sendResponse(message, content);
         console.log('Done.');
       }
     }
