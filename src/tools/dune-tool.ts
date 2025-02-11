@@ -81,7 +81,7 @@ export default class DuneTool extends AbstractTool {
     try {
       const orderByParam = orderBy ? `&sort_by=${orderBy}%20desc` : '';
       const response = await fetch(
-        `https://api.dune.com/api/v1/query/${query}/results?limit=50${orderByParam}`,
+        `https://api.dune.com/api/v1/query/${query}/results?limit=5${orderByParam}`,
         requestOptions
       );
       const result = await response.json();
