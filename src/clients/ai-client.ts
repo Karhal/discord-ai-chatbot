@@ -28,12 +28,6 @@ export default class AIClient extends EventEmitter implements AIClientType {
     }
   }
 
-  async getSummary(systemPrompt: string, messages: MessageInput[]): Promise<string | null> {
-    if (!this.client) return null;
-    this.emit('completionRequested', { systemPrompt, messages });
-    return await this.client.getSummary(systemPrompt, messages);
-  }
-
   async getAiCompletion(systemPrompt: string, conversation: MessageInput[], tools: AITool[]): Promise<string> {
     if (!this.client) return '';
     this.emit('completionRequested', { systemPrompt, conversation });

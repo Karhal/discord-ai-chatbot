@@ -10,7 +10,6 @@ import { AIPromptBuilder } from '../utils/ai-prompt-builder';
 
 export default class AiCompletionHandler extends EventEmitter {
   private messages: MessageInput[] = [];
-  public summary: string | null = null;
   private discordConfig: DiscordConfigType;
   private messageFormatter: MessageFormatter;
   private logger: Logger;
@@ -29,27 +28,10 @@ export default class AiCompletionHandler extends EventEmitter {
     this.botId = botId;
   }
 
-  async getSummary(channelId: string): Promise<string | null> {
-    try {
-      const systemPrompt = this.promptBuilder.createSummaryPrompt();
-      const messages = this.messageFormatter.formatFirstMessages(
-        this.getFirstMessagesOfAChannel(this.discordConfig.maxHistory, channelId),
-        channelId
-      );
 
-      const summary = await this.aiClient.getSummary(systemPrompt, messages);
-      this.logger.debug('Summary generated:', summary);
-      return summary;
-    }
-    catch (error) {
-      this.logger.error('Error getting summary:', error);
-      return 'An error occurred while processing your request.';
-    }
-  }
-
-  async getAiCompletion(summary: string, channelId: string): Promise<string> {
+  async getAiCompletion(channelId: string): Promise<string> {
     try {
-      const systemPrompt = this.promptBuilder.createCompletionPrompt(summary);
+      const systemPrompt = this.promptBuilder.createCompletionPrompt();
       const messages = this.messageFormatter.formatLastMessages(
         this.getLastMessagesOfAChannel(5, channelId),
         channelId
