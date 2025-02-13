@@ -28,6 +28,7 @@ export interface ConfigType {
   puppeteer: PuppeteerConfigType;
   moderation: ModerationConfigType;
   tradingChart: TradingChartConfigType;
+  twitter: TwitterConfigType;
 }
 
 export interface OpenAIClientConfigType {
@@ -125,6 +126,10 @@ export interface ModerationConfigType {
     maxWarnings: number;
   };
   googleSafeBrowsingKey: string;
+}
+
+export interface TwitterConfigType extends ActivatorConfigType {
+  bearerToken: string;
 }
 
 export type PuppeteerConfigType = ActivatorConfigType;
@@ -258,6 +263,11 @@ export default class ConfigManager {
     googleSafeBrowsingKey: process.env.GOOGLE_SAFE_BROWSING_KEY || configValues.moderation?.googleSafeBrowsingKey || ''
   };
 
+  private twitterConfig: TwitterConfigType = {
+    active: process.env.TWITTER_ACTIVE === 'true' || configValues.twitter?.active || false,
+    bearerToken: process.env.TWITTER_BEARER_TOKEN || configValues.twitter?.bearerToken || ''
+  };
+
   private _config: ConfigType = {
     aiClient: process.env.AI_CLIENT || configValues.aiClient || 'openAI',
     discord: this.discordConfig,
@@ -282,7 +292,8 @@ export default class ConfigManager {
       active: process.env.PUPPETEER_ACTIVE === 'true' || configValues.puppeteer?.active || true
     },
     moderation: this.moderationConfig,
-    tradingChart: this.tradingChartConfig
+    tradingChart: this.tradingChartConfig,
+    twitter: this.twitterConfig
   };
 
   private static getInstance() {
@@ -362,6 +373,10 @@ export default class ConfigManager {
     }
     if (this._config.tradingChart?.active && !this._config.tradingChart?.apiKey) {
       throw new Error('No Trading Chart API key configured');
+    }
+
+    if (this._config.twitter?.active && !this._config.twitter?.bearerToken) {
+      throw new Error('No Twitter Bearer Token configured');
     }
   }
 }
