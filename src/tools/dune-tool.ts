@@ -45,6 +45,8 @@ export default class DuneTool extends AbstractTool {
           - 2743884 (GMX V2 GMX V2 Volume, 24H Unique Users, Weekly Unique Users, Monthly Unique Users, Unique Users, Total Users, 24H Volume, Weekly Volume, Monthly Volume, 24H Fees, Weekly Fees, Monthly Fees, Total Liquidations, GMX V2 Fees, Total Volume, Total Fees, Unique Users, Lineage, order by block_date) \
           - 2827533 (GMX V2 Chain Volume Breakdown, Version Volume Comparison, Version Fees Comparison, Fees Breakdown, Version Volume Weighting, Version User Comparison, Volume Breakdown, Chain Users Breakdown, Chain Fees Breakdown, 24H Volume, Weekly Volume, Monthly Volume, 24H Fees, Weekly Fees, Monthly Fees, Total Fees, Total Volume, Total Users, 24H Users, Weekly Users, Monthly Users, User Breakdown, Weekly Arbitrum V1 Fees, Weekly Arbitrum V2 Fees, order by block_date) \
           - 2831076 (GMX V1+V2 Total Value Locked, Daily Change, Weekly Change, Monthly Change, TVL, Lineage , day ) \
+          - 4208557 (Ethereum ETFs, in $, order by time) \
+          - 3953621 (Ethereum ETFs recent flows in ETH, order by block_time_est) \
           '
       },
       orderBy: {
