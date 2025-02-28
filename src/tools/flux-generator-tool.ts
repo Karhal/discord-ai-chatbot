@@ -24,26 +24,9 @@ export default class FluxGeneratorTool extends AbstractTool {
           Begin by defining your core subject with exceptional precision, moving \
           beyond basic descriptions to include specific poses, actions, and contextual details that \
           breathe life into your vision. \
-          Your prompt should systematically integrate ten critical components to maximize \
-          image quality and creative output. \
-          Start with a crystal-clear topic description that captures not just what you want to see, \
-          but the intricate nuances of the scene. \
-          Specify the material rendering style—whether digital painting, photorealistic render, \
-          or abstract sketch—which fundamentally shapes the image\'s visual texture. \
-          Articulate a specific artistic style or boldly combine multiple aesthetic approaches to create unique visual \
-          landscapes. Elevate your prompt by invoking renowned artists whose signature styles can profoundly \
-          influence the image\'s character. Leverage art platform references like ArtStation to \
-          signal high-quality conceptual expectations. \
-          Emphasize sharpness and detail through precise descriptive language, ensuring crisp, \
-          well-defined visual elements. Atmospheric depth comes from carefully chosen extra details \
-          that communicate mood and emotional tone. Manipulate shade, color, and lighting to create specific visual \
-          atmospheres—whether moody, dramatic, or subtly nuanced. \
-          Each descriptive layer adds complexity and richness to the generated image. \
-          Crucially, include negative prompts to explicitly exclude undesired elements, technical imperfections, \
-          or stylistic aberrations. This final filtering mechanism ensures the output aligns \
-          precisely with your creative vision. \
-          The ultimate prompt is a symphonic blend of specificity, creativity, \
-          and technical guidance—a linguistic blueprint that transforms textual imagination into visual reality. '
+          Use this prompt template : A [descriptive adjectives] [subject], in a [location/environment], [actions/movements]. [Specific features of the subject]. Shot with a [lens type] lens for a [perspective/style], emphasizing [elements to highlight]. The lighting is [lighting description], creating a [atmosphere/feeling]. [additional elements/details]. \
+          Examples 1 : A pale-skinned realistic young fitness model from Brazil, aged 26, wearing a vibrant yellow Western short dress, standing on a sunny Rio de Janeiro beach with the ocean in the background. She has curly brown hair, a bright smile, and a toned body. Shot with a 24–70mm f/2.8 lens for a wide-angle view, capturing the vibrant colors of the beach and her energetic pose. The lighting is natural and sunny, enhancing the tropical vibe \
+          Examples 2 : A sleek, cherry-red sports car, possibly a Ferrari or Lamborghini, hurtles down a winding California coastal highway, the sun setting in a vibrant blaze of orange and gold. The gleaming chrome accents of the car reflect the golden light, and the Pacific Ocean shimmers in the distance, a deep azure under the fading daylight. The road curves through a lush landscape of palm trees and wildflowers, the scenery a blur of motion as the car accelerates. Photographed with a wide-angle lens to capture the breathtaking scope of the environment and the car\'s speed, it conveys a sense of thrilling freedom and boundless energy in a stunning California setting. The composition uses cinematic lighting, with warm, saturated colors, offering a vibrant portrayal of the California dream'
       }
     }
   };
