@@ -24,7 +24,7 @@ export default class TradingChartTool extends AbstractTool {
   tradingChartConfig = ConfigManager.config.tradingChart;
   anthropicConfig = ConfigManager.config.claude;
   readonly description =
-    'Call this tool to get an analysis of a requested stock chart with customizable indicators.';
+    'Call this tool to get a chart of a requested stock with customizable indicators. Use it when the user asks for a chart of a stock or an analysis of a token price.';
 
   // Pre-defined indicator configurations
   readonly indicatorPresets: Record<string, StudyIndicator> = {
