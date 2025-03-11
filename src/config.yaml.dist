@@ -72,3 +72,6 @@ moderation:
 tradingChart:
   active: false
   apiKey: ''
+twitter:
+  active: false
+  bearerToken: ''

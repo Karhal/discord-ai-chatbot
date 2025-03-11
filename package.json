@@ -25,6 +25,7 @@
     "openai": "latest",
     "puppeteer": "^23.11.1",
     "serpapi": "latest",
+    "twitter-api-v2": "^1.19.1",
     "youtube-transcript": "^1.2.1",
     "youtubei.js": "^12.2.0"
   },
