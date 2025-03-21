@@ -2,7 +2,6 @@ import { AIClientType } from '../../types/AIClientType';
 import { MessageInput, AITool } from '../../types/types';
 import ConfigManager from '../../configManager';
 import { EventEmitter } from 'events';
-import axios from 'axios';
 
 export default class FlowiseClient extends EventEmitter implements AIClientType {
   private flowiseConfig = ConfigManager.config.flowise;
@@ -26,7 +25,7 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
 
       // Create history array with all messages, transforming assistant roles to apiMessage
       const history = messages.map(msg => ({
-        role: msg.role === 'assistant' ? 'apiMessage' : msg.role,
+        role: msg.role === 'assistant' ? 'apiMessage' : 'userMessage',
         content: msg.content
       }));
 
@@ -45,25 +44,29 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
 
       console.log('Request body:', JSON.stringify(requestBody, null, 2));
 
-      const response = await axios.post(
+      const response = await fetch(
         `${this.flowiseConfig.apiUrl}/api/v1/prediction/${this.flowiseConfig.flowId}`,
-        requestBody,
         {
+          method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${this.flowiseConfig.apiKey}`
-          }
+          },
+          body: JSON.stringify(requestBody)
         }
       );
 
-      return response.data?.text || null;
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data?.text || null;
     }
     catch (error) {
       console.error('Error with Flowise:', error);
-      if (axios.isAxiosError(error)) {
-        console.error('Axios error details:', {
-          status: error.response?.status,
-          data: error.response?.data,
+      if (error instanceof Error) {
+        console.error('Error details:', {
           message: error.message
         });
       }
