@@ -33,7 +33,7 @@ export default class AiCompletionHandler extends EventEmitter {
     try {
       const systemPrompt = this.promptBuilder.createCompletionPrompt();
       const messages = this.messageFormatter.formatLastMessages(
-        this.getLastMessagesOfAChannel(5, channelId),
+        this.getLastMessagesOfAChannel(ConfigManager.config.discord.maxHistory, channelId),
         channelId
       );
 
@@ -79,14 +79,14 @@ export default class AiCompletionHandler extends EventEmitter {
   getLastMessagesOfAChannel(count: number, channelId: string) {
     if (!this.messages) return [];
 
-    return this.messages.filter((msg) => msg.channelId === channelId).slice(-5);
+    return this.messages.filter((msg) => msg.channelId === channelId).slice(-count);
   }
 
   getFirstMessagesOfAChannel(count: number, channelId: string) {
     if (!this.messages) return [];
 
     const channelMessages = this.messages.filter((msg) => msg.channelId === channelId);
-    const endIndex = channelMessages.length - 5;
+    const endIndex = channelMessages.length - count;
     const startIndex = Math.max(0, endIndex - count);
 
     return channelMessages.slice(startIndex, endIndex);
