@@ -96,8 +96,6 @@ export default class ClaudeClient extends EventEmitter implements AIClientType {
   ): Promise<string> {
     const toolUseItem = this.findToolUseItem(response);
     if (!toolUseItem) {
-      /*console.log('no tool use item');
-      console.log(response);*/
       return response.content[0].text;
     }
 

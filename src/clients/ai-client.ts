@@ -3,6 +3,7 @@ import { MessageInput, AITool } from '../types/types';
 import OpenAiClient from './ai-clients/openAI-client';
 import ConfigManager from '../configManager';
 import ClaudeClient from './ai-clients/claude-client';
+import FlowiseClient from './ai-clients/flowise-client';
 import { EventEmitter } from 'events';
 
 export default class AIClient extends EventEmitter implements AIClientType {
@@ -17,6 +18,10 @@ export default class AIClient extends EventEmitter implements AIClientType {
     else if (ConfigManager.config.aiClient === 'claude') {
       this.client = new ClaudeClient();
       console.log('Claude Client initialized');
+    }
+    else if (ConfigManager.config.aiClient === 'flowise') {
+      this.client = new FlowiseClient();
+      console.log('Flowise Client initialized');
     }
     else {
       console.log('AI Client not initialized');

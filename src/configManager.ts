@@ -28,6 +28,7 @@ export interface ConfigType {
   puppeteer: PuppeteerConfigType;
   moderation: ModerationConfigType;
   tradingChart: TradingChartConfigType;
+  flowise: FlowiseConfigType;
 }
 
 export interface OpenAIClientConfigType {
@@ -128,6 +129,13 @@ export interface ModerationConfigType {
 }
 
 export type PuppeteerConfigType = ActivatorConfigType;
+
+export interface FlowiseConfigType extends ActivatorConfigType {
+  apiKey: string;
+  apiUrl: string;
+  flowId: string;
+  agentName: string;
+}
 
 export default class ConfigManager {
   static get config() {
@@ -258,6 +266,14 @@ export default class ConfigManager {
     googleSafeBrowsingKey: process.env.GOOGLE_SAFE_BROWSING_KEY || configValues.moderation?.googleSafeBrowsingKey || ''
   };
 
+  private flowiseConfig: FlowiseConfigType = {
+    active: process.env.FLOWISE_ACTIVE === 'true' || configValues.flowise?.active || false,
+    apiKey: process.env.FLOWISE_API_KEY || configValues.flowise?.apiKey || '',
+    apiUrl: process.env.FLOWISE_API_URL || configValues.flowise?.apiUrl || '',
+    flowId: process.env.FLOWISE_FLOW_ID || configValues.flowise?.flowId || '',
+    agentName: process.env.FLOWISE_AGENT_NAME || configValues.flowise?.agentName || ''
+  };
+
   private _config: ConfigType = {
     aiClient: process.env.AI_CLIENT || configValues.aiClient || 'openAI',
     discord: this.discordConfig,
@@ -282,7 +298,8 @@ export default class ConfigManager {
       active: process.env.PUPPETEER_ACTIVE === 'true' || configValues.puppeteer?.active || true
     },
     moderation: this.moderationConfig,
-    tradingChart: this.tradingChartConfig
+    tradingChart: this.tradingChartConfig,
+    flowise: this.flowiseConfig
   };
 
   private static getInstance() {
