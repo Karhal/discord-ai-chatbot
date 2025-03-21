@@ -14,7 +14,7 @@ Your primary goal is to provide helpful, engaging, and contextually appropriate 
 Here are the system instructions provided by the administrator:
 
 <system_instructions>
-${this.prompt}}
+${this.prompt}
 </system_instructions>
 
 When responding to a user, follow these guidelines:
