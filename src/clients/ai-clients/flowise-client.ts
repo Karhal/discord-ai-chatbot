@@ -2,34 +2,50 @@ import { AIClientType } from '../../types/AIClientType';
 import { MessageInput, AITool } from '../../types/types';
 import ConfigManager from '../../configManager';
 import { EventEmitter } from 'events';
+import ImageHandler from '../../handlers/image-handler';
 
 export default class FlowiseClient extends EventEmitter implements AIClientType {
   private flowiseConfig = ConfigManager.config.flowise;
+  private imageHandler = new ImageHandler();
 
-  constructor() {
-    super();
-    console.log('FlowiseClient initialized with config:', {
-      apiUrl: this.flowiseConfig.apiUrl,
-      flowId: this.flowiseConfig.flowId,
-      agentName: this.flowiseConfig.agentName,
-      active: this.flowiseConfig.active
-    });
+  private isImageUrl(url: string): boolean {
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
+    return imageExtensions.some(ext => url.toLowerCase().endsWith(ext));
+  }
+
+  private extractImageUrls(toolOutput: string): string[] {
+    const urls: string[] = [];
+    
+    // Check for <img> tags
+    if (toolOutput.includes('<img src=')) {
+      const matches = toolOutput.matchAll(/src='([^']+)'/g);
+      for (const match of matches) {
+        if (match[1]) urls.push(match[1]);
+      }
+    }
+
+    // Check for direct URLs
+    const urlRegex = /(https?:\/\/[^\s<>"]+)/g;
+    const matches = toolOutput.matchAll(urlRegex);
+    for (const match of matches) {
+      if (this.isImageUrl(match[1])) {
+        urls.push(match[1]);
+      }
+    }
+
+    return urls;
   }
 
   private async message(systemPrompt: string, messages: MessageInput[]): Promise<string | null> {
     try {
-      // Ensure we have at least one message
       if (messages.length === 0) {
         throw new Error('No messages provided');
       }
 
-      // Create history array with all messages, transforming assistant roles to apiMessage
       const history = messages.map(msg => ({
         role: msg.role === 'assistant' ? 'apiMessage' : 'userMessage',
         content: msg.content
       }));
-
-      console.log('Prepared history for Flowise:', history);
 
       const requestBody = {
         question: messages[messages.length - 1].content,
@@ -41,8 +57,6 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
         },
         history: history
       };
-
-      console.log('Request body:', JSON.stringify(requestBody, null, 2));
 
       const response = await fetch(
         `${this.flowiseConfig.apiUrl}/api/v1/prediction/${this.flowiseConfig.flowId}`,
@@ -61,6 +75,40 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
       }
 
       const data = await response.json();
+      const imageUrls: string[] = [];
+      
+      data?.agentReasoning?.forEach((reasoning: any) => {
+        reasoning.usedTools?.forEach((tool: any) => {
+          if (tool.toolOutput && typeof tool.toolOutput === 'string') {
+            const urls = this.extractImageUrls(tool.toolOutput);
+            imageUrls.push(...urls);
+          }
+        });
+      });
+
+      if (imageUrls.length > 0) {
+        console.log('Found image URLs:', imageUrls);
+        await this.imageHandler.downloadImages(imageUrls);
+      }
+
+      console.log('Flowise response:', JSON.stringify({
+        text: data?.text,
+        question: data?.question,
+        chatId: data?.chatId,
+        chatMessageId: data?.chatMessageId,
+        sessionId: data?.sessionId,
+        memoryType: data?.memoryType,
+        agentReasoning: data?.agentReasoning?.map((reasoning: any) => ({
+          agentName: reasoning.agentName,
+          messages: reasoning.messages,
+          usedTools: reasoning.usedTools,
+          sourceDocuments: reasoning.sourceDocuments,
+          artifacts: reasoning.artifacts,
+          state: reasoning.state,
+          nodeName: reasoning.nodeName,
+          nodeId: reasoning.nodeId
+        }))
+      }, null, 2));
       return data?.text || null;
     }
     catch (error) {
@@ -75,13 +123,7 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
   }
 
   async getAiCompletion(systemPrompt: string, messages: MessageInput[], tools: AITool[]): Promise<string> {
-    console.log('FlowiseClient.getAiCompletion called with:', {
-      systemPrompt,
-      messages,
-      tools
-    });
     const response = await this.message(ConfigManager.config.AIPrompt, messages);
-    console.log('Parsing response:', response);
     if (!response) {
       throw new Error('No response from Flowise');
     }

@@ -40,6 +40,11 @@ export interface MessageInput {
   role: string;
   content: string;
   channelId: string;
+  attachments?: Array<{
+    name: string;
+    url: string;
+    contentType: string;
+  }>;
 }
 
 export interface FormattedMessage {
