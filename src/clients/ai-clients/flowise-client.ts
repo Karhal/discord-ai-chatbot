@@ -24,17 +24,11 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
         throw new Error('No messages provided');
       }
 
-      // Create history array with all messages except the last one
-      const history = messages.slice(0, -1).map(msg => ({
+      // Create history array with all messages, transforming assistant roles to apiMessage
+      const history = messages.map(msg => ({
         role: msg.role === 'assistant' ? 'apiMessage' : msg.role,
         content: msg.content
       }));
-
-      // Add the last message to history as well
-      history.push({
-        role: messages[messages.length - 1].role,
-        content: messages[messages.length - 1].content
-      });
 
       console.log('Prepared history for Flowise:', history);
 
@@ -62,11 +56,6 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
         }
       );
 
-      console.log('Received response from Flowise:', {
-        status: response.status,
-        data: response.data
-      });
-
       return response.data?.text || null;
     }
     catch (error) {
@@ -88,7 +77,7 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
       messages,
       tools
     });
-    const response = await this.message(systemPrompt, messages);
+    const response = await this.message(ConfigManager.config.AIPrompt, messages);
     console.log('Parsing response:', response);
     if (!response) {
       throw new Error('No response from Flowise');
