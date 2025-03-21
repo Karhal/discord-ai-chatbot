@@ -27,8 +27,8 @@ export default class OpenAIClient extends EventEmitter implements AIClientType {
     catch (error) {
       console.error('Error with primary model:', error);
 
-      if (error instanceof Error && 
-          (error.message.includes('overloaded') || 
+      if (error instanceof Error &&
+          (error.message.includes('overloaded') ||
            error.message.includes('capacity') ||
            error.message.includes('rate limit'))) {
 
