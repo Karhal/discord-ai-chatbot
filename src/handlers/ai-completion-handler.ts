@@ -32,10 +32,16 @@ export default class AiCompletionHandler extends EventEmitter {
   async getAiCompletion(channelId: string): Promise<string> {
     try {
       const systemPrompt = this.promptBuilder.createCompletionPrompt();
-      const messages = this.messageFormatter.formatLastMessages(
+      const formattedMessages = this.messageFormatter.formatLastMessages(
         this.getLastMessagesOfAChannel(ConfigManager.config.discord.maxHistory, channelId),
         channelId
       );
+
+      const messages: MessageInput[] = formattedMessages.map(msg => ({
+        role: msg.role,
+        content: msg.content,
+        channelId: channelId
+      }));
 
       this.logger.debug('AI Completion Request:', { systemPrompt, messages });
       this.emit('completionRequested', { channelId });
@@ -103,20 +109,20 @@ export default class AiCompletionHandler extends EventEmitter {
     let currentUserMessages: string[] = [];
     let lastRole: 'user' | 'assistant' | null = null;
 
-    console.log('\n=== Message History Processing ===');
     messagesChannelHistory.reverse().forEach((msg: Message) => {
-      if (msg.content === '') return;
+      if (msg.content === '' && msg.attachments.size === 0) return;
 
       const role = msg.author.id === this.botId ? 'assistant' : 'user';
       const content = msg.content;
       const author = msg.author.username;
 
-      console.log(`\nProcessing message from ${author}`);
-      console.log('Role:', role);
-      console.log('Content:', content);
+      const attachments = msg.attachments.map(attachment => ({
+        name: attachment.name,
+        url: attachment.url,
+        contentType: attachment.contentType || 'application/octet-stream'
+      }));
 
       if (role !== lastRole && lastRole === 'user' && currentUserMessages.length > 0) {
-        console.log('\nGrouping user messages:', currentUserMessages);
         messages.push({
           role: 'user',
           content: currentUserMessages.join('\n'),
@@ -129,18 +135,21 @@ export default class AiCompletionHandler extends EventEmitter {
         messages.push({
           role: 'assistant',
           content: content,
-          channelId: msg.channelId
+          channelId: msg.channelId,
+          attachments: attachments.length > 0 ? attachments : undefined
         });
       }
       else {
-        currentUserMessages.push(`${author}: ${content}`);
+        const messageWithAttachments = attachments.length > 0
+          ? `${author}: ${content}\n[Pièces jointes: ${attachments.map(a => `${a.name} (${a.url})`).join(', ')}]`
+          : `${author}: ${content}`;
+        currentUserMessages.push(messageWithAttachments);
       }
 
       lastRole = role;
     });
 
     if (currentUserMessages.length > 0) {
-      console.log('\nGrouping remaining user messages:', currentUserMessages);
       messages.push({
         role: 'user',
         content: currentUserMessages.join('\n'),
@@ -148,13 +157,14 @@ export default class AiCompletionHandler extends EventEmitter {
       });
     }
 
-    console.log('\nFinal formatted messages:');
     messages.forEach((msg, index) => {
       console.log(`\n[Message ${index + 1}]`);
       console.log('Role:', msg.role);
       console.log('Content:', msg.content);
+      if (msg.attachments) {
+        console.log('Attachments:', msg.attachments.map(a => `${a.name} (${a.url})`).join('\n'));
+      }
     });
-    console.log('==============================\n');
 
     return messages;
   }
