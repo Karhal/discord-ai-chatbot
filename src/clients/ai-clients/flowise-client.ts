@@ -16,24 +16,51 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
   private extractImageUrls(toolOutput: string): string[] {
     const urls: string[] = [];
     
-    // Check for <img> tags
-    if (toolOutput.includes('<img src=')) {
-      const matches = toolOutput.matchAll(/src='([^']+)'/g);
-      for (const match of matches) {
-        if (match[1]) urls.push(match[1]);
+    try {
+      // Try to parse as JSON first
+      const parsedOutput = JSON.parse(toolOutput);
+      if (parsedOutput.response) {
+        const response = parsedOutput.response;
+        // Look for URLs in the response
+        const urlRegex = /(https?:\/\/[^\s<>"]+)/g;
+        const matches = response.matchAll(urlRegex);
+        
+        for (const match of matches) {
+          const cleanUrl = match[1].replace(/\\n/g, '').replace(/\\/g, '');
+          if (this.isImageUrl(cleanUrl)) {
+            urls.push(cleanUrl);
+          }
+        }
       }
     }
+    catch (e) {
+      const urlRegex = /(https?:\/\/[^\s<>"]+)/g;
+      const matches = toolOutput.matchAll(urlRegex);
 
-    // Check for direct URLs
-    const urlRegex = /(https?:\/\/[^\s<>"]+)/g;
-    const matches = toolOutput.matchAll(urlRegex);
-    for (const match of matches) {
-      if (this.isImageUrl(match[1])) {
-        urls.push(match[1]);
+      for (const match of matches) {
+        const cleanUrl = match[1].replace(/\\n/g, '').replace(/\\/g, '');
+        if (this.isImageUrl(cleanUrl)) {
+          urls.push(cleanUrl);
+        }
       }
     }
 
     return urls;
+  }
+
+  private cleanResponseText(text: string, downloadedImageUrls: string[]): string {
+    let cleanedText = text;
+
+    downloadedImageUrls.forEach(imageUrl => {
+      const markdownRegex = new RegExp(`!\\[([^\\]]*)\\]\\(${imageUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\)`, 'g');
+      cleanedText = cleanedText.replace(markdownRegex, '');
+
+      cleanedText = cleanedText.replace(imageUrl, '');
+    });
+
+    cleanedText = cleanedText.replace(/\n\s*\n\s*\n/g, '\n\n');
+
+    return cleanedText;
   }
 
   private async message(systemPrompt: string, messages: MessageInput[]): Promise<string | null> {
@@ -76,7 +103,7 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
 
       const data = await response.json();
       const imageUrls: string[] = [];
-      
+
       data?.agentReasoning?.forEach((reasoning: any) => {
         reasoning.usedTools?.forEach((tool: any) => {
           if (tool.toolOutput && typeof tool.toolOutput === 'string') {
@@ -89,6 +116,9 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
       if (imageUrls.length > 0) {
         console.log('Found image URLs:', imageUrls);
         await this.imageHandler.downloadImages(imageUrls);
+        if (data?.text) {
+          data.text = this.cleanResponseText(data.text, imageUrls);
+        }
       }
 
       console.log('Flowise response:', JSON.stringify({
