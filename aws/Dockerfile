@@ -15,25 +15,29 @@ RUN npm run build \
 
 FROM --platform=linux/amd64 debian:bullseye-slim
 
-# Combine user creation and dependency installation
-RUN groupadd --gid 1000 node \
-    && useradd --uid 1000 --gid node --shell /bin/bash --create-home node \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
+# Check if group/user exists before creating and install dependencies
+RUN if ! getent group node > /dev/null 2>&1; then \
+        groupadd --gid 1000 node; \
+    fi && \
+    if ! getent passwd node > /dev/null 2>&1; then \
+        useradd --uid 1000 --gid node --shell /bin/bash --create-home node; \
+    fi && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
         ca-certificates \
         curl \
-        gnupg \
-    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && curl -fsSL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
+        gnupg && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    curl -fsSL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
         nodejs \
-        google-chrome-stable \
-    && apt-get purge -y --auto-remove curl gnupg \
-    && rm -rf /var/lib/apt/lists/* \
-    && mkdir -p /attachments \
-    && chmod 777 /attachments
+        google-chrome-stable && \
+    apt-get purge -y --auto-remove curl gnupg && \
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir -p /attachments && \
+    chmod 777 /attachments
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome \
