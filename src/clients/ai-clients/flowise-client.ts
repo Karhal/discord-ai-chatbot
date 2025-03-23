@@ -84,7 +84,7 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
       const requestBody = {
         question: messages[messages.length - 1].content,
         overrideConfig: {
-          agentName: this.flowiseConfig.agentName,
+          agentName: ConfigManager.config.discord.botName,
           vars: {
             user_prompt: systemPrompt
           }
@@ -136,7 +136,7 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
       if (imageUrls.length > 0) {
         console.log('Found image URLs:', imageUrls);
         await this.imageHandler.downloadImages(imageUrls);
-        
+
         if (data.text) {
           data.text = this.cleanResponseText(data.text, imageUrls);
         }

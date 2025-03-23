@@ -54,6 +54,7 @@ export interface DiscordConfigType {
   token: string;
   maxHistory: number;
   lang: string;
+  botName?: string;
 }
 
 export interface ActivatorConfigType {
@@ -202,7 +203,8 @@ export default class ConfigManager {
   private discordConfig: DiscordConfigType = {
     token: process.env.DISCORD_TOKEN || configValues.discord?.token || '',
     maxHistory: Number(process.env.DISCORD_MAX_HISTORY) || configValues.discord?.maxHistory || 10,
-    lang: process.env.DISCORD_LANG || configValues.discord?.lang || 'en'
+    lang: process.env.DISCORD_LANG || configValues.discord?.lang || 'en',
+    botName: process.env.DISCORD_BOT_NAME || configValues.discord?.botName || undefined
   };
 
   private duneConfig: DuneConfigType = {
