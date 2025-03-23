@@ -4,6 +4,15 @@ import ConfigManager from '../../configManager';
 import { EventEmitter } from 'events';
 import ImageHandler from '../../handlers/image-handler';
 
+interface FlowiseResponse {
+  text?: string;
+  agentReasoning?: Array<{
+    usedTools?: Array<{
+      toolOutput?: string;
+    }>;
+  }>;
+}
+
 export default class FlowiseClient extends EventEmitter implements AIClientType {
   private flowiseConfig = ConfigManager.config.flowise;
   private imageHandler = new ImageHandler();
@@ -13,44 +22,40 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
     return imageExtensions.some(ext => url.toLowerCase().endsWith(ext));
   }
 
-  private extractImageUrls(toolOutput: string): string[] {
-    const urls: string[] = [];
-
-    // Check for <img> tags first
+  private extractUrlsFromImgTags(text: string): string[] {
     const imgRegex = /<img[^>]+src=['"]([^'"]+)['"]/g;
-    const imgMatches = toolOutput.matchAll(imgRegex);
-    for (const match of imgMatches) {
-      if (this.isImageUrl(match[1])) {
-        urls.push(match[1]);
-      }
-    }
+    const matches = text.matchAll(imgRegex);
+    return Array.from(matches)
+      .map(match => match[1])
+      .filter(url => this.isImageUrl(url));
+  }
 
+  private extractUrlsFromText(text: string): string[] {
+    const urlRegex = /(https?:\/\/[^\s<>"]+)/g;
+    const matches = text.matchAll(urlRegex);
+    return Array.from(matches)
+      .map(match => match[1].replace(/\\n/g, '').replace(/\\/g, ''))
+      .filter(url => this.isImageUrl(url));
+  }
+
+  private extractUrlsFromJson(jsonText: string): string[] {
     try {
-      // Try to parse as JSON and look for URLs in the response field
-      const parsedOutput = JSON.parse(toolOutput);
-      if (parsedOutput?.response) {
-        const urlRegex = /(https?:\/\/[^\s<>"]+)/g;
-        const matches = parsedOutput.response.matchAll(urlRegex);
-        for (const match of matches) {
-          const cleanUrl = match[1].replace(/\\n/g, '').replace(/\\/g, '');
-          if (this.isImageUrl(cleanUrl)) {
-            urls.push(cleanUrl);
-          }
-        }
+      const parsedOutput = JSON.parse(jsonText);
+      if (!parsedOutput?.response) {
+        return [];
       }
-    } catch (e) {
-      // If JSON parsing fails, check for direct URLs in the raw text
-      const urlRegex = /(https?:\/\/[^\s<>"]+)/g;
-      const matches = toolOutput.matchAll(urlRegex);
-      for (const match of matches) {
-        const cleanUrl = match[1].replace(/\\n/g, '').replace(/\\/g, '');
-        if (this.isImageUrl(cleanUrl)) {
-          urls.push(cleanUrl);
-        }
-      }
+      return this.extractUrlsFromText(parsedOutput.response);
+    } catch {
+      return [];
     }
+  }
 
-    return urls;
+  private extractImageUrls(toolOutput: string): string[] {
+    const imgTagUrls = this.extractUrlsFromImgTags(toolOutput);
+    const jsonUrls = this.extractUrlsFromJson(toolOutput);
+    const directUrls = this.extractUrlsFromText(toolOutput);
+
+    return [...new Set([...imgTagUrls, ...jsonUrls, ...directUrls])];
   }
 
   private cleanResponseText(text: string, downloadedImageUrls: string[]): string {
@@ -59,21 +64,18 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
     downloadedImageUrls.forEach(imageUrl => {
       const markdownRegex = new RegExp(`!\\[([^\\]]*)\\]\\(${imageUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\)`, 'g');
       cleanedText = cleanedText.replace(markdownRegex, '');
-
       cleanedText = cleanedText.replace(imageUrl, '');
     });
 
-    cleanedText = cleanedText.replace(/\n\s*\n\s*\n/g, '\n\n');
-
-    return cleanedText;
+    return cleanedText.replace(/\n\s*\n\s*\n/g, '\n\n');
   }
 
   private async message(systemPrompt: string, messages: MessageInput[]): Promise<string | null> {
-    try {
-      if (messages.length === 0) {
-        throw new Error('No messages provided');
-      }
+    if (messages.length === 0) {
+      throw new Error('No messages provided');
+    }
 
+    try {
       const history = messages.map(msg => ({
         role: msg.role === 'assistant' ? 'apiMessage' : 'userMessage',
         content: msg.content
@@ -106,53 +108,53 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as FlowiseResponse;
+      if (!data) {
+        throw new Error('Empty response from Flowise');
+      }
+
       const imageUrls: string[] = [];
 
-      data?.agentReasoning?.forEach((reasoning: any) => {
-        if (!reasoning?.usedTools) return;
-        
-        reasoning.usedTools.forEach((tool: any) => {
-          if (!tool?.toolOutput) return;
-          
-          try {
-            const urls = this.extractImageUrls(tool.toolOutput);
-            imageUrls.push(...urls);
-          } catch (error) {
-            console.error('Error extracting image URLs:', error);
+      if (data.agentReasoning) {
+        for (const reasoning of data.agentReasoning) {
+          if (!reasoning?.usedTools) continue;
+
+          for (const tool of reasoning.usedTools) {
+            if (!tool?.toolOutput) continue;
+
+            try {
+              const urls = this.extractImageUrls(tool.toolOutput);
+              imageUrls.push(...urls);
+            }
+            catch (error) {
+              console.error('Error extracting image URLs:', error);
+            }
           }
-        });
-      });
+        }
+      }
 
       if (imageUrls.length > 0) {
         console.log('Found image URLs:', imageUrls);
         await this.imageHandler.downloadImages(imageUrls);
-        if (data?.text) {
+        
+        if (data.text) {
           data.text = this.cleanResponseText(data.text, imageUrls);
         }
       }
 
+      if (!data.text) {
+        throw new Error('Response missing required text field');
+      }
+
       console.log('Flowise response:', JSON.stringify({
-        text: data?.text,
-        question: data?.question,
-        chatId: data?.chatId,
-        chatMessageId: data?.chatMessageId,
-        sessionId: data?.sessionId,
-        memoryType: data?.memoryType,
-        agentReasoning: data?.agentReasoning?.map((reasoning: any) => ({
-          agentName: reasoning.agentName,
-          messages: reasoning.messages,
-          usedTools: reasoning.usedTools,
-          sourceDocuments: reasoning.sourceDocuments,
-          artifacts: reasoning.artifacts,
-          state: reasoning.state,
-          nodeName: reasoning.nodeName,
-          nodeId: reasoning.nodeId
+        text: data.text,
+        agentReasoning: data.agentReasoning?.map(reasoning => ({
+          usedTools: reasoning.usedTools
         }))
       }, null, 2));
-      return data?.text || null;
-    }
-    catch (error) {
+
+      return data.text;
+    } catch (error) {
       console.error('Error with Flowise:', error);
       if (error instanceof Error) {
         console.error('Error details:', {
