@@ -92,10 +92,7 @@ export default class AiCompletionHandler extends EventEmitter {
     if (!this.messages) return [];
 
     const channelMessages = this.messages.filter((msg) => msg.channelId === channelId);
-    const endIndex = channelMessages.length - count;
-    const startIndex = Math.max(0, endIndex - count);
-
-    return channelMessages.slice(startIndex, endIndex);
+    return channelMessages.slice(0, count);
   }
 
   setChannelHistory(channelId: string, messages: Collection<string, Message<boolean>>) {
@@ -110,17 +107,17 @@ export default class AiCompletionHandler extends EventEmitter {
     let lastRole: 'user' | 'assistant' | null = null;
 
     messagesChannelHistory.reverse().forEach((msg: Message) => {
-      if (msg.content === '' && msg.attachments.size === 0) return;
+      if (msg.content === '' && (!msg.attachments || msg.attachments.size === 0)) return;
 
       const role = msg.author.id === this.botId ? 'assistant' : 'user';
       const content = msg.content;
       const author = msg.author.username;
 
-      const attachments = msg.attachments.map(attachment => ({
+      const attachments = msg.attachments?.map(attachment => ({
         name: attachment.name,
         url: attachment.url,
         contentType: attachment.contentType || 'application/octet-stream'
-      }));
+      })) || [];
 
       if (role !== lastRole && lastRole === 'user' && currentUserMessages.length > 0) {
         messages.push({
