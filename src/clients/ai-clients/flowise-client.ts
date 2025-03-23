@@ -15,16 +15,22 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
 
   private extractImageUrls(toolOutput: string): string[] {
     const urls: string[] = [];
-    
+
+    // Check for <img> tags first
+    const imgRegex = /<img[^>]+src=['"]([^'"]+)['"]/g;
+    const imgMatches = toolOutput.matchAll(imgRegex);
+    for (const match of imgMatches) {
+      if (this.isImageUrl(match[1])) {
+        urls.push(match[1]);
+      }
+    }
+
     try {
-      // Try to parse as JSON first
+      // Try to parse as JSON and look for URLs in the response field
       const parsedOutput = JSON.parse(toolOutput);
-      if (parsedOutput.response) {
-        const response = parsedOutput.response;
-        // Look for URLs in the response
+      if (parsedOutput?.response) {
         const urlRegex = /(https?:\/\/[^\s<>"]+)/g;
-        const matches = response.matchAll(urlRegex);
-        
+        const matches = parsedOutput.response.matchAll(urlRegex);
         for (const match of matches) {
           const cleanUrl = match[1].replace(/\\n/g, '').replace(/\\/g, '');
           if (this.isImageUrl(cleanUrl)) {
@@ -32,11 +38,10 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
           }
         }
       }
-    }
-    catch (e) {
+    } catch (e) {
+      // If JSON parsing fails, check for direct URLs in the raw text
       const urlRegex = /(https?:\/\/[^\s<>"]+)/g;
       const matches = toolOutput.matchAll(urlRegex);
-
       for (const match of matches) {
         const cleanUrl = match[1].replace(/\\n/g, '').replace(/\\/g, '');
         if (this.isImageUrl(cleanUrl)) {
@@ -105,10 +110,16 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
       const imageUrls: string[] = [];
 
       data?.agentReasoning?.forEach((reasoning: any) => {
-        reasoning.usedTools?.forEach((tool: any) => {
-          if (tool.toolOutput && typeof tool.toolOutput === 'string') {
+        if (!reasoning?.usedTools) return;
+        
+        reasoning.usedTools.forEach((tool: any) => {
+          if (!tool?.toolOutput) return;
+          
+          try {
             const urls = this.extractImageUrls(tool.toolOutput);
             imageUrls.push(...urls);
+          } catch (error) {
+            console.error('Error extracting image URLs:', error);
           }
         });
       });
