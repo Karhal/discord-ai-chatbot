@@ -17,12 +17,18 @@ export default class ClaudeClient extends EventEmitter implements AIClientType {
   }
 
   async getAiCompletion(systemPrompt: string, messages: MessageInput[]): Promise<string> {
+    // Clean messages to remove unsupported fields and ensure correct types
+    const cleanedMessages = messages.map(msg => ({
+      role: msg.role as 'user' | 'assistant',
+      content: typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content)
+    }));
+
     const options: Anthropic.MessageCreateParams = {
       model: this.claudeAIConfig.model,
       max_tokens: this.claudeAIConfig.maxTokens,
       temperature: this.claudeAIConfig.temperature,
       system: systemPrompt,
-      messages: messages,
+      messages: cleanedMessages,
       stream: false,
       tools: tools.map((tool) => {
         return {
@@ -33,21 +39,28 @@ export default class ClaudeClient extends EventEmitter implements AIClientType {
       })
     };
 
-    const response: Anthropic.Message = await this.message(options);
+    const response = await this.message(options);
+    if (!response) {
+      throw new Error('No response from Claude');
+    }
     return await this.handleResponse(response, systemPrompt, messages);
   }
 
-  private async message(options: Anthropic.MessageCreateParams): Promise<Anthropic.Message | null> {
-    if (!this.client) return null;
+  private async message(options: Anthropic.MessageCreateParams): Promise<Anthropic.Message> {
+    if (!this.client) {
+      throw new Error('Claude client not initialized');
+    }
     this.emit('working', options);
     const intervalId = setInterval(() => {
       this.emit('working', options);
     }, 4000);
 
     try {
-
       const response = await this.client.messages.create(options);
-      return response || null;
+      if (!response) {
+        throw new Error('Empty response from Claude');
+      }
+      return response as Anthropic.Message;
     }
     catch (error) {
       console.error('Error with primary model:', error);
@@ -74,7 +87,10 @@ export default class ClaudeClient extends EventEmitter implements AIClientType {
             ...options,
             model: fallbackModel
           });
-          return fallbackResponse || null;
+          if (!fallbackResponse) {
+            throw new Error('Empty response from Claude fallback model');
+          }
+          return fallbackResponse as Anthropic.Message;
         }
         catch (fallbackError) {
           console.error('Error with fallback model:', fallbackError);
@@ -96,7 +112,8 @@ export default class ClaudeClient extends EventEmitter implements AIClientType {
   ): Promise<string> {
     const toolUseItem = this.findToolUseItem(response);
     if (!toolUseItem) {
-      return response.content[0].text;
+      const textContent = response.content.find(item => item.type === 'text');
+      return textContent?.text || '';
     }
 
     return this.handleToolUseResponse(toolUseItem, systemPrompt, messages);
@@ -118,7 +135,7 @@ export default class ClaudeClient extends EventEmitter implements AIClientType {
       return '';
     }
 
-    const toolResult = await this.executeToolFunction(toolToUse, toolArgs);
+    const toolResult = await this.executeToolFunction(toolToUse, toolArgs as Record<string, unknown>);
     this.updateMessages(messages, toolUseItem, toolResult);
 
     return this.getSecondCallResponse(systemPrompt, messages);
@@ -128,26 +145,31 @@ export default class ClaudeClient extends EventEmitter implements AIClientType {
     return tools.find((tool) => tool.name === toolName);
   }
 
-  private async executeToolFunction(tool: AITool, args: object): Promise<object> {
+  private async executeToolFunction(tool: AITool, args: Record<string, unknown>): Promise<object> {
     const result = await tool.function.function(JSON.stringify(args));
     return result as object;
   }
 
   private updateMessages(messages: MessageInput[], toolUseItem: Anthropic.ToolUseBlock, toolResult: object): void {
+    const lastMessage = messages[messages.length - 1];
+    const channelId = lastMessage?.channelId || '';
+
     messages.push(
       {
         role: 'assistant',
-        content: [{ type: 'tool_use', id: toolUseItem.id, name: toolUseItem.name, input: toolUseItem.input }]
+        content: JSON.stringify([{ type: 'tool_use', id: toolUseItem.id, name: toolUseItem.name, input: toolUseItem.input }]),
+        channelId
       },
       {
         role: 'user',
-        content: [
+        content: JSON.stringify([
           {
             type: 'tool_result',
             tool_use_id: toolUseItem.id,
             content: [{ type: 'text', text: JSON.stringify(toolResult) }]
           }
-        ]
+        ]),
+        channelId
       }
     );
   }
@@ -183,6 +205,7 @@ export default class ClaudeClient extends EventEmitter implements AIClientType {
     };
 
     const response = await this.message(options);
-    return response?.content[0]?.text || '';
+    const textContent = response.content.find(item => item.type === 'text');
+    return textContent?.text || '';
   }
 }
