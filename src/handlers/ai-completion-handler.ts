@@ -107,54 +107,91 @@ export default class AiCompletionHandler extends EventEmitter {
     let lastRole: 'user' | 'assistant' | null = null;
 
     messagesChannelHistory.reverse().forEach((msg: Message) => {
-      if (msg.content === '' && (!msg.attachments || msg.attachments.size === 0)) return;
-
-      const role = msg.author.id === this.botId ? 'assistant' : 'user';
-      const content = msg.content;
-      const author = msg.author.username;
-
       const attachments = msg.attachments?.map(attachment => ({
         name: attachment.name,
         url: attachment.url,
         contentType: attachment.contentType || 'application/octet-stream'
       })) || [];
 
+      const hasContent = msg.content.trim().length > 0;
+      const hasAttachments = attachments.length > 0;
+
+      // Skip messages with no content and no attachments
+      if (!hasContent && !hasAttachments) return;
+
+      const role = msg.author.id === this.botId ? 'assistant' : 'user';
+      const content = msg.content;
+      const author = msg.author.username;
+
+      // If we have pending user messages and we're switching to assistant
       if (role !== lastRole && lastRole === 'user' && currentUserMessages.length > 0) {
-        messages.push({
-          role: 'user',
-          content: currentUserMessages.join('\n'),
-          channelId: msg.channelId
-        });
+        const userContent = currentUserMessages.join('\n');
+        if (userContent.trim().length > 0) {
+          messages.push({
+            role: 'user',
+            content: userContent,
+            channelId: msg.channelId
+          });
+        }
         currentUserMessages = [];
       }
 
       if (role === 'assistant') {
-        messages.push({
-          role: 'assistant',
-          content: content,
-          channelId: msg.channelId,
-          attachments: attachments.length > 0 ? attachments : undefined
-        });
+        const assistantContent = content || '[Message avec pièces jointes]';
+        if (assistantContent.trim().length > 0) {
+          messages.push({
+            role: 'assistant',
+            content: assistantContent,
+            channelId: msg.channelId,
+            attachments: hasAttachments ? attachments : undefined
+          });
+        }
       }
       else {
-        const messageWithAttachments = attachments.length > 0
-          ? `${author}: ${content}\n[Pièces jointes: ${attachments.map(a => `${a.name} (${a.url})`).join(', ')}]`
+        const messageWithAttachments = hasAttachments
+          ? `${author}: ${content || ''}\n[Pièces jointes: ${attachments.map(a => `${a.name} (${a.url})`).join(', ')}]`
           : `${author}: ${content}`;
-        currentUserMessages.push(messageWithAttachments);
+        if (messageWithAttachments.trim().length > 0) {
+          currentUserMessages.push(messageWithAttachments);
+        }
       }
 
       lastRole = role;
     });
 
+    // Handle any remaining user messages
     if (currentUserMessages.length > 0) {
-      messages.push({
-        role: 'user',
-        content: currentUserMessages.join('\n'),
-        channelId: messagesChannelHistory.first()?.channelId || ''
+      const userContent = currentUserMessages.join('\n');
+      if (userContent.trim().length > 0) {
+        messages.push({
+          role: 'user',
+          content: userContent,
+          channelId: messagesChannelHistory.first()?.channelId || ''
+        });
+      }
+    }
+
+    // Ensure strict alternation between user and assistant messages
+    const alternatingMessages: MessageInput[] = [];
+    let currentRole: 'user' | 'assistant' = 'user';
+
+    for (const msg of messages) {
+      if (msg.role === currentRole) {
+        alternatingMessages.push(msg);
+        currentRole = currentRole === 'user' ? 'assistant' : 'user';
+      }
+    }
+
+    // If we end with a user message, add a system message to maintain alternation
+    if (alternatingMessages.length > 0 && alternatingMessages[alternatingMessages.length - 1].role === 'user') {
+      alternatingMessages.push({
+        role: 'assistant',
+        content: '[Message système]',
+        channelId: alternatingMessages[alternatingMessages.length - 1].channelId
       });
     }
 
-    messages.forEach((msg, index) => {
+    alternatingMessages.forEach((msg, index) => {
       console.log(`\n[Message ${index + 1}]`);
       console.log('Role:', msg.role);
       console.log('Content:', msg.content);
@@ -163,6 +200,6 @@ export default class AiCompletionHandler extends EventEmitter {
       }
     });
 
-    return messages;
+    return alternatingMessages;
   }
 }

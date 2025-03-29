@@ -75,10 +75,21 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
       throw new Error('No messages provided');
     }
 
+    // Validate messages to ensure no empty content
+    const validMessages = messages.filter(msg => {
+      const hasContent = msg.content && msg.content.trim().length > 0;
+      const hasAttachments = msg.attachments && msg.attachments.length > 0;
+      return hasContent || hasAttachments;
+    });
+
+    if (validMessages.length === 0) {
+      throw new Error('No valid messages found after filtering empty content');
+    }
+
     try {
-      const history = messages.map(msg => ({
+      const history = validMessages.map(msg => ({
         role: msg.role === 'assistant' ? 'apiMessage' : 'userMessage',
-        content: msg.content
+        content: msg.content || '' // Ensure content is never undefined
       }));
 
       const requestBody = {
