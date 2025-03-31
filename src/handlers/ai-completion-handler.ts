@@ -47,7 +47,6 @@ export default class AiCompletionHandler extends EventEmitter {
         channelId: channelId
       }));
 
-      // Ensure the trigger message is the last message
       if (this.triggerMessage) {
         messages.push(this.triggerMessage);
       }
@@ -125,14 +124,12 @@ export default class AiCompletionHandler extends EventEmitter {
       const hasContent = msg.content.trim().length > 0;
       const hasAttachments = attachments.length > 0;
 
-      // Skip messages with no content and no attachments
       if (!hasContent && !hasAttachments) return;
 
       const role = msg.author.id === this.botId ? 'assistant' : 'user';
       const content = msg.content;
       const author = msg.author.username;
 
-      // If we have pending user messages and we're switching to assistant
       if (role !== lastRole && lastRole === 'user' && currentUserMessages.length > 0) {
         const userContent = currentUserMessages.join('\n');
         if (userContent.trim().length > 0) {
@@ -168,7 +165,6 @@ export default class AiCompletionHandler extends EventEmitter {
       lastRole = role;
     });
 
-    // Handle any remaining user messages
     if (currentUserMessages.length > 0) {
       const userContent = currentUserMessages.join('\n');
       if (userContent.trim().length > 0) {
@@ -180,7 +176,6 @@ export default class AiCompletionHandler extends EventEmitter {
       }
     }
 
-    // Ensure strict alternation between user and assistant messages
     const alternatingMessages: MessageInput[] = [];
     let currentRole: 'user' | 'assistant' = 'user';
 
@@ -191,7 +186,6 @@ export default class AiCompletionHandler extends EventEmitter {
       }
     }
 
-    // If we end with a user message, add a system message to maintain alternation
     if (alternatingMessages.length > 0 && alternatingMessages[alternatingMessages.length - 1].role === 'user') {
       alternatingMessages.push({
         role: 'assistant',

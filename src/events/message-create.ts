@@ -46,7 +46,6 @@ export default class MessageCreate extends EventDiscord {
         this.message = message;
         const channelId = message.channelId;
 
-        // Store the trigger message before fetching history
         const triggerMessage: MessageInput = {
           role: 'user',
           content: message.content,
@@ -68,14 +67,13 @@ export default class MessageCreate extends EventDiscord {
     }
     catch (error) {
       console.error('Error in message handler:', error);
-      // On ne fait rien en cas d'erreur, on ne renvoie pas de message sur Discord
     }
   };
 
   async sendResponse(message: Message, response: string): Promise<boolean> {
     response = response.trim().replace(/\n\s*\n/g, '\n');
     if (!response) {
-      return false; // On ne fait rien si la réponse est vide
+      return false;
     }
 
     const chunks = this.splitResponseIntoChunks(response, 2000);
