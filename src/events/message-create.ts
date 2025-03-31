@@ -68,37 +68,39 @@ export default class MessageCreate extends EventDiscord {
     }
     catch (error) {
       console.error('Error in message handler:', error);
+      // On ne fait rien en cas d'erreur, on ne renvoie pas de message sur Discord
     }
   };
 
   async sendResponse(message: Message, response: string): Promise<boolean> {
     response = response.trim().replace(/\n\s*\n/g, '\n');
-    if (response) {
-      const chunks = this.splitResponseIntoChunks(response, 2000);
+    if (!response) {
+      return false; // On ne fait rien si la réponse est vide
+    }
 
-      for (const chunk of chunks) {
-        if (message.channel instanceof TextChannel) {
-          await message.channel.send(chunk);
-        }
+    const chunks = this.splitResponseIntoChunks(response, 2000);
+
+    for (const chunk of chunks) {
+      if (message.channel instanceof TextChannel) {
+        await message.channel.send(chunk);
       }
+    }
 
-      const metricsService = MetricsService.getInstance();
-      const attachmentsPath = FileHandler.getFolderFilenameFullPaths(this.config.tmpFolder.path);
+    const metricsService = MetricsService.getInstance();
+    const attachmentsPath = FileHandler.getFolderFilenameFullPaths(this.config.tmpFolder.path);
+    await metricsService.sendMetrics(
+      this.config.discord.token,
+      message.author.username,
+      false
+    );
+    for (let i = 0; i < attachmentsPath.length; i++) {
       await metricsService.sendMetrics(
         this.config.discord.token,
         message.author.username,
-        false
+        true
       );
-      for (let i = 0; i < attachmentsPath.length; i++) {
-        await metricsService.sendMetrics(
-          this.config.discord.token,
-          message.author.username,
-          true
-        );
-      }
     }
-    const attachmentsPath = FileHandler.getFolderFilenameFullPaths(this.config.tmpFolder.path);
-    console.log('Attachments:', attachmentsPath);
+
     if (attachmentsPath.length > 0) {
       if (message.channel instanceof TextChannel) {
         await message.channel.send({ files: [...attachmentsPath] });

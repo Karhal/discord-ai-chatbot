@@ -59,7 +59,7 @@ export default class AiCompletionHandler extends EventEmitter {
     }
     catch (error) {
       this.logger.error('Error getting AI completion:', error);
-      return 'An error occurred while processing your request.';
+      return '';
     }
   }
 
