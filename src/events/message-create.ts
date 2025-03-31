@@ -1,9 +1,10 @@
 import EventDiscord from '../clients/events-discord';
-import { Collection, Events, Message } from 'discord.js';
+import { Collection, Events, Message, TextChannel } from 'discord.js';
 import FileHandler from '../handlers/file-handler';
 import ConfigManager from '../configManager';
 import { Client } from 'discord.js';
 import { AIClientType } from '../types/AIClientType';
+import { MessageInput } from '../types/types';
 import MetricsService from '../services/metrics-service';
 import ModerationService from '../services/moderation-service';
 import AiCompletionHandler from '../handlers/ai-completion-handler';
@@ -16,7 +17,7 @@ export default class MessageCreate extends EventDiscord {
   message: Message | null = null;
   config = ConfigManager.config;
   private moderationService: ModerationService;
-  private aiCompletionHandler: AiCompletionHandler;
+  public aiCompletionHandler: AiCompletionHandler;
 
   constructor(
     public discordClient: Client,
@@ -44,6 +45,20 @@ export default class MessageCreate extends EventDiscord {
         }
         this.message = message;
         const channelId = message.channelId;
+
+        // Store the trigger message before fetching history
+        const triggerMessage: MessageInput = {
+          role: 'user',
+          content: message.content,
+          channelId: channelId,
+          attachments: message.attachments?.map(attachment => ({
+            name: attachment.name,
+            url: attachment.url,
+            contentType: attachment.contentType || 'application/octet-stream'
+          }))
+        };
+        this.aiCompletionHandler.setTriggerMessage(triggerMessage);
+
         const messagesChannelHistory = await this.fetchChannelHistory(message, this.config.discord.maxHistory);
         this.aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
         const content = await this.aiCompletionHandler.getAiCompletion(channelId);
@@ -62,7 +77,9 @@ export default class MessageCreate extends EventDiscord {
       const chunks = this.splitResponseIntoChunks(response, 2000);
 
       for (const chunk of chunks) {
-        await message.channel.send(chunk);
+        if (message.channel instanceof TextChannel) {
+          await message.channel.send(chunk);
+        }
       }
 
       const metricsService = MetricsService.getInstance();
@@ -83,7 +100,9 @@ export default class MessageCreate extends EventDiscord {
     const attachmentsPath = FileHandler.getFolderFilenameFullPaths(this.config.tmpFolder.path);
     console.log('Attachments:', attachmentsPath);
     if (attachmentsPath.length > 0) {
-      await message.channel.send({ files: [...attachmentsPath] });
+      if (message.channel instanceof TextChannel) {
+        await message.channel.send({ files: [...attachmentsPath] });
+      }
       console.log('Attachments sent');
       FileHandler.emptyFolder(this.config.tmpFolder.path);
     }
@@ -120,7 +139,7 @@ export default class MessageCreate extends EventDiscord {
     this.aiCompletionHandler.on('completionRequested', (data) => {
       if (data && data.channelId) {
         const channel = this.discordClient.channels.cache.get(data.channelId);
-        if (channel && channel.isTextBased()) {
+        if (channel && channel instanceof TextChannel) {
           channel.sendTyping();
         }
       }
