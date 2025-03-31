@@ -15,6 +15,7 @@ export default class AiCompletionHandler extends EventEmitter {
   private logger: Logger;
   private promptBuilder: AIPromptBuilder;
   private botId: string;
+  private triggerMessage: MessageInput | null = null;
 
   constructor(
     private aiClient: AIClientType & EventEmitter,
@@ -28,6 +29,9 @@ export default class AiCompletionHandler extends EventEmitter {
     this.botId = botId;
   }
 
+  setTriggerMessage(message: MessageInput) {
+    this.triggerMessage = message;
+  }
 
   async getAiCompletion(channelId: string): Promise<string> {
     try {
@@ -42,6 +46,11 @@ export default class AiCompletionHandler extends EventEmitter {
         content: msg.content,
         channelId: channelId
       }));
+
+      // Ensure the trigger message is the last message
+      if (this.triggerMessage) {
+        messages.push(this.triggerMessage);
+      }
 
       this.logger.debug('AI Completion Request:', { systemPrompt, messages });
       this.emit('completionRequested', { channelId });
