@@ -31,6 +31,15 @@ jest.mock('../../src/configManager', () => {
           maxTokens: 2000,
           temperature: 0.5
         },
+        moderation: {
+          enabled: false,
+          bannedWords: [],
+          actions: {
+            timeout: 300,
+            maxWarnings: 3
+          },
+          googleSafeBrowsingKey: 'mock_safe_browsing_key'
+        },
         fluxApi: {
           active: false,
           apiKey: 'mock_flux_api_key'
@@ -48,6 +57,15 @@ jest.mock('../../src/configManager', () => {
           token: 'mock_token',
           maxHistory: 20,
           lang: 'en'
+        },
+        moderation: {
+          enabled: false,
+          bannedWords: [],
+          actions: {
+            timeout: 300,
+            maxWarnings: 3
+          },
+          googleSafeBrowsingKey: 'mock_safe_browsing_key'
         },
         fluxApi: {
           active: false,

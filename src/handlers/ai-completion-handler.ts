@@ -192,6 +192,8 @@ export default class AiCompletionHandler extends EventEmitter {
 
   createMessagesArrayFromHistory(messages: MessageInput[]): MessageInput[] {
     console.log('\n[Messages from History]');
+    const result: MessageInput[] = [];
+    
     messages.forEach((msg, index) => {
       console.log(`\nMessage ${index + 1}:`);
       console.log('Role:', msg.role);
@@ -199,8 +201,17 @@ export default class AiCompletionHandler extends EventEmitter {
       if (msg.attachments) {
         console.log('Attachments:', msg.attachments.map(a => `${a.name} (${a.url})`).join('\n'));
       }
+      
+      result.push({
+        role: msg.role,
+        content: msg.content,
+        channelId: msg.channelId,
+        id: msg.id,
+        attachments: msg.attachments
+      });
     });
-    return messages;
+    
+    return result;
   }
 
   private prepareMessagesForApi(messages: MessageInput[]): MessageInput[] {
