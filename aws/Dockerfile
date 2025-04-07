@@ -1,4 +1,5 @@
-FROM --platform=linux/amd64 node:18-slim AS builder
+# Use an official Node runtime as a parent image
+FROM --platform=$BUILDPLATFORM node:18-slim AS builder
 WORKDIR /usr/src/app
 
 # Combine package copying and installation steps
@@ -13,41 +14,38 @@ RUN npm run build \
     && mv ./src/config.yaml.dist ./src/config.yaml \
     && npm prune --production
 
-FROM --platform=linux/amd64 debian:bullseye-slim
+FROM --platform=$TARGETPLATFORM debian:bullseye-slim
 
-# Check if group/user exists before creating and install dependencies
-RUN if ! getent group node > /dev/null 2>&1; then \
-        groupadd --gid 1000 node; \
-    fi && \
-    if ! getent passwd node > /dev/null 2>&1; then \
-        useradd --uid 1000 --gid node --shell /bin/bash --create-home node; \
-    fi && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends \
+# Combine user creation and dependency installation
+RUN groupadd --gid 1000 node \
+    && useradd --uid 1000 --gid node --shell /bin/bash --create-home node \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
         ca-certificates \
         curl \
-        gnupg && \
-    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    curl -fsSL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
-    echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends \
+        gnupg \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_18.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
         nodejs \
-        google-chrome-stable && \
-    apt-get purge -y --auto-remove curl gnupg && \
-    rm -rf /var/lib/apt/lists/* && \
-    mkdir -p /attachments && \
-    chmod 777 /attachments
+    && apt-get purge -y --auto-remove curl gnupg \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /attachments \
+    && chmod 777 /attachments
 
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome \
-    NODE_ENV=production
+ENV NODE_ENV=production \
+    PORT=3000
 
 # Copie uniquement les fichiers nécessaires
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/src/config.yaml ./src/config.yaml
 COPY package.json ./
+
+# Expose the port
+EXPOSE 3000
 
 ENTRYPOINT ["node"]
 CMD ["dist/index.cjs"]

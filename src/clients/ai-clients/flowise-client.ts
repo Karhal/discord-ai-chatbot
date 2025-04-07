@@ -87,21 +87,33 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
     }
 
     try {
-      const history = validMessages.map(msg => ({
+      // Create history without the last message to avoid duplication
+      const lastMessage = validMessages[validMessages.length - 1];
+      const historyWithoutLast = validMessages.slice(0, -1).map(msg => ({
         role: msg.role === 'assistant' ? 'apiMessage' : 'userMessage',
         content: msg.content || '' // Ensure content is never undefined
       }));
 
+      console.log('\n[Flowise Client] Preparing API request:');
+      console.log('Last message (as question):', lastMessage.content.substring(0, 50) + (lastMessage.content.length > 50 ? '...' : ''));
+      console.log('History messages (without last):', historyWithoutLast.length);
+      
       const requestBody = {
-        question: messages[messages.length - 1].content,
+        question: lastMessage.content,
         overrideConfig: {
           agentName: ConfigManager.config.discord.botName,
           vars: {
             user_prompt: systemPrompt
           }
         },
-        history: history
+        history: historyWithoutLast
       };
+
+      console.log('Request structure:', JSON.stringify({
+        questionLength: requestBody.question.length,
+        historyLength: requestBody.history.length,
+        overrideConfig: requestBody.overrideConfig
+      }, null, 2));
 
       const response = await fetch(
         `${this.flowiseConfig.apiUrl}/api/v1/prediction/${this.flowiseConfig.flowId}`,

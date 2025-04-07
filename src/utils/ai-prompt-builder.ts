@@ -1,8 +1,5 @@
-import { DiscordConfigType } from '../types/types';
-
 export class AIPromptBuilder {
   constructor(
-    private config: DiscordConfigType,
     private prompt: string
   ) {}
 
@@ -44,11 +41,12 @@ Problem-Solving & Tool Usage:
 
 Remember: You are an autonomous problem solver. 
 Don't stop at the first obstacle or ask for help - use your tools creatively to find alternative paths to the information. Your goal is to always provide value, even if you need to adapt your approach.
+Do not write your analysis in the output.
+Your final output should consist only of the response and should not duplicate or rehash any of the work you did in the conversation analysis.
 
 Example output structure:
 [Your final response to the user, adhering to the guidelines and length requirements]
 
-Your final output should consist only of the response and should not duplicate or rehash any of the work you did in the conversation analysis.
-    `;
+`;
   }
 }
