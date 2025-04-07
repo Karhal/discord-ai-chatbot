@@ -4,14 +4,12 @@ import { MessageInput } from '../types/types';
 import { tools } from './../tools-manager';
 import ConfigManager, { DiscordConfigType } from '../configManager';
 import { EventEmitter } from 'events';
-import { MessageFormatter } from '../utils/message-formatter';
 import { Logger } from '../utils/logger';
 import { AIPromptBuilder } from '../utils/ai-prompt-builder';
 
 export default class AiCompletionHandler extends EventEmitter {
   private messages: MessageInput[] = [];
   private discordConfig: DiscordConfigType;
-  private messageFormatter: MessageFormatter;
   private logger: Logger;
   private promptBuilder: AIPromptBuilder;
   private botId: string;
@@ -23,38 +21,49 @@ export default class AiCompletionHandler extends EventEmitter {
   ) {
     super();
     this.discordConfig = ConfigManager.config.discord;
-    this.messageFormatter = new MessageFormatter();
     this.logger = new Logger();
-    this.promptBuilder = new AIPromptBuilder(this.discordConfig, ConfigManager.config.AIPrompt);
+    this.promptBuilder = new AIPromptBuilder(ConfigManager.config.AIPrompt);
     this.botId = botId;
   }
 
   setTriggerMessage(message: MessageInput) {
-    this.triggerMessage = message;
+    this.triggerMessage = {
+      ...message,
+      id: message.id || Date.now().toString()
+    };
+    console.log(`Set trigger message with ID: ${this.triggerMessage.id}`);
   }
 
   async getAiCompletion(channelId: string): Promise<string> {
     try {
       const systemPrompt = this.promptBuilder.createCompletionPrompt();
-      const formattedMessages = this.messageFormatter.formatLastMessages(
-        this.getLastMessagesOfAChannel(ConfigManager.config.discord.maxHistory, channelId),
-        channelId
-      );
+      console.log('\n[System Prompt]');
+      console.log(systemPrompt);
 
-      const messages: MessageInput[] = formattedMessages.map(msg => ({
-        role: msg.role,
-        content: msg.content,
-        channelId: channelId
-      }));
+      const messages = this.getLastMessagesOfAChannel(ConfigManager.config.discord.maxHistory, channelId);
+      const formattedMessages = this.createMessagesArrayFromHistory(messages);
 
-      if (this.triggerMessage) {
-        messages.push(this.triggerMessage);
-      }
+      console.log('\n[Before API preparation]');
+      console.log('Number of messages:', formattedMessages.length);
+      formattedMessages.forEach(msg => {
+        console.log(`Message ID: ${msg.id}, Content: ${msg.content.substring(0, 50)}...`);
+      });
 
-      this.logger.debug('AI Completion Request:', { systemPrompt, messages });
+      const triggerId = this.triggerMessage?.id;
+
+      const apiMessages = this.prepareMessagesForApi(formattedMessages);
+
+      console.log('\n[After API preparation]');
+      console.log('Number of messages:', apiMessages.length);
+      console.log(`Original trigger ID: ${triggerId}`);
+      apiMessages.forEach(msg => {
+        console.log(`Message ID: ${msg.id}, Content: ${msg.content.substring(0, 50)}...`);
+      });
+
+      this.logger.debug('AI Completion Request:', { systemPrompt, messages: apiMessages });
       this.emit('completionRequested', { channelId });
 
-      return await this.aiClient.getAiCompletion(systemPrompt, messages, tools);
+      return await this.aiClient.getAiCompletion(systemPrompt, apiMessages, tools);
     }
     catch (error) {
       this.logger.error('Error getting AI completion:', error);
@@ -90,10 +99,11 @@ export default class AiCompletionHandler extends EventEmitter {
     }
   }
 
-  getLastMessagesOfAChannel(count: number, channelId: string) {
+  getLastMessagesOfAChannel(count: number, channelId: string): MessageInput[] {
     if (!this.messages) return [];
-
-    return this.messages.filter((msg) => msg.channelId === channelId).slice(-count);
+    return this.messages
+      .filter(msg => msg.channelId === channelId)
+      .slice(-count);
   }
 
   getFirstMessagesOfAChannel(count: number, channelId: string) {
@@ -105,16 +115,22 @@ export default class AiCompletionHandler extends EventEmitter {
 
   setChannelHistory(channelId: string, messages: Collection<string, Message<boolean>>) {
     this.eraseMessagesWithChannelId(channelId);
-    const handlerMessages = this.createMessagesArrayFromHistory(messages);
+    const handlerMessages = this.convertDiscordMessagesToInput(messages);
     this.addMessageArrayToChannel(handlerMessages);
   }
 
-  createMessagesArrayFromHistory(messagesChannelHistory: Collection<string, Message<boolean>>) {
-    const messages: MessageInput[] = [];
-    let currentUserMessages: string[] = [];
-    let lastRole: 'user' | 'assistant' | null = null;
+  private convertDiscordMessagesToInput(messages: Collection<string, Message<boolean>>): MessageInput[] {
+    const result: MessageInput[] = [];
 
-    messagesChannelHistory.reverse().forEach((msg: Message) => {
+    console.log('\n[Converting Discord messages to input]');
+    console.log('Trigger message ID:', this.triggerMessage?.id);
+
+    messages.reverse().forEach((msg: Message) => {
+      if (this.triggerMessage && msg.id === this.triggerMessage.id) {
+        console.log('Skipping trigger message from history:', msg.id);
+        return;
+      }
+
       const attachments = msg.attachments?.map(attachment => ({
         name: attachment.name,
         url: attachment.url,
@@ -130,25 +146,16 @@ export default class AiCompletionHandler extends EventEmitter {
       const content = msg.content;
       const author = msg.author.username;
 
-      if (role !== lastRole && lastRole === 'user' && currentUserMessages.length > 0) {
-        const userContent = currentUserMessages.join('\n');
-        if (userContent.trim().length > 0) {
-          messages.push({
-            role: 'user',
-            content: userContent,
-            channelId: msg.channelId
-          });
-        }
-        currentUserMessages = [];
-      }
-
       if (role === 'assistant') {
-        const assistantContent = content || '[Message avec pièces jointes]';
+        const assistantContent = hasAttachments 
+          ? attachments.map(a => a.url).join('\n')
+          : content;
         if (assistantContent.trim().length > 0) {
-          messages.push({
+          result.push({
             role: 'assistant',
             content: assistantContent,
             channelId: msg.channelId,
+            id: msg.id,
             attachments: hasAttachments ? attachments : undefined
           });
         }
@@ -158,51 +165,130 @@ export default class AiCompletionHandler extends EventEmitter {
           ? `${author}: ${content || ''}\n[Pièces jointes: ${attachments.map(a => `${a.name} (${a.url})`).join(', ')}]`
           : `${author}: ${content}`;
         if (messageWithAttachments.trim().length > 0) {
-          currentUserMessages.push(messageWithAttachments);
+          result.push({
+            role: 'user',
+            content: messageWithAttachments,
+            channelId: msg.channelId,
+            id: msg.id
+          });
         }
       }
-
-      lastRole = role;
     });
 
-    if (currentUserMessages.length > 0) {
-      const userContent = currentUserMessages.join('\n');
-      if (userContent.trim().length > 0) {
-        messages.push({
-          role: 'user',
-          content: userContent,
-          channelId: messagesChannelHistory.first()?.channelId || ''
-        });
+    console.log('\n[Discord Messages to Input]');
+    console.log('Number of converted messages:', result.length);
+    result.forEach((msg, index) => {
+      console.log(`\nMessage ${index + 1}:`);
+      console.log('ID:', msg.id);
+      console.log('Role:', msg.role);
+      console.log('Content:', msg.content.substring(0, 50) + (msg.content.length > 50 ? '...' : ''));
+      if (msg.attachments) {
+        console.log('Attachments:', msg.attachments.length);
       }
-    }
+    });
 
-    const alternatingMessages: MessageInput[] = [];
-    let currentRole: 'user' | 'assistant' = 'user';
+    return result;
+  }
 
-    for (const msg of messages) {
-      if (msg.role === currentRole) {
-        alternatingMessages.push(msg);
-        currentRole = currentRole === 'user' ? 'assistant' : 'user';
-      }
-    }
-
-    if (alternatingMessages.length > 0 && alternatingMessages[alternatingMessages.length - 1].role === 'user') {
-      alternatingMessages.push({
-        role: 'assistant',
-        content: '[Message système]',
-        channelId: alternatingMessages[alternatingMessages.length - 1].channelId
-      });
-    }
-
-    alternatingMessages.forEach((msg, index) => {
-      console.log(`\n[Message ${index + 1}]`);
+  createMessagesArrayFromHistory(messages: MessageInput[]): MessageInput[] {
+    console.log('\n[Messages from History]');
+    messages.forEach((msg, index) => {
+      console.log(`\nMessage ${index + 1}:`);
       console.log('Role:', msg.role);
       console.log('Content:', msg.content);
       if (msg.attachments) {
         console.log('Attachments:', msg.attachments.map(a => `${a.name} (${a.url})`).join('\n'));
       }
     });
+    return messages;
+  }
 
-    return alternatingMessages;
+  private prepareMessagesForApi(messages: MessageInput[]): MessageInput[] {
+    console.log('\n[Preparing Messages for API]');
+    console.log('Initial messages:', messages.length);
+
+    const messagesWithoutTrigger = this.triggerMessage
+      ? messages.filter(msg => msg.id !== this.triggerMessage?.id)
+      : [...messages];
+
+    console.log('\nMessages without trigger:', messagesWithoutTrigger.length);
+
+    const result: MessageInput[] = [];
+
+    let currentUserMessage: MessageInput | null = null;
+    let currentAssistantMessage: MessageInput | null = null;
+
+    for (const msg of messagesWithoutTrigger) {
+      if (msg.role === 'assistant') {
+        if (currentUserMessage) {
+          result.push(currentUserMessage);
+          currentUserMessage = null;
+        }
+
+        if (!currentAssistantMessage) {
+          currentAssistantMessage = { ...msg };
+        }
+        else {
+          currentAssistantMessage.content += '\n' + msg.content;
+        }
+      }
+      else {
+
+        if (currentAssistantMessage) {
+          result.push(currentAssistantMessage);
+          currentAssistantMessage = null;
+        }
+
+        if (!currentUserMessage) {
+          currentUserMessage = { ...msg };
+        }
+        else {
+
+          currentUserMessage.content += '\n' + msg.content;
+        }
+      }
+    }
+
+    if (currentUserMessage) {
+      result.push(currentUserMessage);
+    }
+    if (currentAssistantMessage) {
+      result.push(currentAssistantMessage);
+    }
+
+    console.log('\nProcessed messages before adding trigger:', result.length);
+    result.forEach((msg, i) => {
+      console.log(`Message ${i+1}: ${msg.role}, ID: ${msg.id || 'none'}, Content: ${msg.content.substring(0, 30)}...`);
+    });
+
+    if (this.triggerMessage) {
+
+      let username = '';
+      for (const msg of messages) {
+        const match = msg.content.match(/^([^:]+):/);
+        if (match) {
+          username = match[1];
+          break;
+        }
+      }
+
+      const triggerContent = this.triggerMessage.content;
+      const hasPrefix = triggerContent.includes(':');
+      const finalContent = hasPrefix ? triggerContent : username ? `${username}: ${triggerContent}` : triggerContent;
+
+      console.log('\nAdding trigger message:', finalContent);
+      result.push({
+        ...this.triggerMessage,
+        content: finalContent
+      });
+    }
+
+    console.log('\n[Final API Messages]');
+    console.log('Total messages:', result.length);
+    result.forEach((msg, i) => {
+      console.log(`Message ${i+1}: ${msg.role}, Content: ${msg.content.substring(0, 30)}...`);
+    });
+
+    return result;
   }
 }

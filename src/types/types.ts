@@ -40,6 +40,7 @@ export interface MessageInput {
   role: string;
   content: string;
   channelId: string;
+  id?: string;
   attachments?: Array<{
     name: string;
     url: string;

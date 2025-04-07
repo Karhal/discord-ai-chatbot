@@ -50,6 +50,7 @@ export default class MessageCreate extends EventDiscord {
           role: 'user',
           content: message.content,
           channelId: channelId,
+          id: message.id,
           attachments: message.attachments?.map(attachment => ({
             name: attachment.name,
             url: attachment.url,
