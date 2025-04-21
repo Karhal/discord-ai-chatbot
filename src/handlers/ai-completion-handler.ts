@@ -27,11 +27,24 @@ export default class AiCompletionHandler extends EventEmitter {
   }
 
   setTriggerMessage(message: MessageInput) {
+    // Format message content to include attachments if present
+    let content = message.content || '';
+
+    if (message.attachments && message.attachments.length > 0) {
+      const attachmentText = `\n[Attachements: ${message.attachments.map(a => `${a.name} (${a.url})`).join(', ')}]`;
+      content = content.trim() + attachmentText;
+    }
+
     this.triggerMessage = {
       ...message,
+      content,
       id: message.id || Date.now().toString()
     };
     console.log(`Set trigger message with ID: ${this.triggerMessage.id}`);
+    console.log(`Trigger message content: ${this.triggerMessage.content.substring(0, 100)}...`);
+    if (message.attachments) {
+      console.log(`Trigger message has ${message.attachments.length} attachments`);
+    }
   }
 
   async getAiCompletion(channelId: string): Promise<string> {
@@ -126,11 +139,6 @@ export default class AiCompletionHandler extends EventEmitter {
     console.log('Trigger message ID:', this.triggerMessage?.id);
 
     messages.reverse().forEach((msg: Message) => {
-      if (this.triggerMessage && msg.id === this.triggerMessage.id) {
-        console.log('Skipping trigger message from history:', msg.id);
-        return;
-      }
-
       const attachments = msg.attachments?.map(attachment => ({
         name: attachment.name,
         url: attachment.url,
@@ -147,8 +155,8 @@ export default class AiCompletionHandler extends EventEmitter {
       const author = msg.author.username;
 
       if (role === 'assistant') {
-        const assistantContent = hasAttachments 
-          ? attachments.map(a => a.url).join('\n')
+        const assistantContent = hasAttachments
+          ? attachments.map(a => a.url).join('\\n')
           : content;
         if (assistantContent.trim().length > 0) {
           result.push({
@@ -162,7 +170,7 @@ export default class AiCompletionHandler extends EventEmitter {
       }
       else {
         const messageWithAttachments = hasAttachments
-          ? `${author}: ${content || ''}\n[Pièces jointes: ${attachments.map(a => `${a.name} (${a.url})`).join(', ')}]`
+          ? `${author}: ${content || ''}\n[Attachements: ${attachments.map(a => `${a.name} (${a.url})`).join(', ')}]`
           : `${author}: ${content}`;
         if (messageWithAttachments.trim().length > 0) {
           result.push({
@@ -193,7 +201,7 @@ export default class AiCompletionHandler extends EventEmitter {
   createMessagesArrayFromHistory(messages: MessageInput[]): MessageInput[] {
     console.log('\n[Messages from History]');
     const result: MessageInput[] = [];
-    
+
     messages.forEach((msg, index) => {
       console.log(`\nMessage ${index + 1}:`);
       console.log('Role:', msg.role);
@@ -201,7 +209,7 @@ export default class AiCompletionHandler extends EventEmitter {
       if (msg.attachments) {
         console.log('Attachments:', msg.attachments.map(a => `${a.name} (${a.url})`).join('\n'));
       }
-      
+
       result.push({
         role: msg.role,
         content: msg.content,
@@ -210,96 +218,33 @@ export default class AiCompletionHandler extends EventEmitter {
         attachments: msg.attachments
       });
     });
-    
+
     return result;
   }
 
   private prepareMessagesForApi(messages: MessageInput[]): MessageInput[] {
     console.log('\n[Preparing Messages for API]');
-    console.log('Initial messages:', messages.length);
-
-    const messagesWithoutTrigger = this.triggerMessage
-      ? messages.filter(msg => msg.id !== this.triggerMessage?.id)
-      : [...messages];
-
-    console.log('\nMessages without trigger:', messagesWithoutTrigger.length);
-
-    const result: MessageInput[] = [];
-
-    let currentUserMessage: MessageInput | null = null;
-    let currentAssistantMessage: MessageInput | null = null;
-
-    for (const msg of messagesWithoutTrigger) {
-      if (msg.role === 'assistant') {
-        if (currentUserMessage) {
-          result.push(currentUserMessage);
-          currentUserMessage = null;
-        }
-
-        if (!currentAssistantMessage) {
-          currentAssistantMessage = { ...msg };
-        }
-        else {
-          currentAssistantMessage.content += '\n' + msg.content;
-        }
-      }
-      else {
-
-        if (currentAssistantMessage) {
-          result.push(currentAssistantMessage);
-          currentAssistantMessage = null;
-        }
-
-        if (!currentUserMessage) {
-          currentUserMessage = { ...msg };
-        }
-        else {
-
-          currentUserMessage.content += '\n' + msg.content;
-        }
-      }
-    }
-
-    if (currentUserMessage) {
-      result.push(currentUserMessage);
-    }
-    if (currentAssistantMessage) {
-      result.push(currentAssistantMessage);
-    }
-
-    console.log('\nProcessed messages before adding trigger:', result.length);
-    result.forEach((msg, i) => {
+    console.log('\nHistory messages before adding trigger:', messages.length);
+    messages.forEach((msg, i) => {
       console.log(`Message ${i+1}: ${msg.role}, ID: ${msg.id || 'none'}, Content: ${msg.content.substring(0, 30)}...`);
     });
 
+    const historyMessages = [...messages];
+
     if (this.triggerMessage) {
-
-      let username = '';
-      for (const msg of messages) {
-        const match = msg.content.match(/^([^:]+):/);
-        if (match) {
-          username = match[1];
-          break;
-        }
-      }
-
-      const triggerContent = this.triggerMessage.content;
-      const hasPrefix = triggerContent.includes(':');
-      const finalContent = hasPrefix ? triggerContent : username ? `${username}: ${triggerContent}` : triggerContent;
-
-      console.log('\nAdding trigger message:', finalContent);
-      result.push({
-        ...this.triggerMessage,
-        content: finalContent
-      });
+      console.log('\nAdding trigger message:', this.triggerMessage.content);
+      historyMessages.push(this.triggerMessage);
+    }
+    else {
+      console.log('\nNo trigger message to add.');
     }
 
     console.log('\n[Final API Messages]');
-    console.log('Total messages:', result.length);
-    result.forEach((msg, i) => {
+    console.log('Total messages:', historyMessages.length);
+    historyMessages.forEach((msg, i) => {
       console.log(`Message ${i+1}: ${msg.role}, Content: ${msg.content.substring(0, 30)}...`);
     });
 
-    return result;
+    return historyMessages;
   }
 }

@@ -34,8 +34,8 @@ export default class FluxGeneratorTool extends AbstractTool {
   readonly execute = async (promptAsString: string) => {
     try {
       const prompt = JSON.parse(promptAsString);
-
       const imageHandler = new ImageHandler();
+      const channelId = prompt.channelId;
 
       const result = await fal.subscribe('fal-ai/flux/dev', {
         input: {
@@ -56,7 +56,7 @@ export default class FluxGeneratorTool extends AbstractTool {
         return element.url;
       });
 
-      await imageHandler.downloadImages(imgUrls);
+      await imageHandler.downloadImages(imgUrls, channelId);
 
       return JSON.stringify({ image_ready: true });
     }

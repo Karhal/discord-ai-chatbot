@@ -74,9 +74,12 @@ export default class StableDiffusionTool extends AbstractTool {
       const prompt = JSON.parse(promptAsString);
       const imageHandler = new ImageHandler();
 
+      // Extract channelId from the prompt if available
+      const channelId = prompt.channelId;
+
       const imageBuffer = await this.generateImage(prompt.imagePrompt);
       if (imageBuffer) {
-        await imageHandler.saveBase64Image(imageBuffer, 'webp');
+        await imageHandler.saveBase64Image(imageBuffer, 'webp', channelId);
       }
       return JSON.stringify({ image_ready: true, info: 'Image generated and saved will be send as attachement' });
     }

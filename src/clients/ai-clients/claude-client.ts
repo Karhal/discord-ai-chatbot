@@ -17,7 +17,6 @@ export default class ClaudeClient extends EventEmitter implements AIClientType {
   }
 
   async getAiCompletion(systemPrompt: string, messages: MessageInput[]): Promise<string> {
-    // Clean messages to remove unsupported fields and ensure correct types
     const cleanedMessages = messages.map(msg => ({
       role: msg.role as 'user' | 'assistant',
       content: typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content)
@@ -135,7 +134,14 @@ export default class ClaudeClient extends EventEmitter implements AIClientType {
       return '';
     }
 
-    const toolResult = await this.executeToolFunction(toolToUse, toolArgs as Record<string, unknown>);
+    const lastMessage = messages[messages.length - 1];
+    const channelId = lastMessage?.channelId || '';
+    const toolArgsWithChannelId = {
+      ...toolArgs as Record<string, unknown>,
+      channelId
+    };
+
+    const toolResult = await this.executeToolFunction(toolToUse, toolArgsWithChannelId);
     this.updateMessages(messages, toolUseItem, toolResult);
 
     return this.getSecondCallResponse(systemPrompt, messages);
