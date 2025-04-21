@@ -13,9 +13,24 @@ interface FlowiseResponse {
   }>;
 }
 
+interface FetchOptions {
+  method: string;
+  headers: Record<string, string>;
+  body: string;
+  signal?: AbortSignal;
+}
+
+interface CustomError extends Error {
+  cause?: {
+    code?: string;
+  };
+}
+
 export default class FlowiseClient extends EventEmitter implements AIClientType {
   private flowiseConfig = ConfigManager.config.flowise;
   private imageHandler = new ImageHandler();
+  private maxRetries = 2;
+  private timeoutMs = 60000;
 
   private isImageUrl(url: string): boolean {
     const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
@@ -45,7 +60,8 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
         return [];
       }
       return this.extractUrlsFromText(parsedOutput.response);
-    } catch {
+    }
+    catch (error) {
       return [];
     }
   }
@@ -70,12 +86,42 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
     return cleanedText.replace(/\n\s*\n\s*\n/g, '\n\n');
   }
 
+  private async fetchWithRetry(url: string, options: FetchOptions, retries = 0): Promise<Response> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeoutMs);
+
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal
+      });
+
+      if (!response.ok && retries < this.maxRetries) {
+        console.log(`Retry ${retries + 1}/${this.maxRetries} for Flowise request`);
+        return this.fetchWithRetry(url, options, retries + 1);
+      }
+
+      return response;
+    }
+    catch (error) {
+      if (retries < this.maxRetries) {
+        console.log(`Request failed, retry ${retries + 1}/${this.maxRetries} for Flowise request`);
+        const backoffTime = Math.min(1000 * 2 ** retries, 10000);
+        await new Promise(resolve => setTimeout(resolve, backoffTime));
+        return this.fetchWithRetry(url, options, retries + 1);
+      }
+      throw error;
+    }
+    finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
   private async message(systemPrompt: string, messages: MessageInput[]): Promise<string | null> {
     if (messages.length === 0) {
       throw new Error('No messages provided');
     }
 
-    // Validate messages to ensure no empty content
     const validMessages = messages.filter(msg => {
       const hasContent = msg.content && msg.content.trim().length > 0;
       const hasAttachments = msg.attachments && msg.attachments.length > 0;
@@ -87,17 +133,18 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
     }
 
     try {
-      // Create history without the last message to avoid duplication
       const lastMessage = validMessages[validMessages.length - 1];
+      const channelId = lastMessage.channelId;
       const historyWithoutLast = validMessages.slice(0, -1).map(msg => ({
         role: msg.role === 'assistant' ? 'apiMessage' : 'userMessage',
-        content: msg.content || '' // Ensure content is never undefined
+        content: msg.content || ''
       }));
 
       console.log('\n[Flowise Client] Preparing API request:');
+      console.log('History messages:', historyWithoutLast.length);
       console.log('Last message (as question):', lastMessage.content.substring(0, 50) + (lastMessage.content.length > 50 ? '...' : ''));
-      console.log('History messages (without last):', historyWithoutLast.length);
-      
+      console.log('Channel ID:', channelId);
+
       const requestBody = {
         question: lastMessage.content,
         overrideConfig: {
@@ -115,17 +162,20 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
         overrideConfig: requestBody.overrideConfig
       }, null, 2));
 
-      const response = await fetch(
-        `${this.flowiseConfig.apiUrl}/api/v1/prediction/${this.flowiseConfig.flowId}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${this.flowiseConfig.apiKey}`
-          },
-          body: JSON.stringify(requestBody)
-        }
-      );
+      const apiUrl = `${this.flowiseConfig.apiUrl}/api/v1/prediction/${this.flowiseConfig.flowId}`;
+
+      console.log(`Connecting to Flowise API at ${this.flowiseConfig.apiUrl} with timeout ${this.timeoutMs}ms`);
+
+      const options: FetchOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.flowiseConfig.apiKey}`
+        },
+        body: JSON.stringify(requestBody)
+      };
+
+      const response = await this.fetchWithRetry(apiUrl, options);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -158,7 +208,7 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
 
       if (imageUrls.length > 0) {
         console.log('Found image URLs:', imageUrls);
-        await this.imageHandler.downloadImages(imageUrls);
+        await this.imageHandler.downloadImages(imageUrls, channelId);
 
         if (data.text) {
           data.text = this.cleanResponseText(data.text, imageUrls);
@@ -177,13 +227,26 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
       }, null, 2));
 
       return data.text;
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Error with Flowise:', error);
+
       if (error instanceof Error) {
+        const customError = error as CustomError;
+        const isTimeout = error.name === 'AbortError' ||
+                          customError.cause?.code === 'UND_ERR_CONNECT_TIMEOUT';
+
+        if (isTimeout) {
+          console.error('Connection timeout when connecting to Flowise API. Please check your network connection and the API server status.');
+        }
+
         console.error('Error details:', {
-          message: error.message
+          message: error.message,
+          cause: customError.cause?.code,
+          name: error.name
         });
       }
+
       throw error;
     }
   }

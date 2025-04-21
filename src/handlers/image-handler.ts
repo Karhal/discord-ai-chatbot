@@ -4,8 +4,8 @@ import ConfigManager from '../configManager';
 
 type ImageHandlerType = {
   deleteImages: () => void;
-  downloadImages: (images: string[]) => Promise<string[]>;
-  downloadImage: (image: string) => Promise<string | null>;
+  downloadImages: (images: string[], channelId?: string) => Promise<string[]>;
+  downloadImage: (image: string, channelId?: string) => Promise<string | null>;
 };
 
 export default class ImageHandler implements ImageHandlerType {
@@ -26,10 +26,10 @@ export default class ImageHandler implements ImageHandlerType {
     });
   }
 
-  async downloadImages(images: string[]): Promise<string[]> {
+  async downloadImages(images: string[], channelId?: string): Promise<string[]> {
     if (!images) return [];
     const findImagesWithNull: (string | null)[] = await Promise.all(
-      images.map(async (image) => this.downloadImage(image))
+      images.map(async (image) => this.downloadImage(image, channelId))
     );
 
     const findImages = findImagesWithNull.filter((img) => img !== null);
@@ -37,11 +37,11 @@ export default class ImageHandler implements ImageHandlerType {
     return findImages;
   }
 
-  public async downloadImage(image: string): Promise<string | null> {
+  public async downloadImage(image: string, channelId?: string): Promise<string | null> {
     try {
       console.log('Downloading image:', image);
       const response = await fetch(image);
-      return this.processImageResponse(response);
+      return this.processImageResponse(response, channelId);
     }
     catch (error) {
       console.error('Error during image download:', error);
@@ -50,11 +50,12 @@ export default class ImageHandler implements ImageHandlerType {
   }
 
   public async processImageResponse(
-    response: Response
+    response: Response,
+    channelId?: string
   ): Promise<string | null> {
     if (response.status === 200) {
       const responseBuffer = await response.arrayBuffer();
-      return this.saveImage(responseBuffer);
+      return this.saveImage(responseBuffer, channelId);
     }
     else {
       console.error(
@@ -66,12 +67,21 @@ export default class ImageHandler implements ImageHandlerType {
     }
   }
 
-  private saveImage(response: ArrayBuffer): string {
+  private saveImage(response: ArrayBuffer, channelId?: string): string {
     try {
       const imageName = this.generateImageName();
       const imageData = Buffer.from(response);
+
+      // Determine the folder path based on channelId
+      const folderPath = channelId
+        ? `${ConfigManager.config.tmpFolder.path}/${channelId}`
+        : ConfigManager.config.tmpFolder.path;
+
+      // Ensure the folder exists
+      FileHandler.createFolder(folderPath);
+
       const imagePath = FileHandler.saveArrayBufferToFile(
-        ConfigManager.config.tmpFolder.path,
+        folderPath,
         imageName,
         imageData
       );
@@ -89,12 +99,21 @@ export default class ImageHandler implements ImageHandlerType {
     return `${timestamp}.${format}`;
   }
 
-  public async saveBase64Image(base64Data: string, format: string): Promise<string> {
+  public async saveBase64Image(base64Data: string, format: string, channelId?: string): Promise<string> {
     try {
       const buffer = Buffer.from(base64Data, 'base64');
       const imageName = this.generateImageName(format);
+
+      // Determine the folder path based on channelId
+      const folderPath = channelId
+        ? `${ConfigManager.config.tmpFolder.path}/${channelId}`
+        : ConfigManager.config.tmpFolder.path;
+
+      // Ensure the folder exists
+      FileHandler.createFolder(folderPath);
+
       const imagePath = FileHandler.saveArrayBufferToFile(
-        ConfigManager.config.tmpFolder.path,
+        folderPath,
         imageName,
         buffer
       );

@@ -9,6 +9,8 @@ import MetricsService from '../services/metrics-service';
 import ModerationService from '../services/moderation-service';
 import AiCompletionHandler from '../handlers/ai-completion-handler';
 import { EventEmitter } from 'events';
+import fs from 'fs';
+import path from 'path';
 
 export default class MessageCreate extends EventDiscord {
 
@@ -48,7 +50,7 @@ export default class MessageCreate extends EventDiscord {
 
         const triggerMessage: MessageInput = {
           role: 'user',
-          content: message.content,
+          content: `${message.author.username}: ${message.content}`,
           channelId: channelId,
           id: message.id,
           attachments: message.attachments?.map(attachment => ({
@@ -86,7 +88,14 @@ export default class MessageCreate extends EventDiscord {
     }
 
     const metricsService = MetricsService.getInstance();
-    const attachmentsPath = FileHandler.getFolderFilenameFullPaths(this.config.tmpFolder.path);
+    const channelId = message.channelId;
+    const channelAttachmentsPath = `${this.config.tmpFolder.path}/${channelId}`;
+    // Check if the directory exists before trying to get files
+    const folderExists = fs.existsSync(path.join('.', channelAttachmentsPath));
+    const attachmentsPath = folderExists
+      ? FileHandler.getFolderFilenameFullPaths(channelAttachmentsPath)
+      : [];
+
     await metricsService.sendMetrics(
       this.config.discord.token,
       message.author.username,
@@ -105,13 +114,13 @@ export default class MessageCreate extends EventDiscord {
         await message.channel.send({ files: [...attachmentsPath] });
       }
       console.log('Attachments sent');
-      FileHandler.emptyFolder(this.config.tmpFolder.path);
+      FileHandler.emptyFolder(channelAttachmentsPath);
     }
     return true;
   }
 
   private async fetchChannelHistory(message: Message, limit: number): Promise<Collection<string, Message<boolean>>> {
-    return await message.channel.messages.fetch({ limit });
+    return await message.channel.messages.fetch({ limit: limit, before: message.id });
   }
 
   private shouldIgnoreMessage(message: Message): boolean {

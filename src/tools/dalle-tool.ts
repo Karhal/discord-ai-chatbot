@@ -63,10 +63,13 @@ export default class DallETool extends AbstractTool {
       console.log('prompt', prompt);
       const imageHandler = new ImageHandler();
 
+      // Extract channelId from the prompt if available
+      const channelId = prompt.channelId;
+
       const imgUrl = await this.generateImage(prompt.imagePrompt);
       if (imgUrl) {
         console.log('imgUrl', imgUrl);
-        await imageHandler.downloadImages([imgUrl]);
+        await imageHandler.downloadImages([imgUrl], channelId);
       }
       else {
         console.log('No image URL generated');

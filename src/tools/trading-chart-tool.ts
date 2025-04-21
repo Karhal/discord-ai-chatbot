@@ -3,7 +3,6 @@ import AbstractTool from './absract-tool';
 import ImageHandler from '../handlers/image-handler';
 import ClaudeClient from '../clients/ai-clients/claude-client';
 
-// Define indicator interfaces for type safety
 interface IndicatorInput {
   [key: string]: string | number | boolean;
 }
@@ -24,9 +23,8 @@ export default class TradingChartTool extends AbstractTool {
   tradingChartConfig = ConfigManager.config.tradingChart;
   anthropicConfig = ConfigManager.config.claude;
   readonly description =
-    'Call this tool to get a chart of a requested stock with customizable indicators. Use it when the user asks for a chart of a stock or an analysis of a token price.';
+    'This tool generates and analyzes trading charts with technical indicators using chart-img.com API  for analysis. You can use up to 3 indicators at time. Chose wisely.';
 
-  // Pre-defined indicator configurations
   readonly indicatorPresets: Record<string, StudyIndicator> = {
     'SMA9': {
       name: 'Moving Average',
@@ -153,7 +151,7 @@ export default class TradingChartTool extends AbstractTool {
             }
           ]
         },
-        maxItems: 2,
+        maxItems: 3,
         minItems: 1
       }
     },
@@ -162,42 +160,33 @@ export default class TradingChartTool extends AbstractTool {
 
   readonly execute = async (query: string) => {
     const queryParameters = JSON.parse(query);
-
-    // Process indicators
     let studies: StudyIndicator[] = [];
 
     if (Array.isArray(queryParameters.indicators)) {
-      // Limit to maximum 2 indicators
-      const limitedIndicators = queryParameters.indicators.slice(0, 2);
+      const limitedIndicators = queryParameters.indicators.slice(0, 3);
 
-      if (queryParameters.indicators.length > 2) {
-        console.warn(`Too many indicators provided (${queryParameters.indicators.length}). Only the first 2 will be used.`);
+      if (queryParameters.indicators.length > 3) {
+        console.warn(`Too many indicators provided (${queryParameters.indicators.length}). Only the first 3 will be used.`);
       }
 
       studies = limitedIndicators.map((indicator: string | StudyIndicator) => {
-        // If indicator is a string, look it up in presets
         if (typeof indicator === 'string') {
           if (this.indicatorPresets[indicator]) {
             return this.indicatorPresets[indicator];
           }
           else {
-            console.warn(`Unknown indicator preset: ${indicator}. Using MACD as fallback.`);
-            return this.indicatorPresets['MACD'];
+            console.warn(`Unknown indicator preset: ${indicator}.`);
           }
         }
-        // If indicator is already an object, use it directly
         else if (typeof indicator === 'object' && indicator.name) {
           return indicator;
         }
-        // Fallback for invalid formats
         else {
-          console.warn('Invalid indicator format. Using MACD as fallback.');
-          return this.indicatorPresets['MACD'];
+          console.warn('Invalid indicator format');
         }
       });
     }
     else {
-      // If indicators parameter is missing or not an array, throw an error
       throw new Error('The "indicators" parameter is required and must be an array containing 1 or 2 indicators');
     }
 
@@ -227,7 +216,7 @@ export default class TradingChartTool extends AbstractTool {
     );
 
     const imageHandler = new ImageHandler();
-    const imagePath = await imageHandler.processImageResponse(response);
+    const imagePath = await imageHandler.processImageResponse(response, queryParameters.channelId);
 
     if (!imagePath) {
       throw new Error('Failed to process chart image');
@@ -235,8 +224,6 @@ export default class TradingChartTool extends AbstractTool {
 
     const imageBase64 = await imageHandler.getImageAsBase64(imagePath);
     const claudeClient = new ClaudeClient();
-
-    // Customize prompt based on the indicators being used
     const indicatorNames = studies.map(study => study.name);
     const analysisPoints = [
       '1. **Candlestick Analysis**:\\',
@@ -245,7 +232,6 @@ export default class TradingChartTool extends AbstractTool {
       '- Highlight any breakout or pullback zones.\\'
     ];
 
-    // Add indicator-specific analysis points
     if (indicatorNames.some(name => name === 'MACD')) {
       analysisPoints.push(
         '2. **MACD Analysis**:\\',
@@ -282,7 +268,6 @@ export default class TradingChartTool extends AbstractTool {
       );
     }
 
-    // Add general analysis points that apply to all charts
     analysisPoints.push(
       '6. **Support and Resistance Levels**;\\',
       '- Identify key support and resistance zones based on the chart.\\',
@@ -305,9 +290,6 @@ ${analysisPoints.join('\n')}`;
 
     const analysis = await claudeClient.analyzeImage(imageBase64, prompt, 'image/png');
 
-    return {
-      result: true,
-      analysis: analysis
-    };
+    return analysis;
   };
 }

@@ -241,7 +241,7 @@ describe('AiCompletionHandler', () => {
 
       expect(result[0]).toEqual({
         role: 'user',
-        content: 'User1: Check this out\n[Pièces jointes: image.png (http://example.com/image.png)]',
+        content: 'User1: Check this out\n[Attachements: image.png (http://example.com/image.png)]',
         channelId: '123',
         id: 'msg1'
       });
