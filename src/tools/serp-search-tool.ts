@@ -34,7 +34,7 @@ export default class SerpSearchTool extends AbstractTool {
       });
 
       console.log(response);
-      return response;
+      return JSON.stringify(response);
     }
     catch (error) {
       console.error(error);

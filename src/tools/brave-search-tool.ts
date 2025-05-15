@@ -41,6 +41,6 @@ export default class BraveSearchTool extends AbstractTool {
     const resultJSON = await response.json();
 
     console.log(queryParameters, lang);
-    return { news: resultJSON.news, web_search: resultJSON.web };
+    return JSON.stringify({ news: resultJSON.news, web_search: resultJSON.web });
   };
 }

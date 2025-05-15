@@ -43,7 +43,7 @@ export default class GoogleSearchTool extends AbstractTool {
       const response = await fetch(url);
 
       const resultJSON = await response.json();
-      return resultJSON;
+      return JSON.stringify(resultJSON);
     }
     catch (e) {
       console.log('err getGoogleSearch', e);

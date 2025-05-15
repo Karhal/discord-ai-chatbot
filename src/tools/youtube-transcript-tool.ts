@@ -81,7 +81,7 @@ export default class YoutubeTranscriptTool extends AbstractTool {
         .map(segment => segment.snippet.text)
         .join(' ');
 
-      return { success: true, response: formattedTranscript };
+      return formattedTranscript;
     } catch (error) {
       console.error('Error details:', error);
       return {

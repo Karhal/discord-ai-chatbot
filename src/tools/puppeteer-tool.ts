@@ -19,16 +19,24 @@ export default class PuppeteerTool extends AbstractTool {
 
   readonly execute = async (webpageUrl: string) => {
     webpageUrl = JSON.parse(webpageUrl).webpageUrl;
+
+    const timeout = ConfigManager.config.puppeteer.timeout || 180000;
     const browser = await puppeteer.launch({
       executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--timeout', timeout.toString()],
+      timeout: timeout
     });
     try {
       const page = await browser.newPage();
+
+      page.setDefaultTimeout(timeout);
+      page.setDefaultNavigationTimeout(timeout);
+
       await page.goto(webpageUrl, {
-        timeout: 30000,
+        timeout: timeout,
         waitUntil: 'networkidle0'
       });
+
       const bodyContent = await page.evaluate(() => {
         const elementsToRemove = [
           'script',
@@ -54,7 +62,7 @@ export default class PuppeteerTool extends AbstractTool {
         const content = document.body.innerHTML;
         return content.replace(/data:image\/[^;]+;base64[^"']+/g, '[image]');
       });
-      return { content: bodyContent };
+      return bodyContent;
     }
     catch (error) {
       return { error: 'Failed to fetch webpage content' };
