@@ -30,7 +30,7 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
   private flowiseConfig = ConfigManager.config.flowise;
   private imageHandler = new ImageHandler();
   private maxRetries = 2;
-  private timeoutMs = 60000;
+  private timeoutMs = 300000;
 
   private isImageUrl(url: string): boolean {
     const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];

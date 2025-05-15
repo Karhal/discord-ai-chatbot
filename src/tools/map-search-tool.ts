@@ -45,7 +45,7 @@ export default class MapSearchTool extends AbstractTool {
   public readonly execute = async (
     query: string,
     city: string
-  ): Promise<LocalResults> => {
+  ): Promise<string> => {
     const searchParams: SearchParams = {
       engine: 'google_local',
       q: query,
@@ -58,7 +58,7 @@ export default class MapSearchTool extends AbstractTool {
     try {
       const json = await getJson(searchParams);
       console.log('Maps search results:', json);
-      return json['local_results'];
+      return JSON.stringify(json['local_results']);
     }
     catch (error) {
       console.error('Error fetching maps search results:', error);

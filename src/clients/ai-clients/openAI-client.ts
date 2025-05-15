@@ -9,11 +9,14 @@ import { EventEmitter } from 'events';
 export default class OpenAIClient extends EventEmitter implements AIClientType {
   client: OpenAI;
   openAIConfig = ConfigManager.config.openAI;
+  requestTimeout = this.openAIConfig.requestTimeout || 300000;
 
   constructor() {
     super();
     this.client = new OpenAI({
-      apiKey: this.openAIConfig.apiKey
+      apiKey: this.openAIConfig.apiKey,
+      timeout: this.requestTimeout,
+      maxRetries: 2
     });
   }
 
@@ -158,7 +161,23 @@ export default class OpenAIClient extends EventEmitter implements AIClientType {
     }
     catch (error) {
       console.error('Error in OpenAI completion:', error);
-      return 'Une erreur est survenue lors de la génération de la réponse.';
+
+      // Handle specific error types with user-friendly messages
+      if (error instanceof Error) {
+        if (error.message.includes('timeout') || error instanceof TypeError && error.message.includes('network')) {
+          return 'Sorry, I couldn\'t generate a response. Please try again later.';
+        }
+
+        if (error.message.includes('rate limit')) {
+          return 'Sorry, I\'ve reached my rate limit. Please wait a moment before trying again.';
+        }
+
+        if (error.message.includes('overloaded') || error.message.includes('capacity')) {
+          return 'The servers are currently overloaded. Please try again in a few minutes.';
+        }
+      }
+
+      return 'Sorry, I couldn\'t generate a response. Please try again later.';
     }
   }
 }

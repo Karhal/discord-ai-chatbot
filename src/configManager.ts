@@ -37,6 +37,7 @@ export interface OpenAIClientConfigType {
   fallbackModel: string;
   temperature: number;
   maxTokens: number;
+  requestTimeout?: number;
 }
 export interface ClaudeClientConfigType {
   apiKey: string;
@@ -129,7 +130,9 @@ export interface ModerationConfigType {
   googleSafeBrowsingKey: string;
 }
 
-export type PuppeteerConfigType = ActivatorConfigType;
+export interface PuppeteerConfigType extends ActivatorConfigType {
+  timeout?: number;
+}
 
 export interface FlowiseConfigType extends ActivatorConfigType {
   apiKey: string;
@@ -189,7 +192,8 @@ export default class ConfigManager {
     model: process.env.OPENAI_MODEL || configValues.openAI?.model || 'gpt-4o',
     fallbackModel: process.env.OPENAI_FALLBACK_MODEL || configValues.openAI?.fallbackModel || 'gpt-3.5-turbo',
     maxTokens: process.env.OPENAI_MAX_TOKENS ? parseInt(process.env.OPENAI_MAX_TOKENS) : configValues.openAI?.maxTokens || 2000,
-    temperature: process.env.OPENAI_TEMPERATURE ? parseFloat(process.env.OPENAI_TEMPERATURE) : configValues.openAI?.temperature || 0.5
+    temperature: process.env.OPENAI_TEMPERATURE ? parseFloat(process.env.OPENAI_TEMPERATURE) : configValues.openAI?.temperature || 0.5,
+    requestTimeout: process.env.OPENAI_REQUEST_TIMEOUT ? parseInt(process.env.OPENAI_REQUEST_TIMEOUT) : configValues.openAI?.requestTimeout || 300000
   };
 
   private claudeConfig: ClaudeClientConfigType = {
@@ -297,7 +301,8 @@ export default class ConfigManager {
     metrics: this.metricsConfig,
     youtubeTranscript: this.youtubeTranscriptConfig,
     puppeteer: {
-      active: process.env.PUPPETEER_ACTIVE === 'true' || configValues.puppeteer?.active || true
+      active: process.env.PUPPETEER_ACTIVE === 'true' || configValues.puppeteer?.active || true,
+      timeout: process.env.PUPPETEER_TIMEOUT ? parseInt(process.env.PUPPETEER_TIMEOUT) : configValues.puppeteer?.timeout || 120000
     },
     moderation: this.moderationConfig,
     tradingChart: this.tradingChartConfig,
