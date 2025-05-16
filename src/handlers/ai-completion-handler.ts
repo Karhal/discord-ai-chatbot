@@ -27,7 +27,6 @@ export default class AiCompletionHandler extends EventEmitter {
   }
 
   setTriggerMessage(message: MessageInput) {
-    // Format message content to include attachments if present
     let content = message.content || '';
 
     if (message.attachments && message.attachments.length > 0) {
@@ -40,39 +39,15 @@ export default class AiCompletionHandler extends EventEmitter {
       content,
       id: message.id || Date.now().toString()
     };
-    console.log(`Set trigger message with ID: ${this.triggerMessage.id}`);
-    console.log(`Trigger message content: ${this.triggerMessage.content.substring(0, 100)}...`);
-    if (message.attachments) {
-      console.log(`Trigger message has ${message.attachments.length} attachments`);
-    }
+
   }
 
   async getAiCompletion(channelId: string): Promise<string> {
     try {
       const systemPrompt = this.promptBuilder.createCompletionPrompt();
-      console.log('\n[System Prompt]');
-      console.log(systemPrompt);
-
       const messages = this.getLastMessagesOfAChannel(ConfigManager.config.discord.maxHistory, channelId);
       const formattedMessages = this.createMessagesArrayFromHistory(messages);
-
-      console.log('\n[Before API preparation]');
-      console.log('Number of messages:', formattedMessages.length);
-      formattedMessages.forEach(msg => {
-        console.log(`Message ID: ${msg.id}, Content: ${msg.content.substring(0, 50)}...`);
-      });
-
-      const triggerId = this.triggerMessage?.id;
-
       const apiMessages = this.prepareMessagesForApi(formattedMessages);
-
-      console.log('\n[After API preparation]');
-      console.log('Number of messages:', apiMessages.length);
-      console.log(`Original trigger ID: ${triggerId}`);
-      apiMessages.forEach(msg => {
-        console.log(`Message ID: ${msg.id}, Content: ${msg.content.substring(0, 50)}...`);
-      });
-
       this.logger.debug('AI Completion Request:', { systemPrompt, messages: apiMessages });
       this.emit('completionRequested', { channelId });
 
@@ -135,9 +110,6 @@ export default class AiCompletionHandler extends EventEmitter {
   private convertDiscordMessagesToInput(messages: Collection<string, Message<boolean>>): MessageInput[] {
     const result: MessageInput[] = [];
 
-    console.log('\n[Converting Discord messages to input]');
-    console.log('Trigger message ID:', this.triggerMessage?.id);
-
     messages.reverse().forEach((msg: Message) => {
       const attachments = msg.attachments?.map(attachment => ({
         name: attachment.name,
@@ -183,18 +155,6 @@ export default class AiCompletionHandler extends EventEmitter {
       }
     });
 
-    console.log('\n[Discord Messages to Input]');
-    console.log('Number of converted messages:', result.length);
-    result.forEach((msg, index) => {
-      console.log(`\nMessage ${index + 1}:`);
-      console.log('ID:', msg.id);
-      console.log('Role:', msg.role);
-      console.log('Content:', msg.content.substring(0, 50) + (msg.content.length > 50 ? '...' : ''));
-      if (msg.attachments) {
-        console.log('Attachments:', msg.attachments.length);
-      }
-    });
-
     return result;
   }
 
@@ -203,13 +163,7 @@ export default class AiCompletionHandler extends EventEmitter {
     const result: MessageInput[] = [];
 
     messages.forEach((msg, index) => {
-      console.log(`\nMessage ${index + 1}:`);
-      console.log('Role:', msg.role);
-      console.log('Content:', msg.content);
-      if (msg.attachments) {
-        console.log('Attachments:', msg.attachments.map(a => `${a.name} (${a.url})`).join('\n'));
-      }
-
+      console.log(`Message ${index + 1}: ${msg.role}, Content: ${msg.content.substring(0, 50)}...`);
       result.push({
         role: msg.role,
         content: msg.content,
@@ -223,27 +177,12 @@ export default class AiCompletionHandler extends EventEmitter {
   }
 
   private prepareMessagesForApi(messages: MessageInput[]): MessageInput[] {
-    console.log('\n[Preparing Messages for API]');
-    console.log('\nHistory messages before adding trigger:', messages.length);
-    messages.forEach((msg, i) => {
-      console.log(`Message ${i+1}: ${msg.role}, ID: ${msg.id || 'none'}, Content: ${msg.content.substring(0, 30)}...`);
-    });
 
     const historyMessages = [...messages];
 
     if (this.triggerMessage) {
-      console.log('\nAdding trigger message:', this.triggerMessage.content);
       historyMessages.push(this.triggerMessage);
     }
-    else {
-      console.log('\nNo trigger message to add.');
-    }
-
-    console.log('\n[Final API Messages]');
-    console.log('Total messages:', historyMessages.length);
-    historyMessages.forEach((msg, i) => {
-      console.log(`Message ${i+1}: ${msg.role}, Content: ${msg.content.substring(0, 30)}...`);
-    });
 
     return historyMessages;
   }

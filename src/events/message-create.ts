@@ -41,32 +41,30 @@ export default class MessageCreate extends EventDiscord {
         await this.moderationService.moderateMessage(message);
       }
 
-      if (!message.deleted) {
-        if (this.shouldIgnoreMessage(message)) {
-          return;
-        }
-        this.message = message;
-        const channelId = message.channelId;
-
-        const triggerMessage: MessageInput = {
-          role: 'user',
-          content: `${message.author.username}: ${message.content}`,
-          channelId: channelId,
-          id: message.id,
-          attachments: message.attachments?.map(attachment => ({
-            name: attachment.name,
-            url: attachment.url,
-            contentType: attachment.contentType || 'application/octet-stream'
-          }))
-        };
-        this.aiCompletionHandler.setTriggerMessage(triggerMessage);
-
-        const messagesChannelHistory = await this.fetchChannelHistory(message, this.config.discord.maxHistory);
-        this.aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
-        const content = await this.aiCompletionHandler.getAiCompletion(channelId);
-        await this.sendResponse(message, content);
-        console.log('Done.');
+      if (this.shouldIgnoreMessage(message)) {
+        return;
       }
+      this.message = message;
+      const channelId = message.channelId;
+
+      const triggerMessage: MessageInput = {
+        role: 'user',
+        content: `${message.author.username}: ${message.content}`,
+        channelId: channelId,
+        id: message.id,
+        attachments: message.attachments?.map(attachment => ({
+          name: attachment.name,
+          url: attachment.url,
+          contentType: attachment.contentType || 'application/octet-stream'
+        }))
+      };
+      this.aiCompletionHandler.setTriggerMessage(triggerMessage);
+
+      const messagesChannelHistory = await this.fetchChannelHistory(message, this.config.discord.maxHistory);
+      this.aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
+      const content = await this.aiCompletionHandler.getAiCompletion(channelId);
+      await this.sendResponse(message, content);
+      console.log('Done.');
     }
     catch (error) {
       console.error('Error in message handler:', error);
@@ -81,16 +79,21 @@ export default class MessageCreate extends EventDiscord {
 
     const chunks = this.splitResponseIntoChunks(response, 2000);
 
-    for (const chunk of chunks) {
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
       if (message.channel instanceof TextChannel) {
-        await message.channel.send(chunk);
+        if (i === 0) {
+          await message.reply(chunk);
+        }
+        else {
+          await message.channel.send(chunk);
+        }
       }
     }
 
     const metricsService = MetricsService.getInstance();
     const channelId = message.channelId;
     const channelAttachmentsPath = `${this.config.tmpFolder.path}/${channelId}`;
-    // Check if the directory exists before trying to get files
     const folderExists = fs.existsSync(path.join('.', channelAttachmentsPath));
     const attachmentsPath = folderExists
       ? FileHandler.getFolderFilenameFullPaths(channelAttachmentsPath)
@@ -135,14 +138,17 @@ export default class MessageCreate extends EventDiscord {
     const botName = this.discordClient.user?.username;
     const botId = this.discordClient.user?.id;
     const triggerWords = ConfigManager.config.triggerWords;
-    if (!!botName || !!botId) {
-      return (
-        (!!botName && message.content.toLowerCase().includes(botName.toLowerCase())) ||
-        (!!botId && message.content.toLowerCase().includes('<@' + botId + '>')) ||
-        triggerWords.some((word) => message.content.toLowerCase().includes(word.toLowerCase()))
-      );
+
+    if (!botName && !botId) {
+      return false;
     }
-    return false;
+
+    const contentLower = message.content.toLowerCase();
+    const nameMatch = !!botName && contentLower.includes(botName.toLowerCase());
+    const idMatch = !!botId && contentLower.includes('<@' + botId + '>');
+    const triggerWordMatch = triggerWords.some((word) => contentLower.includes(word.toLowerCase()));
+
+    return nameMatch || idMatch || triggerWordMatch;
   }
 
   private setupEventListeners(): void {
@@ -154,7 +160,7 @@ export default class MessageCreate extends EventDiscord {
         }
       }
       else {
-        console.error('ChannelId manquant dans les données de completion');
+        console.error('Missing ChannelId in completion data');
       }
     });
   }
