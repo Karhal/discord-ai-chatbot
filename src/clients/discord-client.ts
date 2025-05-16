@@ -2,14 +2,13 @@ import { Client, GatewayIntentBits } from 'discord.js';
 import Ready from '../events/ready';
 import MessageCreate from '../events/message-create';
 import AIClient from './ai-client';
-import { AIClientType } from '../types/AIClientType';
 import ConfigManager, { DiscordConfigType } from '../configManager';
 
 export default class DiscordClient {
   discordClient: Client;
   private discordConfig: DiscordConfigType;
 
-  aiClient: AIClientType = new AIClient();
+  aiClient: AIClient = new AIClient();
   ready = false;
 
   constructor() {
