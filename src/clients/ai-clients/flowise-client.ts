@@ -96,7 +96,11 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
         signal: controller.signal
       });
 
-      if (!response.ok && retries < this.maxRetries) {
+      if (!response) {
+        throw new Error('Fetch returned undefined response');
+      }
+
+      if (!response.ok && retries < this.maxRetries && (!response.status || response.status >= 500)) {
         console.log(`Retry ${retries + 1}/${this.maxRetries} for Flowise request`);
         return this.fetchWithRetry(url, options, retries + 1);
       }
@@ -252,7 +256,7 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
   }
 
   async getAiCompletion(systemPrompt: string, messages: MessageInput[], tools: AITool[]): Promise<string> {
-    const response = await this.message(ConfigManager.config.AIPrompt, messages);
+    const response = await this.message(ConfigManager.config.AIPrompt.trim(), messages);
     if (!response) {
       throw new Error('No response from Flowise');
     }
