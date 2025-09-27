@@ -150,7 +150,6 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
       });
 
       console.log('\n[Flowise Client] Preparing API request:');
-      console.log('History messages:', historyWithoutLast);
       console.log('Last message (as question):', lastMessage.content.substring(0, 50) + (lastMessage.content.length > 50 ? '...' : ''));
       const requestBody = {
         question: lastMessage.content,
