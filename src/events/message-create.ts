@@ -11,15 +11,18 @@ import AiCompletionHandler from '../handlers/ai-completion-handler';
 import { EventEmitter } from 'events';
 import fs from 'fs';
 import path from 'path';
+import { Logger } from '../utils/logger';
 
 export default class MessageCreate extends EventDiscord {
 
   eventName: Events = Events.MessageCreate;
-  intervalDate: NodeJS.Timeout | null = null;
+  intervalDate: ReturnType<typeof setTimeout> | null = null;
   message: Message | null = null;
   config = ConfigManager.config;
   private moderationService: ModerationService;
   public aiCompletionHandler: AiCompletionHandler;
+  private logger: Logger = new Logger('info');
+  private static channelQueues: Map<string, Promise<void>> = new Map();
 
   constructor(
     public discordClient: Client,
@@ -39,6 +42,9 @@ export default class MessageCreate extends EventDiscord {
     try {
       if (ConfigManager.config.moderation.enabled) {
         await this.moderationService.moderateMessage(message);
+        if (message.deleted) {
+          return;
+        }
       }
 
       if (this.shouldIgnoreMessage(message)) {
@@ -52,7 +58,7 @@ export default class MessageCreate extends EventDiscord {
         content: `${message.author.username}: ${message.content}`,
         channelId: channelId,
         id: message.id,
-        attachments: message.attachments?.map(attachment => ({
+        attachments: message.attachments?.map((attachment: any) => ({
           name: attachment.name,
           url: attachment.url,
           contentType: attachment.contentType || 'application/octet-stream'
@@ -62,12 +68,14 @@ export default class MessageCreate extends EventDiscord {
 
       const messagesChannelHistory = await this.fetchChannelHistory(message, this.config.discord.maxHistory);
       this.aiCompletionHandler.setChannelHistory(channelId, messagesChannelHistory);
+      const stopTyping = this.startTypingLoop(message);
       const content = await this.aiCompletionHandler.getAiCompletion(channelId);
       await this.sendResponse(message, content);
-      console.log('Done.');
+      stopTyping();
+      this.logger.info('Response sent.', { channelId });
     }
     catch (error) {
-      console.error('Error in message handler:', error);
+      this.logger.error('Error in message handler:', error);
     }
   };
 
@@ -82,11 +90,21 @@ export default class MessageCreate extends EventDiscord {
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
       if (message.channel instanceof TextChannel) {
-        if (i === 0) {
-          await message.reply(chunk);
-        }
-        else {
-          await message.channel.send(chunk);
+        await this.enqueueSend(message.channelId, async () => {
+          if (i === 0) {
+            try {
+              await message.reply({ content: chunk, allowedMentions: { parse: [] } });
+            }
+            catch (err) {
+              await message.channel.send({ content: chunk, allowedMentions: { parse: [] } });
+            }
+          }
+          else {
+            await message.channel.send({ content: chunk, allowedMentions: { parse: [] } });
+          }
+        });
+        if (i > 0) {
+          await this.sleep(300);
         }
       }
     }
@@ -114,9 +132,11 @@ export default class MessageCreate extends EventDiscord {
 
     if (attachmentsPath.length > 0) {
       if (message.channel instanceof TextChannel) {
-        await message.channel.send({ files: [...attachmentsPath] });
+        await this.enqueueSend(message.channelId, async () => {
+          await message.channel.send({ files: [...attachmentsPath], allowedMentions: { parse: [] } });
+        });
       }
-      console.log('Attachments sent');
+      this.logger.info('Attachments sent', { count: attachmentsPath.length, channelId });
       FileHandler.emptyFolder(channelAttachmentsPath);
     }
     return true;
@@ -135,24 +155,20 @@ export default class MessageCreate extends EventDiscord {
   }
 
   private theMessageContainsBotName(message: Message): boolean {
-    const botName = this.discordClient.user?.username;
     const botId = this.discordClient.user?.id;
-    const triggerWords = ConfigManager.config.triggerWords;
-
-    if (!botName && !botId) {
-      return false;
-    }
-
     const contentLower = message.content.toLowerCase();
-    const nameMatch = !!botName && contentLower.includes(botName.toLowerCase());
-    const idMatch = !!botId && contentLower.includes('<@' + botId + '>');
-    const triggerWordMatch = triggerWords.some((word) => contentLower.includes(word.toLowerCase()));
+    const triggerWords = (this.config.triggerWords || []);
+    const configBotName = this.config.discord.botName?.toLowerCase();
 
-    return nameMatch || idMatch || triggerWordMatch;
+    const mentionMatch = !!botId && message.mentions?.users?.has(botId);
+    const botNameMatch = !!configBotName && contentLower.includes(configBotName);
+    const triggerWordMatch = triggerWords.some((word) => contentLower.includes(word));
+
+    return Boolean(mentionMatch || botNameMatch || triggerWordMatch);
   }
 
   private setupEventListeners(): void {
-    this.aiCompletionHandler.on('completionRequested', (data) => {
+    (this.aiCompletionHandler as any).on('completionRequested', (data: { channelId?: string }) => {
       if (data && data.channelId) {
         const channel = this.discordClient.channels.cache.get(data.channelId);
         if (channel && channel instanceof TextChannel) {
@@ -160,7 +176,7 @@ export default class MessageCreate extends EventDiscord {
         }
       }
       else {
-        console.error('Missing ChannelId in completion data');
+        this.logger.warn('Missing ChannelId in completion data');
       }
     });
   }
@@ -188,5 +204,34 @@ export default class MessageCreate extends EventDiscord {
     }
 
     return chunks;
+  }
+
+  private async enqueueSend(channelId: string, task: () => Promise<void>): Promise<void> {
+    const prev = MessageCreate.channelQueues.get(channelId) || Promise.resolve();
+    const next = prev.then(task).catch((err) => {
+      this.logger.error('Channel send failed', { channelId, err });
+    });
+    MessageCreate.channelQueues.set(channelId, next);
+    await next;
+  }
+
+  private sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  private startTypingLoop(message: Message): () => void {
+    try {
+      if (message.channel instanceof TextChannel) {
+        message.channel.sendTyping();
+        const interval = setInterval(() => {
+          message.channel.sendTyping();
+        }, 8000);
+        return () => clearInterval(interval);
+      }
+    }
+    catch (e) {
+      this.logger.warn('Failed to start typing loop');
+    }
+    return () => {};
   }
 }

@@ -152,11 +152,14 @@ export default class ConfigManager {
     process.env.AI_PROMPT || configValues.AIPrompt || 'You are a nice assistant in a discord server';
 
   private triggerWords: string[] = (() => {
+    const normalize = (arr: string[]) =>
+      Array.from(new Set(arr.map(w => String(w).trim().toLowerCase()).filter(Boolean)));
+
     if (process.env.TRIGGER_WORDS) {
-      return process.env.TRIGGER_WORDS.split(',');
+      return normalize(process.env.TRIGGER_WORDS.split(','));
     }
     if (configValues.triggerWords && Array.isArray(configValues.triggerWords)) {
-      return configValues.triggerWords;
+      return normalize(configValues.triggerWords);
     }
     console.warn('No trigger words defined. Using an empty array.');
     return [];
@@ -301,7 +304,7 @@ export default class ConfigManager {
     metrics: this.metricsConfig,
     youtubeTranscript: this.youtubeTranscriptConfig,
     puppeteer: {
-      active: process.env.PUPPETEER_ACTIVE === 'true' || configValues.puppeteer?.active || true,
+      active: process.env.PUPPETEER_ACTIVE === 'true' || configValues.puppeteer?.active || false,
       timeout: process.env.PUPPETEER_TIMEOUT ? parseInt(process.env.PUPPETEER_TIMEOUT) : configValues.puppeteer?.timeout || 120000
     },
     moderation: this.moderationConfig,

@@ -42,6 +42,7 @@ export default class AIClient extends EventEmitter implements AIClientType {
 
   private extractResponseTagContent(text: string): string {
     if (!text) return '';
+    console.log('Message from AI', text);
     const match = text.match(/<response>([\s\S]*?)<\/response>/i);
     return match ? match[1].trim() : text;
   }
