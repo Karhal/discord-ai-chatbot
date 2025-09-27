@@ -11,7 +11,6 @@ import SerpSearchTool from './serp-search-tool';
 import StableDiffusionTool from './stablediffusion-tool';
 import GiphyTool from './giphy-tool';
 import YoutubeTranscriptTool from './youtube-transcript-tool';
-import PuppeteerTool from './puppeteer-tool';
 import TradingChartTool from './trading-chart-tool';
 const toolList: (typeof AbstractTool)[] = [
   DallETool,
@@ -26,7 +25,6 @@ const toolList: (typeof AbstractTool)[] = [
   FluxGeneratorTool,
   StableDiffusionTool,
   YoutubeTranscriptTool,
-  PuppeteerTool,
   TradingChartTool
 ];
 

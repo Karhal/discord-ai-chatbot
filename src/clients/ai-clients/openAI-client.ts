@@ -74,7 +74,7 @@ export default class OpenAIClient extends EventEmitter implements AIClientType {
     messages.forEach(msg => {
       formattedMessages.push({
         role: msg.role as 'user' | 'assistant' | 'system',
-        content: msg.content
+        content: typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content)
       });
     });
 
@@ -108,7 +108,7 @@ export default class OpenAIClient extends EventEmitter implements AIClientType {
 
         formattedMessages.push(responseMessage as any);
 
-        const toolResponses = [];
+        const toolResponses = [] as Array<{ role: 'tool'; tool_call_id: string; content: string }>;
 
         for (const toolCall of toolCalls) {
           const functionName = toolCall.function.name;
@@ -119,7 +119,7 @@ export default class OpenAIClient extends EventEmitter implements AIClientType {
           }
 
           const tool = tools.find(t => t.name === functionName);
-          let toolResponse = '';
+          let toolResponse: unknown = '';
 
           if (tool) {
             toolResponse = await tool.function.function(JSON.stringify(functionArgs));
@@ -128,10 +128,14 @@ export default class OpenAIClient extends EventEmitter implements AIClientType {
             toolResponse = JSON.stringify({ error: `Tool ${functionName} not found` });
           }
 
+          const contentString = typeof toolResponse === 'string'
+            ? toolResponse
+            : (() => { try { return JSON.stringify(toolResponse); } catch { return String(toolResponse); } })();
+
           toolResponses.push({
             role: 'tool',
             tool_call_id: toolCall.id,
-            content: toolResponse
+            content: contentString
           });
         }
 
