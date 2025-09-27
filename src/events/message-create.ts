@@ -158,13 +158,15 @@ export default class MessageCreate extends EventDiscord {
     const botId = this.discordClient.user?.id;
     const contentLower = message.content.toLowerCase();
     const triggerWords = (this.config.triggerWords || []);
-    const configBotName = this.config.discord.botName?.toLowerCase();
+    const configuredName = (this.config.discord.botName || (this.config as any).botName)?.toLowerCase();
 
-    const mentionMatch = !!botId && message.mentions?.users?.has(botId);
-    const botNameMatch = !!configBotName && contentLower.includes(configBotName);
-    const triggerWordMatch = triggerWords.some((word) => contentLower.includes(word));
+    const mentionByObject = !!botId && message.mentions?.users?.has(botId);
+    const mentionByText = !!botId && new RegExp(`<@!?${botId}>`).test(message.content);
+    const mentionMatch = Boolean(mentionByObject || mentionByText);
+    const botNameMatch = !!configuredName && contentLower.includes(configuredName);
+    const triggerWordMatch = triggerWords.some((word) => contentLower.includes(String(word).toLowerCase()));
 
-    return Boolean(mentionMatch || botNameMatch || triggerWordMatch);
+    return mentionMatch || botNameMatch || triggerWordMatch;
   }
 
   private setupEventListeners(): void {
