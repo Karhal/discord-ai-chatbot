@@ -139,16 +139,18 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
     try {
       const lastMessage = validMessages[validMessages.length - 1];
       const channelId = lastMessage.channelId;
-      const historyWithoutLast = validMessages.slice(0, -1).map(msg => ({
-        role: msg.role === 'assistant' ? 'apiMessage' : 'userMessage',
-        content: msg.content || ''
-      }));
+
+      const historyWithoutLast = validMessages.slice(0, -1).map(msg => {
+        const normalizedRole = (msg.role || '').toString().trim().toLowerCase();
+        const asFlowiseRole = normalizedRole === 'assistant' ? 'apiMessage' : 'userMessage';
+        return {
+          role: asFlowiseRole,
+          content: msg.content || ''
+        };
+      });
 
       console.log('\n[Flowise Client] Preparing API request:');
-      console.log('History messages:', historyWithoutLast.length);
       console.log('Last message (as question):', lastMessage.content.substring(0, 50) + (lastMessage.content.length > 50 ? '...' : ''));
-      console.log('Channel ID:', channelId);
-
       const requestBody = {
         question: lastMessage.content,
         overrideConfig: {
@@ -261,6 +263,18 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
     if (!response) {
       throw new Error('No response from Flowise');
     }
-    return response;
+    
+    // Clean <response> tags from Flowise response (same logic as AIClient.extractResponseTagContent)
+    let cleanedResponse = response;
+    const pairedMatch = cleanedResponse.match(/<response\b[^>]*>([\s\S]*?)<\/response>/i);
+    if (pairedMatch) {
+      cleanedResponse = pairedMatch[1].trim();
+    } else {
+      cleanedResponse = cleanedResponse
+        .replace(/<response\b[^>]*>/ig, '')
+        .replace(/<\/response>/ig, '');
+    }
+    
+    return cleanedResponse.trim();
   }
 }

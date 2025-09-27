@@ -42,7 +42,8 @@ export default class MessageCreate extends EventDiscord {
     try {
       if (ConfigManager.config.moderation.enabled) {
         await this.moderationService.moderateMessage(message);
-        if (message.deleted) {
+        const wasDeleted = (message as unknown as { deleted?: boolean }).deleted === true;
+        if (wasDeleted) {
           return;
         }
       }
@@ -90,17 +91,18 @@ export default class MessageCreate extends EventDiscord {
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
       if (message.channel instanceof TextChannel) {
+        const textChannel = message.channel as TextChannel;
         await this.enqueueSend(message.channelId, async () => {
           if (i === 0) {
             try {
               await message.reply({ content: chunk, allowedMentions: { parse: [] } });
             }
             catch (err) {
-              await message.channel.send({ content: chunk, allowedMentions: { parse: [] } });
+              await textChannel.send({ content: chunk, allowedMentions: { parse: [] } });
             }
           }
           else {
-            await message.channel.send({ content: chunk, allowedMentions: { parse: [] } });
+            await textChannel.send({ content: chunk, allowedMentions: { parse: [] } });
           }
         });
         if (i > 0) {
@@ -132,8 +134,9 @@ export default class MessageCreate extends EventDiscord {
 
     if (attachmentsPath.length > 0) {
       if (message.channel instanceof TextChannel) {
+        const textChannel = message.channel as TextChannel;
         await this.enqueueSend(message.channelId, async () => {
-          await message.channel.send({ files: [...attachmentsPath], allowedMentions: { parse: [] } });
+          await textChannel.send({ files: [...attachmentsPath], allowedMentions: { parse: [] } });
         });
       }
       this.logger.info('Attachments sent', { count: attachmentsPath.length, channelId });
@@ -174,7 +177,7 @@ export default class MessageCreate extends EventDiscord {
       if (data && data.channelId) {
         const channel = this.discordClient.channels.cache.get(data.channelId);
         if (channel && channel instanceof TextChannel) {
-          channel.sendTyping();
+          void this.safeSendTyping(channel);
         }
       }
       else {
@@ -217,6 +220,20 @@ export default class MessageCreate extends EventDiscord {
     await next;
   }
 
+  private async safeSendTyping(channel: TextChannel): Promise<void> {
+    try {
+      await channel.sendTyping();
+    }
+    catch (err: unknown) {
+      const error = err as any;
+      this.logger.debug('sendTyping failed', {
+        channelId: channel.id,
+        message: error?.message,
+        code: error?.code
+      });
+    }
+  }
+
   private sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
@@ -224,9 +241,10 @@ export default class MessageCreate extends EventDiscord {
   private startTypingLoop(message: Message): () => void {
     try {
       if (message.channel instanceof TextChannel) {
-        message.channel.sendTyping();
+        const channel = message.channel;
+        void this.safeSendTyping(channel);
         const interval = setInterval(() => {
-          message.channel.sendTyping();
+          void this.safeSendTyping(channel);
         }, 8000);
         return () => clearInterval(interval);
       }

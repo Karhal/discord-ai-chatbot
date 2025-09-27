@@ -122,14 +122,29 @@ export default class AiCompletionHandler extends EventEmitter {
 
       if (!hasContent && !hasAttachments) return;
 
-      const role = msg.author.id === this.botId ? 'assistant' : 'user';
+      const isAssistant = msg.author.id === this.botId;
+      const role = isAssistant ? 'assistant' : 'user';
       const content = msg.content;
       const author = msg.author.username;
 
       if (role === 'assistant') {
+        // Clean any residual <response> tags from bot messages in history + log if found
+        let cleanedContent = content;
+        const pairedMatch = cleanedContent.match(/<response\b[^>]*>([\s\S]*?)<\/response>/i);
+        if (pairedMatch) {
+          console.warn(`🐛 [ANOMALY] Found <response> tags in Discord history for message ${msg.id}:`, content.substring(0, 100));
+          cleanedContent = pairedMatch[1].trim();
+        } else if (cleanedContent.includes('<response>') || cleanedContent.includes('</response>')) {
+          console.warn(`🐛 [ANOMALY] Found partial <response> tags in Discord history for message ${msg.id}:`, content.substring(0, 100));
+          cleanedContent = cleanedContent
+            .replace(/<response\b[^>]*>/ig, '')
+            .replace(/<\/response>/ig, '')
+            .trim();
+        }
+        
         const assistantContent = hasAttachments
-          ? attachments.map(a => a.url).join('\\n')
-          : content;
+          ? `${author}: ${cleanedContent}\n[Attachements: ${attachments.map(a => `${a.name} (${a.url})`).join(', ')}]`
+          : `${author}: ${cleanedContent}`;
         if (assistantContent.trim().length > 0) {
           result.push({
             role: 'assistant',
