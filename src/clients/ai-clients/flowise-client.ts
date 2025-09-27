@@ -153,6 +153,7 @@ export default class FlowiseClient extends EventEmitter implements AIClientType 
         question: lastMessage.content,
         overrideConfig: {
           agentName: ConfigManager.config.discord.botName,
+          sessionId: channelId,
           vars: {
             user_prompt: systemPrompt
           }

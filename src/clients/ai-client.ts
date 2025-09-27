@@ -7,7 +7,7 @@ import FlowiseClient from './ai-clients/flowise-client';
 import { EventEmitter } from 'events';
 
 export default class AIClient extends EventEmitter implements AIClientType {
-  client: AIClientType | undefined;
+  client: (AIClientType & EventEmitter) | undefined;
 
   constructor() {
     super();
@@ -27,7 +27,7 @@ export default class AIClient extends EventEmitter implements AIClientType {
       console.log('AI Client not initialized');
     }
     if (this.client) {
-      this.client.on('working', (data) => {
+      this.client.on('working', (data: unknown) => {
         this.emit('completionRequested', data);
       });
     }
@@ -36,6 +36,13 @@ export default class AIClient extends EventEmitter implements AIClientType {
   async getAiCompletion(systemPrompt: string, conversation: MessageInput[], tools: AITool[]): Promise<string> {
     if (!this.client) return '';
     this.emit('completionRequested', { systemPrompt, conversation });
-    return await this.client.getAiCompletion(systemPrompt, conversation, tools);
+    const rawResponse = await this.client.getAiCompletion(systemPrompt, conversation, tools);
+    return this.extractResponseTagContent(rawResponse);
+  }
+
+  private extractResponseTagContent(text: string): string {
+    if (!text) return '';
+    const match = text.match(/<response>([\s\S]*?)<\/response>/i);
+    return match ? match[1].trim() : text;
   }
 }
