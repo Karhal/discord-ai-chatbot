@@ -93,7 +93,7 @@ export default class MessageCreate extends EventDiscord {
         await this.enqueueSend(message.channelId, async () => {
           if (i === 0) {
             try {
-              await message.reply({ content: chunk, allowedMentions: { parse: [] } });
+              await message.reply({ content: chunk, allowedMentions: { parse: [], repliedUser: true } });
             }
             catch (err) {
               await message.channel.send({ content: chunk, allowedMentions: { parse: [] } });
